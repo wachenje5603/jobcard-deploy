@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MCRH - Analytics</title>
+
+    <!-- Firebase v9 -->
+    <script type="importmap">
+        {
+            "imports": {
+                "firebase/app": "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js",
+                "firebase/auth": "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js",
+                "firebase/firestore": "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"
+            }
+        }
+    </script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- jsPDF & html2canvas for PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Segoe UI', sans-serif; background:#f4f6f9; padding:20px; }
+        .container { max-width:1400px; margin:0 auto; }
+        .header { display:flex; justify-content:space-between; align-items:center; background:white; padding:16px 24px; border-radius:12px; margin-bottom:24px; box-shadow:0 2px 8px rgba(0,0,0,0.06); }
+        .header h1 { color:#C8102E; }
+        .header .user-info { font-size:14px; font-weight:500; }
+        .header .user-info .role-tag { font-weight:400; color:#6c757d; }
+        .btn { padding:8px 18px; border:none; border-radius:6px; font-weight:600; cursor:pointer; transition:0.2s; }
+        .btn-primary { background:#C8102E; color:white; }
+        .btn-primary:hover { background:#a00d24; }
+        .btn-outline { background:transparent; border:1.5px solid #6c757d; color:#6c757d; }
+        .btn-outline:hover { background:#6c757d; color:white; }
+        .btn-success { background:#28a745; color:white; }
+        .btn-success:hover { background:#1e7e34; }
+        .btn-logout { background:#6c757d; color:white; padding:8px 16px; border:none; border-radius:6px; cursor:pointer; font-weight:600; transition:0.2s; }
+        .btn-logout:hover { background:#5a6268; }
+        .filter-bar { display:flex; gap:12px; margin-bottom:20px; flex-wrap:wrap; align-items:end; }
+        .filter-bar label { font-weight:600; }
+        .filter-bar input { padding:8px 14px; border:1px solid #ced4da; border-radius:6px; }
+        .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:24px; }
+        .chart-container { background:white; padding:20px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.06); }
+        .chart-container h3 { margin-bottom:12px; }
+        .toast { position:fixed; top:20px; right:20px; background:#1e2a3a; color:white; padding:14px 28px; border-radius:8px; font-weight:500; z-index:999; transform:translateY(-20px); opacity:0; transition:0.3s; border-left:6px solid #C8102E; max-width:380px; }
+        .toast.show { transform:translateY(0); opacity:1; }
+        @media (max-width:768px) { .grid-2 { grid-template-columns:1fr; } }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>📊 Maintenance Analytics</h1>
+            </div>
+            <div>
+                <span class="user-info" id="userDisplay">Loading...</span>
+                <button class="btn-logout" onclick="logout()" style="margin-left:12px;"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                <button class="btn btn-outline" onclick="window.location.href='dashboard.html'" style="margin-left:8px;"><i class="fas fa-arrow-left"></i> Back</button>
+                <button class="btn btn-success" onclick="exportPDF()" style="margin-left:8px;"><i class="fas fa-file-pdf"></i> Export PDF</button>
+            </div>
+        </div>
+
+        <div class="filter-bar">
+            <label>From: <input type="date" id="fromDate" /></label>
+            <label>To: <input type="date" id="toDate" /></label>
+            <button class="btn btn-primary" onclick="applyDateFilter()">Apply</button>
+        </div>
+
+        <div class="grid-2">
+            <div class="chart-container"><h3>Jobs per Month</h3><canvas id="monthlyChart"></canvas></div>
+            <div class="chart-container"><h3>Failure Reasons</h3><canvas id="failureChart"></canvas></div>
+            <div class="chart-container"><h3>Status Breakdown</h3><canvas id="statusChart"></canvas></div>
+            <div class="chart-container"><h3>Average Completion Time (Days)</h3><canvas id="timeChart"></canvas></div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast">Message</div>
+
+    <script type="module">
+        // ============================================================
+        // FIREBASE CONFIG (REPLACE WITH YOUR OWN)
+        // ============================================================
+        const firebaseConfig = {
+  apiKey: "AIzaSyDnsz1s-VnewbUszXNJptcdMZ_h0QsNHYQ",
+  authDomain: "moivoibiomed.firebaseapp.com",
+  databaseURL: "https://moivoibiomed-default-rtdb.firebaseio.com",
+  projectId: "moivoibiomed",
+  storageBucket: "moivoibiomed.firebasestorage.app",
+  messagingSenderId: "996551978571",
+  appId: "1:996551978571:web:f44941649a58e020f5e7ce"
+};
+
+        import { initializeApp } from 'firebase/app';
+        import { getAuth, signOut, onAuthStateChanged } from 'firebase/auth';
+        import { getFirestore, collection, getDocs, doc, getDoc, query, orderBy } from 'firebase/firestore';
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const userDisplay = document.getElementById('userDisplay');
+        let allJobCards = [];
+        let chartInstances = {};
+
+        // ===== TOAST =====
+        function showToast(msg, isError = false) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.style.borderLeftColor = isError ? '#dc3545' : '#C8102E';
+            t.classList.add('show');
+            clearTimeout(t._timer);
+            t._timer = setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        // ===== LOGOUT =====
+        window.logout = function() {
+            signOut(auth).then(() => window.location.href = 'login.html')
+                .catch(err => showToast('Logout error: ' + err.message, true));
+        };
+
+        // ===== FETCH JOBCARDS =====
+        async function fetchJobCards() {
+            try {
+                const snap = await getDocs(query(collection(db, 'jobcards'), orderBy('updatedAt', 'desc')));
+                allJobCards = [];
+                snap.forEach(doc => { allJobCards.push({ id: doc.id, ...doc.data() }); });
+                console.log(`✅ Fetched ${allJobCards.length} jobcards for analytics.`);
+            } catch (err) {
+                showToast('Error fetching jobcards: ' + err.message, true);
+            }
+        }
+
+        function filterByDate(from, to) {
+            return allJobCards.filter(j => {
+                const d = j.updatedAt ? new Date(j.updatedAt) : new Date(j.createdAt);
+                return (!from || d >= new Date(from)) && (!to || d <= new Date(to));
+            });
+        }
+
+        function renderCharts(data) {
+            // Destroy existing charts
+            Object.values(chartInstances).forEach(c => c.destroy());
+            chartInstances = {};
+
+            // Monthly breakdown
+            const months = {};
+            data.forEach(j => {
+                const d = j.updatedAt ? new Date(j.updatedAt) : new Date(j.createdAt);
+                const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+                months[key] = (months[key] || 0) + 1;
+            });
+            const labels = Object.keys(months).sort();
+            const values = labels.map(l => months[l]);
+            const ctx1 = document.getElementById('monthlyChart').getContext('2d');
+            chartInstances.monthly = new Chart(ctx1, {
+                type: 'bar',
+                data: { labels, datasets: [{ label: 'Jobs', data: values, backgroundColor: '#C8102E' }] },
+                options: { responsive: true }
+            });
+
+            // Failure reasons
+            const failures = {};
+            data.forEach(j => {
+                if (j.writeOffReason) {
+                    failures[j.writeOffReason] = (failures[j.writeOffReason] || 0) + 1;
+                }
+            });
+            const labels2 = Object.keys(failures);
+            const values2 = labels2.map(l => failures[l]);
+            const ctx2 = document.getElementById('failureChart').getContext('2d');
+            chartInstances.failure = new Chart(ctx2, {
+                type: 'pie',
+                data: { labels: labels2, datasets: [{ data: values2, backgroundColor: ['#ffc107','#dc3545','#28a745','#17a2b8','#6610f2'] }] },
+                options: { responsive: true }
+            });
+
+            // Status breakdown
+            const statusCounts = { Pending:0, Completed:0, 'Written Off':0 };
+            data.forEach(j => {
+                const s = j.status || 'Pending';
+                if (statusCounts[s] !== undefined) statusCounts[s]++;
+                else statusCounts[s] = 1;
+            });
+            const ctx3 = document.getElementById('statusChart').getContext('2d');
+            chartInstances.status = new Chart(ctx3, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(statusCounts),
+                    datasets: [{ data: Object.values(statusCounts), backgroundColor: ['#ffc107','#28a745','#dc3545'] }]
+                },
+                options: { responsive: true }
+            });
+
+            // Average completion time (days) per month
+            const timeData = {};
+            data.forEach(j => {
+                if (j.startDateTime && j.endDateTime) {
+                    const start = new Date(j.startDateTime);
+                    const end = new Date(j.endDateTime);
+                    const diff = (end - start) / (1000*60*60*24);
+                    if (diff > 0) {
+                        const key = start.getFullYear() + '-' + String(start.getMonth()+1).padStart(2,'0');
+                        if (!timeData[key]) timeData[key] = { total:0, count:0 };
+                        timeData[key].total += diff;
+                        timeData[key].count++;
+                    }
+                }
+            });
+            const labels4 = Object.keys(timeData).sort();
+            const values4 = labels4.map(l => (timeData[l].total / timeData[l].count).toFixed(1));
+            const ctx4 = document.getElementById('timeChart').getContext('2d');
+            chartInstances.time = new Chart(ctx4, {
+                type: 'line',
+                data: { labels: labels4, datasets: [{ label: 'Avg Days', data: values4, borderColor: '#C8102E', fill: false }] },
+                options: { responsive: true }
+            });
+        }
+
+        // ===== APPLY DATE FILTER =====
+        window.applyDateFilter = function() {
+            const from = document.getElementById('fromDate').value;
+            const to = document.getElementById('toDate').value;
+            const filtered = filterByDate(from, to);
+            renderCharts(filtered);
+        };
+
+        // ===== EXPORT PDF =====
+        window.exportPDF = function() {
+            showToast('Generating PDF...');
+            const element = document.querySelector('.container');
+            html2canvas(element, { scale: 2 }).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const imgWidth = 210;
+                const imgHeight = canvas.height * imgWidth / canvas.width;
+                pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+                pdf.save('analytics_report.pdf');
+                showToast('✅ PDF downloaded.');
+            }).catch(err => {
+                showToast('Error generating PDF: ' + err.message, true);
+            });
+        };
+
+        // ============================================================
+        // AUTH & APPROVAL CHECK
+        // ============================================================
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            try {
+                const userDoc = await getDoc(doc(db, 'users', user.uid));
+                if (!userDoc.exists()) {
+                    showToast('User profile not found. Please contact admin.', true);
+                    await signOut(auth);
+                    window.location.href = 'login.html';
+                    return;
+                }
+                const userData = userDoc.data();
+                if (!userData.approved) {
+                    showToast('Your account is pending approval. Please wait for admin.', true);
+                    await signOut(auth);
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                // Only maintenance and admin can view analytics
+                const role = userData.role || 'requester';
+                if (role !== 'maintenance' && role !== 'admin') {
+                    alert('Access denied. You do not have permission to view analytics.');
+                    window.location.href = 'dashboard.html';
+                    return;
+                }
+
+                // Display user info
+                userDisplay.textContent = `${userData.name || 'User'} (${role})`;
+
+                // Fetch data and render
+                await fetchJobCards();
+                const now = new Date();
+                const oneYearAgo = new Date(now.getFullYear()-1, now.getMonth(), now.getDate());
+                document.getElementById('fromDate').value = oneYearAgo.toISOString().split('T')[0];
+                document.getElementById('toDate').value = now.toISOString().split('T')[0];
+                applyDateFilter();
+
+            } catch (err) {
+                console.error(err);
+                showToast('Error loading profile: ' + err.message, true);
+            }
+        });
+    </script>
+</body>
+</html>

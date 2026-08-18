@@ -1,0 +1,1544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MCRH - Job Card</title>
+
+    <!-- Firebase v9 -->
+    <script type="importmap">
+        {
+            "imports": {
+                "firebase/app": "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js",
+                "firebase/auth": "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js",
+                "firebase/firestore": "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"
+            }
+        }
+    </script>
+
+    <!-- Signature Pad -->
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js">
+    </script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f4f6f9;
+            padding: 20px;
+            color: #1e2a3a;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 25px 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+        .hospital-header {
+            border-bottom: 4px solid #C8102E;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .logo-area .logo-icon {
+            font-size: 36px;
+            background: #C8102E;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+        .logo-area h1 {
+            font-size: 24px;
+            color: #C8102E;
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+        .logo-area .sub {
+            font-size: 13px;
+            color: #333;
+            font-weight: 500;
+        }
+        .hospital-header .badge {
+            background: #C8102E;
+            color: white;
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .card-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fc;
+            padding: 8px 16px;
+            border-radius: 8px;
+            margin-bottom: 18px;
+        }
+        .card-title h2 {
+            font-size: 20px;
+            color: #1e2a3a;
+            font-weight: 600;
+        }
+        .card-title .status {
+            font-size: 13px;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        .status.pending {
+            background: #ffc107;
+            color: #1e2a3a;
+        }
+        .status.completed {
+            background: #28a745;
+            color: white;
+        }
+        .status.writtenoff {
+            background: #dc3545;
+            color: white;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px 24px;
+        }
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 14px 20px;
+        }
+        .grid-4 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 12px 16px;
+        }
+        .full-width {
+            grid-column: 1 / -1;
+        }
+        .field-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 4px;
+        }
+        .field-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 3px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        .field-group input,
+        .field-group select,
+        .field-group textarea {
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+            transition: 0.2s;
+            font-family: inherit;
+        }
+        .field-group input:focus,
+        .field-group select:focus,
+        .field-group textarea:focus {
+            border-color: #C8102E;
+            outline: 0;
+            box-shadow: 0 0 0 3px rgba(200, 16, 46, 0.15);
+        }
+        .field-group input[readonly] {
+            background: #e9ecef;
+            cursor: default;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 50px;
+        }
+        .section-block {
+            background: #fafbfc;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 18px 20px;
+            margin-top: 18px;
+        }
+        .section-block h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e2a3a;
+            margin-bottom: 14px;
+            border-left: 4px solid #C8102E;
+            padding-left: 12px;
+        }
+        .inline-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px 30px;
+            align-items: center;
+        }
+        .inline-group label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .inline-group input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #C8102E;
+            cursor: pointer;
+        }
+        .signature-area {
+            border-top: 2px dashed #dee2e6;
+            padding-top: 20px;
+            margin-top: 18px;
+        }
+        .signature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        .signature-box {
+            background: #f8f9fa;
+            padding: 16px 18px;
+            border-radius: 8px;
+        }
+        .signature-box h4 {
+            font-size: 14px;
+            margin-bottom: 12px;
+            color: #C8102E;
+        }
+        .sig-pad-wrapper {
+            border: 2px solid #ced4da;
+            border-radius: 6px;
+            background: white;
+            margin: 6px 0 8px 0;
+            touch-action: none;
+            position: relative;
+        }
+        .sig-pad-wrapper canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            touch-action: none;
+            cursor: crosshair;
+        }
+        .sig-pad-wrapper .sig-placeholder {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #adb5bd;
+            font-size: 14px;
+            pointer-events: none;
+        }
+        .sig-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 6px;
+        }
+        .sig-actions .btn-sm {
+            padding: 4px 14px;
+            font-size: 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .sig-actions .btn-clear {
+            background: #dc3545;
+            color: white;
+        }
+        .sig-actions .btn-undo {
+            background: #ffc107;
+            color: #1e2a3a;
+        }
+        .sig-status {
+            font-size: 12px;
+            color: #28a745;
+            margin-top: 4px;
+            display: none;
+        }
+        .sig-status.show {
+            display: block;
+        }
+        .sig-status.signed {
+            color: #28a745;
+        }
+        .sig-status.empty {
+            color: #dc3545;
+        }
+
+        /* Simplified action bar – only save, print, logout */
+        .action-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 20px 0 12px 0;
+            padding: 16px 0;
+            border-top: 1px solid #e9ecef;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-primary {
+            background: #C8102E;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #a00d24;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(200, 16, 46, 0.3);
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #1e7e34;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid #6c757d;
+            color: #6c757d;
+        }
+        .btn-outline:hover {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #b02a37;
+        }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn-sm {
+            padding: 4px 12px;
+            font-size: 12px;
+            border-radius: 4px;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #1e2a3a;
+            color: white;
+            padding: 14px 28px;
+            border-radius: 8px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+            font-weight: 500;
+            z-index: 999;
+            transform: translateY(-20px);
+            opacity: 0;
+            transition: 0.3s ease;
+            border-left: 6px solid #C8102E;
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media print {
+            .action-bar,
+            .btn,
+            .sig-actions,
+            .no-print {
+                display: none !important;
+            }
+            .sig-pad-wrapper canvas {
+                border: 1px solid #000;
+                max-width: 200px;
+            }
+            .field-group input,
+            .field-group select,
+            .field-group textarea {
+                border: none;
+                background: transparent !important;
+                padding: 2px 0;
+                box-shadow: none;
+                color: #000 !important;
+                font-weight: 500;
+            }
+            .field-group input[readonly] {
+                background: transparent !important;
+            }
+            .field-group select {
+                -webkit-appearance: none;
+                appearance: none;
+                border: none;
+                background: transparent;
+                color: #000;
+                font-weight: 500;
+            }
+            .section-block {
+                border: 1px solid #ccc;
+                background: #fafafa;
+                break-inside: avoid;
+            }
+            .sig-placeholder {
+                display: none !important;
+            }
+            .sig-status {
+                display: none !important;
+            }
+            .container {
+                box-shadow: none;
+                padding: 15px;
+            }
+            .sig-pad-wrapper canvas {
+                border: 1px solid #ddd;
+                background: white;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .grid-2,
+            .grid-3,
+            .grid-4 {
+                grid-template-columns: 1fr;
+            }
+            .signature-grid {
+                grid-template-columns: 1fr;
+            }
+            .container {
+                padding: 15px;
+            }
+            .hospital-header {
+                flex-direction: column;
+                align-items: start;
+                gap: 6px;
+            }
+            .action-bar {
+                flex-direction: column;
+            }
+            .action-bar .btn {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- HEADER -->
+    <header class="hospital-header">
+        <div class="logo-area">
+            <div class="logo-icon">M</div>
+            <div>
+                <h1>MOI COUNTY REFERRAL HOSPITAL</h1>
+                <div class="sub">P.O. BOX 18-80300 VOI | Email: biomedsmoivoi@gmail.com</div>
+                <div style="font-size:14px; font-weight:600; color:#C8102E; margin-top:2px;">TAITA TAVETA COUNTY</div>
+            </div>
+        </div>
+        <span class="badge">MINISTRY OF HEALTH</span>
+    </header>
+
+    <div class="card-title">
+        <h2>⚙️ EQUIPMENT MAINTENANCE JOB CARD</h2>
+        <span class="status pending" id="jobStatusBadge">● PENDING</span>
+        <button class="btn btn-danger btn-sm" onclick="logout()" style="margin-left:auto;">🚪 Logout</button>
+    </div>
+
+    <form id="jobcardForm">
+        <!-- AUTO-FILLED FROM REQUEST -->
+        <div class="grid-2">
+            <div class="field-group">
+                <label>Job Card No.</label>
+                <input type="text" id="jobNo" readonly placeholder="Auto-generated" />
+            </div>
+            <div class="field-group">
+                <label>Request No.</label>
+                <select id="jobRequestNo" onchange="loadRequestData()">
+                    <option value="">-- Select Request --</option>
+                </select>
+            </div>
+            <div class="field-group">
+                <label>Reporting Date / Time</label>
+                <input type="datetime-local" id="jobReportingDateTime" readonly />
+            </div>
+            <div class="field-group">
+                <label>Unit / Ward</label>
+                <input type="text" id="jobUnit" readonly />
+            </div>
+            <div class="field-group">
+                <label>Requester Name</label>
+                <input type="text" id="jobRequester" readonly />
+            </div>
+            <div class="field-group">
+                <label>Equipment Name</label>
+                <input type="text" id="jobEquipName" readonly />
+            </div>
+            <div class="field-group">
+                <label>Inventory / Asset No. <span style="color:#6c757d; font-size:11px; font-weight:normal;">(Coming soon)</span></label>
+                <input type="text" id="jobInventory" readonly style="background:#f8f9fa; color:#6c757d;" placeholder="Coming soon" />
+            </div>
+            <div class="field-group">
+                <label>Serial No.</label>
+                <input type="text" id="jobSerial" readonly />
+            </div>
+            <div class="field-group">
+                <label>Model / Make</label>
+                <input type="text" id="jobModel" readonly />
+            </div>
+            <div class="field-group full-width">
+                <label>Complaint by User (from request)</label>
+                <textarea id="jobComplaint" readonly rows="2"></textarea>
+            </div>
+            <div class="field-group full-width">
+                <label>🩺 Diagnosis by Maintenance Team</label>
+                <textarea id="jobDiagnosis" rows="2" placeholder="Preliminary diagnosis..."></textarea>
+            </div>
+        </div>
+
+        <!-- HANDOVER -->
+        <div class="grid-3">
+            <div class="field-group">
+                <label>Received from (Requester)</label>
+                <input type="text" id="jobReceivedFrom" readonly />
+            </div>
+            <div class="field-group">
+                <label>Date / Time Received</label>
+                <input type="datetime-local" id="jobReceivedDateTime" />
+            </div>
+            <div class="field-group">
+                <label>Received by (Technician)</label>
+                <input type="text" id="jobReceivedBy" readonly />
+            </div>
+            <div class="field-group">
+                <label>Handed back to (User)</label>
+                <select id="jobHandedTo">
+                    <option value="">-- Select --</option>
+                </select>
+            </div>
+            <div class="field-group">
+                <label>Date / Time Handed</label>
+                <input type="datetime-local" id="jobHandedDateTime" />
+            </div>
+            <div class="field-group">
+                <label>Handed by (Technician)</label>
+                <input type="text" id="jobHandedBy" readonly />
+            </div>
+        </div>
+
+        <!-- SERVICE TYPE -->
+        <section class="section-block">
+            <h3>🛠️ Service Type</h3>
+            <div class="inline-group">
+                <label><input type="radio" name="serviceType" value="General Service/Overhaul" checked /> General Service/Overhaul</label>
+                <label><input type="radio" name="serviceType" value="Repair" /> Repair</label>
+                <label><input type="radio" name="serviceType" value="PPM (Planned Preventive)" /> PPM (Planned Preventive)</label>
+                <label><input type="radio" name="serviceType" value="Emergency Call" /> Emergency Call</label>
+            </div>
+        </section>
+
+        <!-- TIMELINE -->
+        <section class="section-block">
+            <h3>⏱️ Technician Timeline & Effort</h3>
+            <div class="grid-3">
+                <div class="field-group">
+                    <label>Job Started</label>
+                    <input type="datetime-local" id="jobStartDateTime" />
+                </div>
+                <div class="field-group">
+                    <label>Job Completed</label>
+                    <input type="datetime-local" id="jobEndDateTime" />
+                </div>
+                <div class="field-group">
+                    <label>Total Time (hh:mm)</label>
+                    <input type="text" id="jobTotalTime" readonly placeholder="Auto-calc" />
+                </div>
+                <div class="field-group">
+                    <label>Response Time (hh:mm)</label>
+                    <input type="text" id="jobResponseTime" readonly placeholder="Auto-calc" />
+                </div>
+                <div class="field-group">
+                    <label>Admin / Requisition Time (hh:mm)</label>
+                    <input type="text" id="jobAdminTime" placeholder="e.g. 00:30" />
+                </div>
+            </div>
+        </section>
+
+        <!-- STATUS & COMPLETION -->
+        <section class="section-block">
+            <h3>📌 Job Status & Completion</h3>
+            <div class="field-group">
+                <label>Status</label>
+                <select id="jobStatus" onchange="toggleStatusFields()">
+                    <option value="Pending">Pending / Postponed</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Written Off">Written Off</option>
+                </select>
+            </div>
+
+            <div id="pendingFields" style="margin-top: 12px;">
+                <div class="grid-2">
+                    <div class="field-group">
+                        <label>Reason for Postponement</label>
+                        <select id="jobPostponeReason">
+                            <option value="Low priority">Low priority</option>
+                            <option value="Awaiting spare parts">Awaiting spare parts</option>
+                            <option value="Awaiting approval">Awaiting approval</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="field-group">
+                        <label>Expected Completion Date</label>
+                        <input type="datetime-local" id="jobExpectedDate" />
+                    </div>
+                    <div class="field-group full-width">
+                        <label>Additional Note</label>
+                        <textarea id="jobPostponeNote" rows="2" placeholder="Details..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div id="completedFields" style="display: none; margin-top: 12px;">
+                <div class="field-group">
+                    <label>🔧 Defects Found</label>
+                    <textarea id="jobDefects" rows="2" placeholder="List defects..."></textarea>
+                </div>
+                <div class="field-group">
+                    <label>🛠️ Action Taken</label>
+                    <textarea id="jobActionTaken" rows="2" placeholder="Describe repairs..."></textarea>
+                </div>
+            </div>
+
+            <div id="writtenOffFields" style="display: none; margin-top: 12px;">
+                <div class="field-group">
+                    <label>Reason for Write‑Off</label>
+                    <select id="jobWriteOffReason">
+                        <option value="Wear & Tear">Wear & Tear</option>
+                        <option value="Mainly unstable">Mainly unstable</option>
+                        <option value="Contamination water/oil">Contamination water/oil</option>
+                        <option value="User error">User error</option>
+                        <option value="Rough handling/operator fault">Rough handling/operator fault</option>
+                        <option value="Dirt">Dirt</option>
+                        <option value="Defective/wrong installation">Defective/wrong installation</option>
+                        <option value="Others">Others</option>
+                    </select>
+                </div>
+                <div class="field-group">
+                    <label>Additional Comments</label>
+                    <textarea id="jobWriteOffNote" rows="2" placeholder="Details..."></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- MEASUREMENTS -->
+        <section class="grid-4">
+            <div class="field-group"><label>Current (A)</label><input type="text" id="jobMeasureCurrent" placeholder="N/A" /></div>
+            <div class="field-group"><label>Voltage (V)</label><input type="text" id="jobMeasureVoltage" placeholder="N/A" /></div>
+            <div class="field-group"><label>Insulation (MΩ)</label><input type="text" id="jobMeasureInsulation" placeholder="N/A" /></div>
+            <div class="field-group"><label>Pressure (bar/mbar)</label><input type="text" id="jobMeasurePressure" placeholder="N/A" /></div>
+        </section>
+
+        <!-- FINAL CHECKS -->
+        <section class="section-block">
+            <h3>✅ Final Verification</h3>
+            <div class="inline-group" style="margin-bottom:12px;">
+                <label><input type="checkbox" id="jobFunctionOk" checked /> Function O.K.</label>
+                <label><input type="checkbox" id="jobSafetyOk" checked /> Safety O.K.</label>
+            </div>
+            <div class="field-group">
+                <label>Comments / Additional Notes</label>
+                <textarea id="jobComments" rows="2" placeholder="Any extra observations..."></textarea>
+            </div>
+        </section>
+
+        <!-- SIGNATURES -->
+        <section class="signature-area">
+            <div class="signature-grid">
+                <div class="signature-box">
+                    <h4>👨‍🔧 Technician Signature</h4>
+                    <div class="field-group">
+                        <label>Name</label>
+                        <select id="jobTechName">
+                            <option value="">-- Select --</option>
+                        </select>
+                    </div>
+                    <div class="field-group">
+                        <label>Draw Signature</label>
+                        <div class="sig-pad-wrapper" id="jobTechSigWrapper">
+                            <canvas id="jobTechSigCanvas" width="400" height="120"></canvas>
+                            <div class="sig-placeholder" id="jobTechSigPlaceholder">✍️ Sign here</div>
+                        </div>
+                        <div class="sig-actions">
+                            <button class="btn-sm btn-clear" onclick="clearSignature('jobTech')">🗑️ Clear</button>
+                            <button class="btn-sm btn-undo" onclick="undoSignature('jobTech')">↩️ Undo</button>
+                        </div>
+                        <div class="sig-status" id="jobTechSigStatus">✅ Signed</div>
+                    </div>
+                    <div class="field-group">
+                        <label>Date</label>
+                        <input type="date" id="jobTechDate" />
+                    </div>
+                </div>
+                <div class="signature-box">
+                    <h4>✅ Supervisor Signature</h4>
+                    <div class="field-group">
+                        <label>Name</label>
+                        <select id="jobCertName">
+                            <option value="">-- Select --</option>
+                        </select>
+                    </div>
+                    <div class="field-group">
+                        <label>Draw Signature</label>
+                        <div class="sig-pad-wrapper" id="jobCertSigWrapper">
+                            <canvas id="jobCertSigCanvas" width="400" height="120"></canvas>
+                            <div class="sig-placeholder" id="jobCertSigPlaceholder">✍️ Sign here</div>
+                        </div>
+                        <div class="sig-actions">
+                            <button class="btn-sm btn-clear" onclick="clearSignature('jobCert')">🗑️ Clear</button>
+                            <button class="btn-sm btn-undo" onclick="undoSignature('jobCert')">↩️ Undo</button>
+                        </div>
+                        <div class="sig-status" id="jobCertSigStatus">✅ Signed</div>
+                    </div>
+                    <div class="field-group">
+                        <label>Date</label>
+                        <input type="date" id="jobCertDate" />
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SIMPLIFIED ACTION BAR -->
+        <div class="action-bar no-print">
+            <button class="btn btn-success" onclick="saveJobCard()">💾 Save Job Card</button>
+            <button class="btn btn-outline" onclick="window.print()">📄 Print Job Card</button>
+        </div>
+    </form>
+
+    <footer style="margin-top:22px;font-size:12px;color:#6c757d;text-align:center;border-top:1px solid #e9ecef;padding-top:14px;">
+        🔥 Firestore‑powered · ✍️ Drawable Signatures · MCRH Job Card v6.0 (Simplified)
+    </footer>
+</div>
+
+<div id="toast" class="toast">Message</div>
+
+<script type="module">
+    // ============================================================
+    // FIREBASE CONFIG
+    // ============================================================
+    const firebaseConfig = {
+        apiKey: "AIzaSyDnsz1s-VnewbUszXNJptcdMZ_h0QsNHYQ",
+        authDomain: "moivoibiomed.firebaseapp.com",
+        databaseURL: "https://moivoibiomed-default-rtdb.firebaseio.com",
+        projectId: "moivoibiomed",
+        storageBucket: "moivoibiomed.firebasestorage.app",
+        messagingSenderId: "996551978571",
+        appId: "1:996551978571:web:f44941649a58e020f5e7ce"
+    };
+
+    import { initializeApp } from 'firebase/app';
+    import {
+        getAuth,
+        onAuthStateChanged,
+        signOut
+    } from 'firebase/auth';
+    import {
+        getFirestore,
+        collection,
+        addDoc,
+        getDocs,
+        getDoc,
+        doc,
+        updateDoc,
+        deleteDoc,
+        query,
+        orderBy,
+        where
+    } from 'firebase/firestore';
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const REQUESTS_COLL = 'requests';
+    const JOBCARDS_COLL = 'jobcards';
+    const USERS_COLL = 'users';
+
+    // ============================================================
+    // GLOBALS
+    // ============================================================
+    let currentUser = null;
+    let currentJobCardId = null;
+    let techSigPad = null;
+    let certSigPad = null;
+    let allUsers = [];
+    let allRequests = [];
+    let allJobCards = [];
+
+    // ============================================================
+    // AUTH
+    // ============================================================
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+            window.location.href = 'login.html';
+            return;
+        }
+
+        try {
+            const userDoc = await getDoc(doc(db, USERS_COLL, user.uid));
+            if (!userDoc.exists()) {
+                await signOut(auth);
+                window.location.href = 'login.html';
+                return;
+            }
+            const userData = userDoc.data();
+            if (!userData.approved) {
+                alert('Your account is pending approval. Please contact admin.');
+                await signOut(auth);
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const role = userData.role || 'requester';
+            if (role !== 'maintenance' && role !== 'admin') {
+                alert('You do not have permission to access this page.');
+                window.location.href = 'dashboard.html';
+                return;
+            }
+
+            currentUser = { id: user.uid, ...userData };
+            await initPage();
+
+        } catch (err) {
+            console.error('Auth error:', err);
+            window.location.href = 'login.html';
+        }
+    });
+
+    // ============================================================
+    // LOGOUT
+    // ============================================================
+    window.logout = function() {
+        signOut(auth).then(() => {
+            window.location.href = 'login.html';
+        });
+    };
+
+    // ============================================================
+    // HELPERS
+    // ============================================================
+    function showToast(msg, isError = false) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.style.borderLeftColor = isError ? '#dc3545' : '#C8102E';
+        t.classList.add('show');
+        clearTimeout(t._timer);
+        t._timer = setTimeout(() => t.classList.remove('show'), 3500);
+    }
+
+    function calcTimeDiff(start, end) {
+        if (!start || !end) return '--:--';
+        try {
+            const s = new Date(start);
+            const e = new Date(end);
+            if (isNaN(s) || isNaN(e) || e < s) return '--:--';
+            const diffMs = e - s;
+            const hrs = Math.floor(diffMs / 3600000);
+            const mins = Math.floor((diffMs % 3600000) / 60000);
+            return `${String(hrs).padStart(2,'0')}:${String(mins).padStart(2,'0')}`;
+        } catch { return '--:--'; }
+    }
+
+    function calcResponseTime(reportDt, startDt) {
+        if (!reportDt || !startDt) return '--:--';
+        try {
+            const r = new Date(reportDt);
+            const s = new Date(startDt);
+            if (isNaN(r) || isNaN(s) || s < r) return '--:--';
+            const diffMs = s - r;
+            const hrs = Math.floor(diffMs / 3600000);
+            const mins = Math.floor((diffMs % 3600000) / 60000);
+            return `${String(hrs).padStart(2,'0')}:${String(mins).padStart(2,'0')}`;
+        } catch { return '--:--'; }
+    }
+
+    async function generateJobNumber() {
+        try {
+            const q = query(collection(db, JOBCARDS_COLL));
+            const snap = await getDocs(q);
+            let max = 0;
+            snap.forEach(doc => {
+                const data = doc.data();
+                if (data.jobNo) {
+                    const match = data.jobNo.match(/MCRH(\d+)/);
+                    if (match) {
+                        const num = parseInt(match[1]);
+                        if (num > max) max = num;
+                    }
+                }
+            });
+            const next = max + 1;
+            return `MCRH${String(next).padStart(3, '0')}`;
+        } catch {
+            return `MCRH${Date.now().toString().slice(-6)}`;
+        }
+    }
+
+    // ============================================================
+    // FETCH USERS
+    // ============================================================
+    async function fetchUsers() {
+        try {
+            const snap = await getDocs(collection(db, USERS_COLL));
+            allUsers = [];
+            snap.forEach(doc => {
+                allUsers.push({ id: doc.id, ...doc.data() });
+            });
+        } catch (err) {
+            console.error('Error fetching users:', err);
+        }
+    }
+
+    // ============================================================
+    // POPULATE DROPDOWNS
+    // ============================================================
+    function populateDropdowns() {
+        // Handed back to: all requesters
+        const handedToSelect = document.getElementById('jobHandedTo');
+        handedToSelect.innerHTML = '<option value="">-- Select --</option>';
+        const requesters = allUsers.filter(u => u.role === 'requester');
+        requesters.forEach(u => {
+            const opt = document.createElement('option');
+            opt.value = u.id;
+            opt.textContent = u.name + ' (' + (u.department || '') + ')';
+            handedToSelect.appendChild(opt);
+        });
+
+        // Technician Name: maintenance or admin
+        const techSelect = document.getElementById('jobTechName');
+        techSelect.innerHTML = '<option value="">-- Select --</option>';
+        const techUsers = allUsers.filter(u => u.role === 'maintenance' || u.role === 'admin');
+        techUsers.forEach(u => {
+            const opt = document.createElement('option');
+            opt.value = u.id;
+            opt.textContent = u.name + ' (' + u.role + ')';
+            techSelect.appendChild(opt);
+        });
+
+        // Supervisor will be populated dynamically by loadRequestData
+    }
+
+    // ============================================================
+    // POPULATE SUPERVISOR DROPDOWN (requesters from same department)
+    // ============================================================
+    function populateSupervisorDropdown(department) {
+        const certSelect = document.getElementById('jobCertName');
+        certSelect.innerHTML = '<option value="">-- Select --</option>';
+        if (!department) {
+            const requesters = allUsers.filter(u => u.role === 'requester');
+            requesters.forEach(u => {
+                const opt = document.createElement('option');
+                opt.value = u.id;
+                opt.textContent = u.name + ' (' + (u.department || '') + ')';
+                certSelect.appendChild(opt);
+            });
+            return;
+        }
+        const deptRequesters = allUsers.filter(u => u.role === 'requester' && u.department === department);
+        if (deptRequesters.length === 0) {
+            const allReq = allUsers.filter(u => u.role === 'requester');
+            allReq.forEach(u => {
+                const opt = document.createElement('option');
+                opt.value = u.id;
+                opt.textContent = u.name + ' (' + (u.department || '') + ')';
+                certSelect.appendChild(opt);
+            });
+        } else {
+            deptRequesters.forEach(u => {
+                const opt = document.createElement('option');
+                opt.value = u.id;
+                opt.textContent = u.name + ' (' + u.department + ')';
+                certSelect.appendChild(opt);
+            });
+        }
+    }
+
+    // ============================================================
+    // SIGNATURE PAD SETUP
+    // ============================================================
+    function initSignaturePads() {
+        const techCanvas = document.getElementById('jobTechSigCanvas');
+        const certCanvas = document.getElementById('jobCertSigCanvas');
+
+        techSigPad = new SignaturePad(techCanvas, {
+            backgroundColor: 'rgb(255,255,255)',
+            penColor: 'rgb(0,0,0)',
+            minWidth: 1.5,
+            maxWidth: 3,
+            onEnd: () => {
+                const status = document.getElementById('jobTechSigStatus');
+                if (techSigPad.isEmpty()) {
+                    status.textContent = '⚠️ No signature drawn';
+                    status.className = 'sig-status show empty';
+                } else {
+                    status.textContent = '✅ Signed ✓';
+                    status.className = 'sig-status show signed';
+                }
+            }
+        });
+        certSigPad = new SignaturePad(certCanvas, {
+            backgroundColor: 'rgb(255,255,255)',
+            penColor: 'rgb(0,0,0)',
+            minWidth: 1.5,
+            maxWidth: 3,
+            onEnd: () => {
+                const status = document.getElementById('jobCertSigStatus');
+                if (certSigPad.isEmpty()) {
+                    status.textContent = '⚠️ No signature drawn';
+                    status.className = 'sig-status show empty';
+                } else {
+                    status.textContent = '✅ Signed ✓';
+                    status.className = 'sig-status show signed';
+                }
+            }
+        });
+
+        techCanvas.addEventListener('pointerdown', () => {
+            document.getElementById('jobTechSigPlaceholder').style.display = 'none';
+        });
+        certCanvas.addEventListener('pointerdown', () => {
+            document.getElementById('jobCertSigPlaceholder').style.display = 'none';
+        });
+
+        const origClearTech = techSigPad.clear.bind(techSigPad);
+        techSigPad.clear = function() {
+            origClearTech();
+            document.getElementById('jobTechSigPlaceholder').style.display = 'block';
+            document.getElementById('jobTechSigStatus').textContent = '⚠️ No signature drawn';
+            document.getElementById('jobTechSigStatus').className = 'sig-status show empty';
+        };
+        const origClearCert = certSigPad.clear.bind(certSigPad);
+        certSigPad.clear = function() {
+            origClearCert();
+            document.getElementById('jobCertSigPlaceholder').style.display = 'block';
+            document.getElementById('jobCertSigStatus').textContent = '⚠️ No signature drawn';
+            document.getElementById('jobCertSigStatus').className = 'sig-status show empty';
+        };
+
+        const origFromDataTech = techSigPad.fromData.bind(techSigPad);
+        techSigPad.fromData = function(data) {
+            origFromDataTech(data);
+            if (!this.isEmpty()) {
+                document.getElementById('jobTechSigPlaceholder').style.display = 'none';
+                document.getElementById('jobTechSigStatus').textContent = '✅ Signed ✓';
+                document.getElementById('jobTechSigStatus').className = 'sig-status show signed';
+            }
+        };
+        const origFromDataCert = certSigPad.fromData.bind(certSigPad);
+        certSigPad.fromData = function(data) {
+            origFromDataCert(data);
+            if (!this.isEmpty()) {
+                document.getElementById('jobCertSigPlaceholder').style.display = 'none';
+                document.getElementById('jobCertSigStatus').textContent = '✅ Signed ✓';
+                document.getElementById('jobCertSigStatus').className = 'sig-status show signed';
+            }
+        };
+    }
+
+    window.clearSignature = function(type) {
+        if (type === 'jobTech') techSigPad && techSigPad.clear();
+        else if (type === 'jobCert') certSigPad && certSigPad.clear();
+    };
+    window.undoSignature = function(type) {
+        const pad = type === 'jobTech' ? techSigPad : certSigPad;
+        if (pad) {
+            const data = pad.toData();
+            if (data.length > 0) { data.pop();
+                pad.fromData(data); }
+        }
+    };
+
+    function getSigData(pad) { return (pad && !pad.isEmpty()) ? pad.toData() : null; }
+
+    function loadSigData(pad, data) { if (pad && data) pad.fromData(data); }
+
+    // ============================================================
+    // REQUEST DROPDOWN
+    // ============================================================
+    async function populateRequestDropdown() {
+        const dropdown = document.getElementById('jobRequestNo');
+        dropdown.innerHTML = '<option value="">-- Select Request --</option>';
+
+        try {
+            const reqSnap = await getDocs(query(collection(db, REQUESTS_COLL), orderBy('createdAt', 'desc')));
+            allRequests = [];
+            reqSnap.forEach(doc => {
+                const data = doc.data();
+                data.id = doc.id;
+                allRequests.push(data);
+            });
+
+            const jobSnap = await getDocs(collection(db, JOBCARDS_COLL));
+            allJobCards = [];
+            jobSnap.forEach(doc => {
+                const data = doc.data();
+                data.id = doc.id;
+                allJobCards.push(data);
+            });
+
+            const jobMap = new Map();
+            allJobCards.forEach(j => {
+                if (j.requestNo) jobMap.set(j.requestNo, j.status);
+            });
+
+            const availableRequests = allRequests.filter(r => {
+                const jobStatus = jobMap.get(r.requestNo);
+                return jobStatus !== 'Completed' && jobStatus !== 'Written Off';
+            });
+
+            availableRequests.forEach(r => {
+                const opt = document.createElement('option');
+                opt.value = r.requestNo;
+                opt.textContent = `${r.requestNo} - ${r.requesterName} (${r.unit}) - ${r.equipName}`;
+                opt.dataset.docId = r.id;
+                dropdown.appendChild(opt);
+            });
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const reqParam = urlParams.get('request');
+            if (reqParam) {
+                for (let opt of dropdown.options) {
+                    if (opt.value === reqParam) {
+                        dropdown.value = reqParam;
+                        break;
+                    }
+                }
+                loadRequestData();
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    // ============================================================
+    // LOAD REQUEST DATA – updates supervisor dropdown
+    // ============================================================
+    window.loadRequestData = async function() {
+        const requestNo = document.getElementById('jobRequestNo').value;
+        if (!requestNo) {
+            ['jobRequester', 'jobUnit', 'jobEquipName', 'jobInventory', 'jobSerial', 'jobModel', 'jobComplaint']
+            .forEach(id => document.getElementById(id).value = '');
+            document.getElementById('jobReportingDateTime').value = '';
+            document.getElementById('jobReceivedFrom').value = '';
+            document.getElementById('jobCertName').innerHTML = '<option value="">-- Select --</option>';
+            return;
+        }
+
+        try {
+            const q = query(collection(db, REQUESTS_COLL), where('requestNo', '==', requestNo));
+            const snap = await getDocs(q);
+            let r = null;
+            snap.forEach(doc => { r = doc.data(); });
+            if (!r) return;
+
+            document.getElementById('jobRequester').value = r.requesterName || '';
+            document.getElementById('jobUnit').value = r.unit || '';
+            document.getElementById('jobEquipName').value = r.equipName || '';
+            document.getElementById('jobInventory').value = r.inventory || '';
+            document.getElementById('jobSerial').value = r.serial || '';
+            document.getElementById('jobModel').value = r.modelMake || '';
+            document.getElementById('jobComplaint').value = r.complaint || '';
+            document.getElementById('jobReportingDateTime').value = r.dateTime || '';
+            document.getElementById('jobReceivedFrom').value = r.requesterName || '';
+
+            if (!document.getElementById('jobReceivedDateTime').value) {
+                document.getElementById('jobReceivedDateTime').value = r.dateTime || '';
+            }
+
+            populateSupervisorDropdown(r.unit);
+            showToast('✅ Request data loaded.');
+        } catch (err) {
+            showToast('Error loading request: ' + err.message, true);
+        }
+    };
+
+    // ============================================================
+    // STATUS TOGGLE
+    // ============================================================
+    window.toggleStatusFields = function() {
+        const status = document.getElementById('jobStatus').value;
+        const pendingDiv = document.getElementById('pendingFields');
+        const completedDiv = document.getElementById('completedFields');
+        const writtenOffDiv = document.getElementById('writtenOffFields');
+        const badge = document.getElementById('jobStatusBadge');
+
+        pendingDiv.style.display = 'none';
+        completedDiv.style.display = 'none';
+        writtenOffDiv.style.display = 'none';
+
+        if (status === 'Pending') {
+            pendingDiv.style.display = 'block';
+            badge.textContent = '● PENDING';
+            badge.className = 'status pending';
+        } else if (status === 'Completed') {
+            completedDiv.style.display = 'block';
+            badge.textContent = '● COMPLETED';
+            badge.className = 'status completed';
+        } else if (status === 'Written Off') {
+            writtenOffDiv.style.display = 'block';
+            badge.textContent = '● WRITTEN OFF';
+            badge.className = 'status writtenoff';
+        }
+    };
+
+    // ============================================================
+    // AUTO-CALCULATE TIMES
+    // ============================================================
+    function updateJobTimeFields() {
+        const report = document.getElementById('jobReportingDateTime').value;
+        const start = document.getElementById('jobStartDateTime').value;
+        const end = document.getElementById('jobEndDateTime').value;
+        document.getElementById('jobTotalTime').value = (start && end) ? calcTimeDiff(start, end) : '--:--';
+        document.getElementById('jobResponseTime').value = (report && start) ? calcResponseTime(report, start) : '--:--';
+    }
+    document.getElementById('jobStartDateTime').addEventListener('change', updateJobTimeFields);
+    document.getElementById('jobEndDateTime').addEventListener('change', updateJobTimeFields);
+    document.getElementById('jobReportingDateTime').addEventListener('change', updateJobTimeFields);
+
+    // ============================================================
+    // SAVE JOB CARD
+    // ============================================================
+    window.saveJobCard = async function() {
+        const btn = document.querySelector('.btn-success');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loading-spinner"></span> Saving...';
+
+        try {
+            const jobNo = document.getElementById('jobNo').value;
+            const requestNo = document.getElementById('jobRequestNo').value;
+            if (!requestNo) { showToast('Please select a request.', true);
+                btn.disabled = false;
+                btn.innerHTML = '💾 Save Job Card'; return; }
+
+            const handedToId = document.getElementById('jobHandedTo').value;
+            const handedToName = handedToId ? allUsers.find(u => u.id === handedToId)?.name || '' : '';
+            const techId = document.getElementById('jobTechName').value;
+            const techName = techId ? allUsers.find(u => u.id === techId)?.name || '' : '';
+            const certId = document.getElementById('jobCertName').value;
+            const certName = certId ? allUsers.find(u => u.id === certId)?.name || '' : '';
+
+            const receivedBy = currentUser?.name || '';
+            const handedBy = currentUser?.name || '';
+
+            const data = {
+                jobNo: jobNo || await generateJobNumber(),
+                requestNo: requestNo,
+                requester: document.getElementById('jobRequester').value,
+                unit: document.getElementById('jobUnit').value,
+                reportingDateTime: document.getElementById('jobReportingDateTime').value,
+                equipName: document.getElementById('jobEquipName').value,
+                inventory: document.getElementById('jobInventory').value,
+                serial: document.getElementById('jobSerial').value,
+                modelMake: document.getElementById('jobModel').value,
+                complaint: document.getElementById('jobComplaint').value,
+                diagnosis: document.getElementById('jobDiagnosis').value,
+                receivedFrom: document.getElementById('jobReceivedFrom').value,
+                receivedDateTime: document.getElementById('jobReceivedDateTime').value,
+                receivedBy: receivedBy,
+                handedTo: handedToName,
+                handedToId: handedToId,
+                handedDateTime: document.getElementById('jobHandedDateTime').value,
+                handedBy: handedBy,
+                serviceType: document.querySelector('input[name="serviceType"]:checked')?.value || '',
+                startDateTime: document.getElementById('jobStartDateTime').value,
+                endDateTime: document.getElementById('jobEndDateTime').value,
+                totalTime: document.getElementById('jobTotalTime').value,
+                responseTime: document.getElementById('jobResponseTime').value,
+                adminTime: document.getElementById('jobAdminTime').value,
+                status: document.getElementById('jobStatus').value,
+                postponeReason: document.getElementById('jobPostponeReason').value,
+                postponeNote: document.getElementById('jobPostponeNote').value,
+                expectedDate: document.getElementById('jobExpectedDate').value,
+                defects: document.getElementById('jobDefects').value,
+                actionTaken: document.getElementById('jobActionTaken').value,
+                writeOffReason: document.getElementById('jobWriteOffReason').value,
+                writeOffNote: document.getElementById('jobWriteOffNote').value,
+                measureCurrent: document.getElementById('jobMeasureCurrent').value,
+                measureVoltage: document.getElementById('jobMeasureVoltage').value,
+                measureInsulation: document.getElementById('jobMeasureInsulation').value,
+                measurePressure: document.getElementById('jobMeasurePressure').value,
+                functionOk: document.getElementById('jobFunctionOk').checked,
+                safetyOk: document.getElementById('jobSafetyOk').checked,
+                comments: document.getElementById('jobComments').value,
+                techName: techName,
+                techId: techId,
+                techSignature: getSigData(techSigPad),
+                techDate: document.getElementById('jobTechDate').value,
+                certName: certName,
+                certId: certId,
+                certSignature: getSigData(certSigPad),
+                certDate: document.getElementById('jobCertDate').value,
+                updatedAt: new Date().toISOString(),
+                technicianId: currentUser ? currentUser.id : null,
+            };
+
+            if (currentJobCardId) {
+                await updateDoc(doc(db, JOBCARDS_COLL, currentJobCardId), data);
+                showToast('✅ Job card updated.');
+            } else {
+                await addDoc(collection(db, JOBCARDS_COLL), data);
+                showToast(`✅ Job card ${data.jobNo} saved.`);
+            }
+
+            if (requestNo) {
+                try {
+                    const reqQuery = query(collection(db, REQUESTS_COLL), where('requestNo', '==', requestNo));
+                    const reqSnap = await getDocs(reqQuery);
+                    reqSnap.forEach(async (doc) => {
+                        await updateDoc(doc.ref, {
+                            jobStatus: data.status,
+                            jobNo: data.jobNo
+                        });
+                    });
+                } catch (err) {
+                    console.warn('Could not update request status:', err);
+                }
+            }
+
+            document.getElementById('jobNo').value = data.jobNo;
+            // Reset form to a clean state (keep the request dropdown empty)
+            resetJobCardForm();
+            document.getElementById('jobNo').value = await generateJobNumber();
+            document.getElementById('jobRequestNo').value = '';
+            ['jobRequester', 'jobUnit', 'jobEquipName', 'jobInventory', 'jobSerial', 'jobModel', 'jobComplaint']
+            .forEach(id => document.getElementById(id).value = '');
+            document.getElementById('jobReportingDateTime').value = '';
+            document.getElementById('jobReceivedFrom').value = '';
+            document.getElementById('jobCertName').innerHTML = '<option value="">-- Select --</option>';
+
+            showToast('✅ Form ready for a new job.');
+        } catch (err) {
+            showToast('❌ Error: ' + err.message, true);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '💾 Save Job Card';
+        }
+    };
+
+    // ============================================================
+    // LOAD JOB CARD (for editing via URL param)
+    // ============================================================
+    window.loadJobCard = async function(id) {
+        try {
+            const snap = await getDoc(doc(db, JOBCARDS_COLL, id));
+            if (!snap.exists()) return;
+            const j = snap.data();
+            currentJobCardId = id;
+
+            // Set all fields
+            const fields = {
+                jobNo: j.jobNo,
+                requestNo: j.requestNo,
+                requester: j.requester,
+                unit: j.unit,
+                reportingDateTime: j.reportingDateTime,
+                equipName: j.equipName,
+                inventory: j.inventory,
+                serial: j.serial,
+                modelMake: j.modelMake,
+                complaint: j.complaint,
+                diagnosis: j.diagnosis,
+                receivedFrom: j.receivedFrom,
+                receivedDateTime: j.receivedDateTime,
+                receivedBy: j.receivedBy || '',
+                handedTo: j.handedTo || '',
+                handedDateTime: j.handedDateTime,
+                handedBy: j.handedBy || '',
+                startDateTime: j.startDateTime,
+                endDateTime: j.endDateTime,
+                totalTime: j.totalTime,
+                responseTime: j.responseTime,
+                adminTime: j.adminTime,
+                status: j.status || 'Pending',
+                postponeReason: j.postponeReason || 'Low priority',
+                postponeNote: j.postponeNote || '',
+                expectedDate: j.expectedDate || '',
+                defects: j.defects || '',
+                actionTaken: j.actionTaken || '',
+                writeOffReason: j.writeOffReason || 'Wear & Tear',
+                writeOffNote: j.writeOffNote || '',
+                measureCurrent: j.measureCurrent || '',
+                measureVoltage: j.measureVoltage || '',
+                measureInsulation: j.measureInsulation || '',
+                measurePressure: j.measurePressure || '',
+                functionOk: j.functionOk !== undefined ? j.functionOk : true,
+                safetyOk: j.safetyOk !== undefined ? j.safetyOk : true,
+                comments: j.comments || '',
+                techName: j.techName || '',
+                techDate: j.techDate || '',
+                certName: j.certName || '',
+                certDate: j.certDate || ''
+            };
+            for (const [key, val] of Object.entries(fields)) {
+                const el = document.getElementById('job' + key.charAt(0).toUpperCase() + key.slice(1));
+                if (el) {
+                    if (el.type === 'checkbox') el.checked = val;
+                    else if (el.tagName === 'SELECT') {
+                        // Selects will be handled after populating options
+                    } else {
+                        el.value = val || '';
+                    }
+                }
+            }
+
+            document.querySelectorAll('input[name="serviceType"]').forEach(el => {
+                el.checked = (el.value === j.serviceType);
+            });
+
+            if (j.techSignature) loadSigData(techSigPad, j.techSignature);
+            else techSigPad && techSigPad.clear();
+            if (j.certSignature) loadSigData(certSigPad, j.certSignature);
+            else certSigPad && certSigPad.clear();
+
+            toggleStatusFields();
+
+            // Set request dropdown and load request data (which populates supervisor)
+            const dropdown = document.getElementById('jobRequestNo');
+            for (let opt of dropdown.options) {
+                if (opt.value === j.requestNo) {
+                    dropdown.value = j.requestNo;
+                    break;
+                }
+            }
+            await loadRequestData();
+
+            // Now set the selected IDs
+            if (j.certId) {
+                document.getElementById('jobCertName').value = j.certId;
+            }
+            if (j.techId) {
+                document.getElementById('jobTechName').value = j.techId;
+            }
+            if (j.handedToId) {
+                document.getElementById('jobHandedTo').value = j.handedToId;
+            }
+
+            showToast('📂 Job card loaded.');
+        } catch (err) {
+            showToast('Error loading: ' + err.message, true);
+        }
+    };
+
+    function resetJobCardForm() {
+        document.querySelectorAll('#jobcardForm input, #jobcardForm textarea, #jobcardForm select').forEach(el => {
+            if (el.id !== 'jobReceivedBy' && el.id !== 'jobHandedBy' && el.id !== 'jobTechName' &&
+                el.id !== 'jobCertName' && el.id !== 'jobRequestNo' && el.id !== 'jobHandedTo') {
+                if (el.type === 'checkbox') el.checked = (el.id === 'jobFunctionOk' || el.id === 'jobSafetyOk');
+                else if (el.tagName !== 'SELECT') el.value = '';
+            }
+        });
+        document.getElementById('jobHandedTo').value = '';
+        document.getElementById('jobTechName').value = '';
+        document.getElementById('jobCertName').value = '';
+        document.getElementById('jobRequestNo').value = '';
+        document.getElementById('jobStatus').value = 'Pending';
+        techSigPad && techSigPad.clear();
+        certSigPad && certSigPad.clear();
+        document.getElementById('jobStatusBadge').textContent = '● PENDING';
+        document.getElementById('jobStatusBadge').className = 'status pending';
+        document.getElementById('jobNo').value = '';
+        currentJobCardId = null;
+        toggleStatusFields();
+        document.getElementById('jobCertName').innerHTML = '<option value="">-- Select --</option>';
+        showToast('🔄 Form reset.');
+    }
+    window.resetJobCardForm = resetJobCardForm;
+
+    // ============================================================
+    // INIT PAGE
+    // ============================================================
+    async function initPage() {
+        document.getElementById('jobReceivedBy').value = currentUser?.name || '';
+        document.getElementById('jobHandedBy').value = currentUser?.name || '';
+
+        await fetchUsers();
+        populateDropdowns();
+        await populateRequestDropdown();
+        initSignaturePads();
+
+        const now = new Date();
+        const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+        const localStr = local.toISOString().slice(0, 16);
+        if (!document.getElementById('jobReceivedDateTime').value)
+            document.getElementById('jobReceivedDateTime').value = localStr;
+        if (!document.getElementById('jobStartDateTime').value)
+            document.getElementById('jobStartDateTime').value = localStr;
+        if (!document.getElementById('jobTechDate').value)
+            document.getElementById('jobTechDate').value = now.toISOString().split('T')[0];
+
+        document.getElementById('jobNo').value = await generateJobNumber();
+        toggleStatusFields();
+
+        // Check if URL has ?view=id to load a specific jobcard for editing
+        const urlParams = new URLSearchParams(window.location.search);
+        const viewParam = urlParams.get('view');
+        if (viewParam) {
+            await window.loadJobCard(viewParam);
+        }
+
+        console.log('🚀 Job Card system ready (simplified).');
+    }
+
+    // Expose functions to global
+    window.saveJobCard = saveJobCard;
+    window.toggleStatusFields = toggleStatusFields;
+    window.loadJobCard = loadJobCard;
+    window.resetJobCardForm = resetJobCardForm;
+</script>
+</body>
+</html>

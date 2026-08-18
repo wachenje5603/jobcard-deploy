@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MCRH - Login</title>
+
+    <!-- Firebase v9 Modular SDK -->
+    <script type="importmap">
+        {
+            "imports": {
+                "firebase/app": "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js",
+                "firebase/auth": "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js",
+                "firebase/firestore": "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"
+            }
+        }
+    </script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f4f6f9 0%, #e9ecef 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .login-container {
+            background: white;
+            padding: 40px 45px;
+            border-radius: 16px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+            max-width: 420px;
+            width: 100%;
+            transition: 0.3s;
+        }
+        .login-container:hover {
+            box-shadow: 0 16px 50px rgba(0, 0, 0, 0.2);
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .logo h1 {
+            color: #C8102E;
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        .logo p {
+            color: #6c757d;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+        .form-group {
+            margin-bottom: 18px;
+        }
+        .form-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #495057;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            font-size: 15px;
+            background: #f8f9fc;
+            transition: 0.2s;
+        }
+        .form-group input:focus {
+            border-color: #C8102E;
+            outline: 0;
+            box-shadow: 0 0 0 3px rgba(200, 16, 46, 0.15);
+            background: white;
+        }
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: #C8102E;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 6px;
+        }
+        .btn-login:hover {
+            background: #a00d24;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(200, 16, 46, 0.3);
+        }
+        .btn-login:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .forgot-password {
+            text-align: right;
+            margin-top: 8px;
+        }
+        .forgot-password a {
+            color: #6c757d;
+            font-size: 13px;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+        .forgot-password a:hover {
+            color: #C8102E;
+            text-decoration: underline;
+        }
+        .error-msg {
+            color: #dc3545;
+            font-size: 13px;
+            margin-top: 8px;
+            display: none;
+        }
+        .error-msg.show {
+            display: block;
+        }
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #1e2a3a;
+            color: white;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-weight: 500;
+            z-index: 999;
+            transform: translateY(-20px);
+            opacity: 0;
+            transition: 0.3s ease;
+            border-left: 6px solid #C8102E;
+            max-width: 380px;
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .loading-spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.8s linear infinite;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        .footer-text {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #6c757d;
+        }
+        /* Removed auth-links (register) */
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 30px 20px;
+                margin: 0 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <div class="logo">
+            <h1>🏥 MCRH</h1>
+            <p>Equipment Maintenance System</p>
+        </div>
+
+        <form id="loginForm" onsubmit="return false;">
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" placeholder="your@email.com" required autofocus />
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter your password" required />
+            </div>
+            <div class="forgot-password">
+                <a href="#" id="forgotPasswordLink">Forgot password?</a>
+            </div>
+            <button type="submit" class="btn-login" id="loginBtn">Sign In</button>
+            <div class="error-msg" id="errorMsg"></div>
+        </form>
+
+        <div class="footer-text">
+            Secure login · Powered by Firebase
+        </div>
+    </div>
+
+    <div id="toast" class="toast">Message</div>
+
+    <script type="module">
+        // ============================================================
+        //  FIREBASE CONFIG (REPLACE WITH YOUR OWN)
+        // ============================================================
+  const firebaseConfig = {
+  apiKey: "AIzaSyDnsz1s-VnewbUszXNJptcdMZ_h0QsNHYQ",
+  authDomain: "moivoibiomed.firebaseapp.com",
+  databaseURL: "https://moivoibiomed-default-rtdb.firebaseio.com",
+  projectId: "moivoibiomed",
+  storageBucket: "moivoibiomed.firebasestorage.app",
+  messagingSenderId: "996551978571",
+  appId: "1:996551978571:web:f44941649a58e020f5e7ce"
+};
+
+        import { initializeApp } from 'firebase/app';
+        import {
+            getAuth,
+            signInWithEmailAndPassword,
+            sendPasswordResetEmail,
+            onAuthStateChanged,
+            signOut
+        } from 'firebase/auth';
+        import { getFirestore, doc, getDoc } from 'firebase/firestore';
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // DOM elements
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const loginBtn = document.getElementById('loginBtn');
+        const errorDiv = document.getElementById('errorMsg');
+        const forgotLink = document.getElementById('forgotPasswordLink');
+        const toast = document.getElementById('toast');
+
+        // ============================================================
+        //  HELPERS
+        // ============================================================
+        function showToast(msg, isError = false) {
+            toast.textContent = msg;
+            toast.style.borderLeftColor = isError ? '#dc3545' : '#C8102E';
+            toast.classList.add('show');
+            clearTimeout(toast._timer);
+            toast._timer = setTimeout(() => toast.classList.remove('show'), 4000);
+        }
+
+        function setError(msg) {
+            errorDiv.textContent = msg;
+            errorDiv.classList.add('show');
+        }
+
+        function clearError() {
+            errorDiv.textContent = '';
+            errorDiv.classList.remove('show');
+        }
+
+        function setLoading(isLoading) {
+            loginBtn.disabled = isLoading;
+            loginBtn.innerHTML = isLoading ?
+                '<span class="loading-spinner"></span> Signing in...' :
+                'Sign In';
+        }
+
+        // ============================================================
+        //  LOGIN HANDLER (with approval check)
+        // ============================================================
+        async function handleLogin() {
+            const email = emailInput.value.trim();
+            const password = passwordInput.value.trim();
+
+            clearError();
+
+            if (!email || !password) {
+                setError('Please enter both email and password.');
+                return;
+            }
+
+            setLoading(true);
+
+            try {
+                // 1. Authenticate with Firebase Auth
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                // 2. Fetch user profile from Firestore
+                const userDoc = await getDoc(doc(db, 'users', user.uid));
+
+                if (!userDoc.exists()) {
+                    showToast('User profile not found. Please contact admin.', true);
+                    await signOut(auth);
+                    setLoading(false);
+                    return;
+                }
+
+                const userData = userDoc.data();
+
+                // 3. Check approval status
+                if (!userData.approved) {
+                    showToast('Your account is pending approval. Please wait for the administrator.', true);
+                    await signOut(auth);
+                    setLoading(false);
+                    return;
+                }
+
+                // 4. Approved – store user info and redirect
+                const role = userData.role || 'requester';
+                sessionStorage.setItem('userRole', role);
+                sessionStorage.setItem('userName', userData.name || '');
+
+                // 5. Redirect to dashboard
+                window.location.href = 'dashboard.html';
+
+            } catch (err) {
+                let msg = 'Login failed. Please try again.';
+                if (err.code === 'auth/user-not-found') {
+                    msg = 'No account found with this email.';
+                } else if (err.code === 'auth/wrong-password') {
+                    msg = 'Incorrect password. Please try again.';
+                } else if (err.code === 'auth/too-many-requests') {
+                    msg = 'Too many failed attempts. Please try again later.';
+                } else if (err.code === 'auth/network-request-failed') {
+                    msg = 'Network error. Please check your connection.';
+                }
+                setError(msg);
+                showToast(msg, true);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        // ============================================================
+        //  FORGOT PASSWORD
+        // ============================================================
+        async function handleForgotPassword() {
+            const email = emailInput.value.trim();
+            if (!email) {
+                setError('Please enter your email address first.');
+                return;
+            }
+            try {
+                await sendPasswordResetEmail(auth, email);
+                showToast('Password reset email sent. Check your inbox.');
+                clearError();
+            } catch (err) {
+                let msg = 'Could not send reset email.';
+                if (err.code === 'auth/user-not-found') {
+                    msg = 'No account found with this email.';
+                }
+                setError(msg);
+                showToast(msg, true);
+            }
+        }
+
+        // ============================================================
+        //  EVENT LISTENERS
+        // ============================================================
+        loginBtn.addEventListener('click', handleLogin);
+
+        // Allow Enter key on both fields
+        emailInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                if (!emailInput.value) return;
+                passwordInput.focus();
+            }
+        });
+        passwordInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleLogin();
+            }
+        });
+
+        forgotLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            handleForgotPassword();
+        });
+
+        // ============================================================
+        //  CHECK IF ALREADY LOGGED IN
+        // ============================================================
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // Already signed in – check approval and redirect
+                try {
+                    const userDoc = await getDoc(doc(db, 'users', user.uid));
+                    if (!userDoc.exists()) {
+                        await signOut(auth);
+                        return;
+                    }
+                    const userData = userDoc.data();
+                    if (!userData.approved) {
+                        showToast('Your account is pending approval. Please wait.', true);
+                        await signOut(auth);
+                        return;
+                    }
+                    // Approved – go to dashboard
+                    window.location.href = 'dashboard.html';
+                } catch (err) {
+                    console.error('Error checking approval status:', err);
+                }
+            }
+        });
+
+        console.log('✅ Login page ready. Firebase Auth initialized.');
+    </script>
+</body>
+</html>

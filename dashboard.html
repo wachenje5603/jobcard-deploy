@@ -1,0 +1,1909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5" />
+    <title>MCRH - Dashboard</title>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "firebase/app": "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js",
+                "firebase/auth": "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js",
+                "firebase/firestore": "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"
+            }
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+    <style>
+        /* ===== BASE ===== */
+        * { margin:0; padding:0; box-sizing:border-box; }
+        :root { --primary: #C8102E; --primary-gradient: linear-gradient(135deg, #C8102E, #e81a3f); --bg: #f4f6fb; --card-bg: #ffffff; --text: #1a1a2e; --text-muted: #6c7a8a; --shadow: 0 8px 32px rgba(0,0,0,0.06); --radius: 16px; --radius-sm: 10px; }
+        body { font-family:'Inter', sans-serif; background:var(--bg); color:var(--text); padding:16px; }
+        .container { max-width:1280px; margin:0 auto; }
+
+        /* ===== HERO ===== */
+        .hero { background:var(--primary-gradient); border-radius:var(--radius); padding:28px 32px; margin-bottom:28px; color:white; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; box-shadow:0 10px 40px rgba(200,16,46,0.25); position:relative; overflow:hidden; }
+        .hero-left { z-index:1; }
+        .hero-left h1 { font-size:26px; font-weight:800; }
+        .hero-left .sub { font-size:15px; opacity:0.85; }
+        .hero-right { display:flex; align-items:center; gap:16px; z-index:1; flex-wrap:wrap; }
+        .hero-right .user-badge { background:rgba(255,255,255,0.18); backdrop-filter:blur(6px); padding:8px 18px; border-radius:40px; font-size:14px; font-weight:500; display:flex; align-items:center; gap:8px; border:1px solid rgba(255,255,255,0.15); }
+        .hero-right .user-badge .role-tag { background:rgba(255,255,255,0.25); padding:2px 12px; border-radius:20px; font-size:11px; font-weight:600; text-transform:uppercase; }
+        .btn-logout { background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.25); color:white; padding:8px 18px; border-radius:40px; font-weight:600; font-size:13px; cursor:pointer; transition:0.25s; backdrop-filter:blur(4px); }
+        .btn-logout:hover { background:rgba(255,255,255,0.25); }
+
+        /* ===== STATS ===== */
+        .stats-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr)); gap:16px; margin-bottom:28px; }
+        .stat-card { background:var(--card-bg); border-radius:var(--radius-sm); padding:18px 20px; box-shadow:var(--shadow); border-left:4px solid var(--primary); cursor:pointer; transition:0.25s; display:flex; justify-content:space-between; align-items:center; }
+        .stat-card:hover { transform:translateY(-3px); box-shadow:0 12px 40px rgba(0,0,0,0.08); }
+        .stat-card .stat-left .number { font-size:28px; font-weight:700; line-height:1.2; }
+        .stat-card .stat-left .label { font-size:13px; color:var(--text-muted); font-weight:500; }
+        .stat-card .stat-icon { font-size:28px; opacity:0.3; color:var(--primary); }
+        .stat-card.pending { border-left-color:#f59e0b; }
+        .stat-card.completed { border-left-color:#22c55e; }
+        .stat-card.writtenoff { border-left-color:#ef4444; }
+        .stat-card.new { border-left-color:#3b82f6; }
+        .stat-card.total { border-left-color:#6b7280; }
+        .stat-card.users { border-left-color:#8b5cf6; }
+        .stat-card.pending-approval { border-left-color:#f59e0b; }
+        .stat-card.jobcards { border-left-color:#17a2b8; }
+        .stat-card.myrequests { border-left-color:#6f42c1; }
+
+        /* ===== CHARTS ===== */
+        .chart-row { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:28px; }
+        .chart-box { background:var(--card-bg); border-radius:var(--radius); padding:20px; box-shadow:var(--shadow); }
+        .chart-box h3 { font-size:16px; font-weight:600; margin-bottom:12px; }
+        .chart-box canvas { max-height:200px; width:100% !important; }
+
+        /* ===== BUTTONS ===== */
+        .actions { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:24px; }
+        .btn { padding:10px 22px; border:none; border-radius:40px; font-weight:600; font-size:14px; cursor:pointer; transition:0.25s; display:inline-flex; align-items:center; gap:8px; text-decoration:none; }
+        .btn-primary { background:var(--primary-gradient); color:white; box-shadow:0 4px 14px rgba(200,16,46,0.25); }
+        .btn-primary:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(200,16,46,0.35); }
+        .btn-success { background:#22c55e; color:white; }
+        .btn-success:hover { background:#16a34a; transform:translateY(-2px); }
+        .btn-outline { background:transparent; border:1.5px solid #d1d5db; color:var(--text); }
+        .btn-outline:hover { background:#f3f4f6; border-color:#9ca3af; }
+        .btn-danger { background:#ef4444; color:white; }
+        .btn-danger:hover { background:#dc2626; }
+        .btn-sm { padding:6px 14px; font-size:12px; border-radius:30px; }
+        .btn-warning { background:#ffc107; color:#1e2a3a; }
+        .btn-warning:hover { background:#e0a800; }
+        .btn-info { background:#17a2b8; color:white; }
+        .btn-info:hover { background:#138496; }
+
+        /* ===== TABLE ===== */
+        .table-wrap { background:var(--card-bg); border-radius:var(--radius); padding:20px 24px; box-shadow:var(--shadow); overflow-x:auto; margin-top:20px; }
+        .table-wrap h3 { font-size:18px; font-weight:700; margin-bottom:14px; }
+        .filter-bar { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:16px; }
+        .filter-bar select, .filter-bar input { padding:8px 14px; border:1px solid #e5e7eb; border-radius:30px; font-size:14px; background:white; font-family:inherit; outline:none; transition:0.25s; }
+        .filter-bar select:focus, .filter-bar input:focus { border-color:var(--primary); box-shadow:0 0 0 3px rgba(200,16,46,0.12); }
+        table { width:100%; border-collapse:collapse; font-size:14px; min-width:600px; }
+        table th { text-align:left; padding:12px 12px 12px 0; font-weight:600; color:var(--text-muted); font-size:12px; text-transform:uppercase; letter-spacing:0.4px; border-bottom:2px solid #f1f3f5; }
+        table td { padding:12px 12px 12px 0; border-bottom:1px solid #f1f3f5; vertical-align:middle; }
+        .status-badge { padding:4px 14px; border-radius:30px; font-size:12px; font-weight:600; display:inline-block; }
+        .status-badge.pending { background:#fef3c7; color:#b45309; }
+        .status-badge.completed { background:#dcfce7; color:#15803d; }
+        .status-badge.writtenoff { background:#fee2e2; color:#b91c1c; }
+        .status-badge.postponed { background:#fef3c7; color:#b45309; }
+        .status-badge.open { background:#dbeafe; color:#1d4ed8; }
+        .table-actions { display:flex; flex-wrap:wrap; gap:6px; }
+
+        /* ===== MODALS ===== */
+        .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(6px); z-index:1000; align-items:center; justify-content:center; padding:20px; }
+        .modal-overlay.show { display:flex; }
+        .modal { background:white; border-radius:var(--radius); padding:32px; max-width:700px; width:90%; max-height:90vh; overflow-y:auto; box-shadow:0 24px 64px rgba(0,0,0,0.2); animation:modalIn 0.3s ease; }
+        @keyframes modalIn { from { opacity:0; transform:scale(0.96) translateY(10px); } to { opacity:1; transform:scale(1) translateY(0); } }
+        .modal .close-btn { float:right; background:none; border:none; font-size:24px; cursor:pointer; color:#9ca3af; }
+        .modal .close-btn:hover { color:var(--text); }
+        .modal h2 { font-size:22px; font-weight:700; margin-bottom:20px; }
+        .modal h2 i { color:var(--primary); margin-right:8px; }
+        .modal hr { border:none; border-top:1px solid #f1f3f5; margin:20px 0; }
+        .modal .form-group { margin-bottom:14px; }
+        .modal .form-group label { display:block; font-weight:600; font-size:13px; margin-bottom:4px; }
+        .modal .form-group input, .modal .form-group select { width:100%; padding:10px 14px; border:1px solid #e5e7eb; border-radius:var(--radius-sm); font-size:14px; font-family:inherit; transition:0.25s; background:#fafbfc; }
+        .modal .form-group input:focus, .modal .form-group select:focus { border-color:var(--primary); outline:none; box-shadow:0 0 0 3px rgba(200,16,46,0.12); background:white; }
+        .modal .btn { width:100%; justify-content:center; margin-top:6px; }
+        .modal .error-text { color:#ef4444; font-size:13px; margin-top:8px; }
+        .modal .success-text { color:#22c55e; font-size:13px; margin-top:8px; display:none; }
+
+        /* ===== USER LIST ===== */
+        .user-list { list-style:none; padding:0; }
+        .user-list li { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #f1f3f5; gap:8px; }
+        .user-list li:last-child { border-bottom:none; }
+        .user-list .user-info { font-size:14px; flex:1; }
+        .user-list .user-info small { color:var(--text-muted); font-size:12px; }
+        .user-list .user-actions { display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
+        .user-list .role-select { padding:4px 8px; border:1px solid #e5e7eb; border-radius:6px; font-size:12px; }
+        .approve-btn { background:#22c55e; color:white; border:none; padding:4px 14px; border-radius:30px; cursor:pointer; font-weight:600; font-size:12px; transition:0.25s; }
+        .approve-btn:hover { background:#16a34a; }
+        .deny-btn { background:#ef4444; color:white; border:none; padding:4px 14px; border-radius:30px; cursor:pointer; font-weight:600; font-size:12px; transition:0.25s; }
+        .deny-btn:hover { background:#dc2626; }
+        .edit-btn { background:#17a2b8; color:white; border:none; padding:4px 14px; border-radius:30px; cursor:pointer; font-weight:600; font-size:12px; transition:0.25s; }
+        .edit-btn:hover { background:#138496; }
+        .pending-user-item { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #f1f3f5; gap:8px; }
+        .pending-user-item .user-info { font-size:14px; flex:1; }
+        .pending-user-item .user-info small { color:var(--text-muted); font-size:12px; }
+
+        /* ===== WHATSAPP INLINE ===== */
+        .whatsapp-inline {
+            display: flex;
+            gap: 8px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+        .whatsapp-inline .field-group-small {
+            display: flex;
+            flex-direction: column;
+            flex: 0 0 auto;
+        }
+        .whatsapp-inline .field-group-small label {
+            font-size: 11px;
+            color: #6c757d;
+            margin-bottom: 2px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            font-weight: 600;
+        }
+        .whatsapp-inline select {
+            width: auto;
+            min-width: 90px;
+            padding: 8px 10px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            background: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .whatsapp-inline select:focus {
+            border-color: #C8102E;
+            outline: 0;
+            box-shadow: 0 0 0 3px rgba(200, 16, 46, 0.15);
+        }
+        .whatsapp-inline input {
+            flex: 2;
+            min-width: 200px;
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+            transition: 0.2s;
+        }
+        .whatsapp-inline input:focus {
+            border-color: #C8102E;
+            outline: 0;
+            box-shadow: 0 0 0 3px rgba(200, 16, 46, 0.15);
+        }
+        @media (max-width: 500px) {
+            .whatsapp-inline {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .whatsapp-inline select,
+            .whatsapp-inline input {
+                width: 100%;
+                flex: none;
+                min-width: unset;
+            }
+        }
+
+        /* ===== TOAST ===== */
+        .toast { position:fixed; bottom:24px; right:24px; background:#1a1a2e; color:white; padding:14px 24px; border-radius:var(--radius-sm); font-weight:500; z-index:9999; transform:translateY(80px); opacity:0; transition:0.4s; border-left:4px solid var(--primary); max-width:380px; box-shadow:0 12px 40px rgba(0,0,0,0.2); font-size:14px; }
+        .toast.show { transform:translateY(0); opacity:1; }
+        select[multiple] { height:auto; min-height:80px; }
+
+        /* PDF templates */
+        #pdfTemplate, #requestPdfTemplate {
+            position: fixed;
+            left: -9999px;
+            top: 0;
+            width: 800px;
+            background: white;
+            padding: 30px;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 14px;
+            color: #000;
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            overflow: visible;
+            box-sizing: border-box;
+            height: auto;
+        }
+
+        @media (max-width:768px) { .hero { padding:20px; flex-direction:column; align-items:flex-start; gap:12px; } .hero-left h1 { font-size:20px; } .hero-left .sub { font-size:13px; } .hero-right { width:100%; justify-content:space-between; } .stats-grid { grid-template-columns:repeat(2,1fr); gap:12px; } .stat-card { padding:14px 16px; } .stat-card .stat-left .number { font-size:22px; } .chart-row { grid-template-columns:1fr; } .modal { padding:20px; } }
+        @media (max-width:480px) { .stats-grid { grid-template-columns:1fr 1fr; gap:10px; } .hero-left h1 { font-size:18px; } .filter-bar select, .filter-bar input { width:100%; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- ===== HERO ===== -->
+    <div class="hero">
+        <div class="hero-left">
+            <h1>👋 Welcome, <span id="userNameDisplay">User</span></h1>
+            <div class="sub">Manage requests, users, and reports — all in one place.</div>
+        </div>
+        <div class="hero-right">
+            <div class="user-badge">
+                <i class="fas fa-user-circle"></i>
+                <span id="userRoleDisplay">(role)</span>
+                <span class="role-tag" id="roleTag">role</span>
+            </div>
+            <button class="btn-logout" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+    </div>
+
+    <!-- ===== STATS CARDS ===== -->
+    <div class="stats-grid" id="statsContainer"></div>
+
+    <!-- ===== CHARTS ===== -->
+    <div class="chart-row">
+        <div class="chart-box">
+            <h3>📊 Job Status Distribution</h3>
+            <canvas id="statusChart"></canvas>
+        </div>
+        <div class="chart-box">
+            <h3>📈 Monthly Job Trend</h3>
+            <canvas id="trendChart"></canvas>
+        </div>
+    </div>
+
+    <!-- ===== ACTIONS ===== -->
+    <div class="actions" id="actionButtons"></div>
+
+    <!-- ===== TABLE ===== -->
+    <div class="table-wrap" id="tableContainer">
+        <h3 id="tableTitle">📋 Requests</h3>
+        <div class="filter-bar" id="filterBar"></div>
+        <div id="tableBody"><p>Loading...</p></div>
+    </div>
+
+    <!-- ===== MODAL: User Management ===== -->
+    <div class="modal-overlay" id="userModal">
+        <div class="modal">
+            <button class="close-btn" onclick="closeUserModal()">&times;</button>
+            <h2 id="userModalTitle"><i class="fas fa-users-cog"></i> Add New User</h2>
+            <div id="userListContainer"><ul class="user-list" id="userList"></ul></div>
+            <hr />
+            <h3 style="margin-bottom:12px; font-size:18px; font-weight:700;" id="userFormTitle">➕ Add New User</h3>
+            <input type="hidden" id="editUserId" value="" />
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="newUserName" placeholder="e.g. Jane Mwangi" />
+            </div>
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="newUserEmail" placeholder="user@hospital.com" />
+            </div>
+            <div class="form-group" id="passwordField">
+                <label>Password</label>
+                <input type="text" id="newUserPassword" placeholder="Set a password for the user" />
+            </div>
+            <div class="form-group">
+                <label>Role</label>
+                <select id="newUserRole" onchange="toggleRoleFields()">
+                    <option value="requester">Requester</option>
+                    <option value="maintenance">Maintenance</option>
+                    <option value="admin">Admin</option>
+                </select>
+            </div>
+
+            <!-- ===== DEPARTMENT DROPDOWN (SINGLE) – UPDATED WITH WARDS ===== -->
+            <div class="form-group" id="deptFieldContainer" style="display:block;">
+                <label id="deptLabel">Department (for requester)</label>
+                <select id="newUserDept">
+                    <option value="">-- Select department --</option>
+                    <optgroup label="🏥 Wards & Units">
+                        <option value="General Ward - Male">General Ward - Male</option>
+                        <option value="General Ward - Female">General Ward - Female</option>
+                        <option value="Medical Ward">Medical Ward</option>
+                        <option value="Surgical Ward">Surgical Ward</option>
+                        <option value="Paediatric Ward">Paediatric Ward</option>
+                        <option value="Maternity Ward">Maternity Ward</option>
+                        <option value="High Dependency Unit (HDU)">High Dependency Unit (HDU)</option>
+                        <option value="ICU / HDU">ICU / HDU</option>
+                        <option value="Neonatal ICU (NICU)">Neonatal ICU (NICU)</option>
+                        <option value="Paediatric ICU (PICU)">Paediatric ICU (PICU)</option>
+                    </optgroup>
+                    <optgroup label="🩺 Clinical & Medical">
+                        <option value="Accident & Emergency (A&E)">Accident & Emergency (A&E)</option>
+                        <option value="Anaesthesia">Anaesthesia</option>
+                        <option value="Cardiology">Cardiology</option>
+                        <option value="Cardiothoracic Surgery">Cardiothoracic Surgery</option>
+                        <option value="Dermatology">Dermatology</option>
+                        <option value="Endocrinology">Endocrinology</option>
+                        <option value="ENT (Ear, Nose & Throat)">ENT (Ear, Nose & Throat)</option>
+                        <option value="Gastroenterology">Gastroenterology</option>
+                        <option value="General Medicine">General Medicine</option>
+                        <option value="General Surgery">General Surgery</option>
+                        <option value="Gynaecology">Gynaecology</option>
+                        <option value="Haematology">Haematology</option>
+                        <option value="Infectious Diseases">Infectious Diseases</option>
+                        <option value="Nephrology (Renal Unit)">Nephrology (Renal Unit)</option>
+                        <option value="Neurology">Neurology</option>
+                        <option value="Neurosurgery">Neurosurgery</option>
+                        <option value="Obstetrics">Obstetrics</option>
+                        <option value="Oncology">Oncology</option>
+                        <option value="Ophthalmology">Ophthalmology</option>
+                        <option value="Orthopaedics & Trauma">Orthopaedics & Trauma</option>
+                        <option value="Paediatrics">Paediatrics</option>
+                        <option value="Palliative Care">Palliative Care</option>
+                        <option value="Psychiatry / Mental Health">Psychiatry / Mental Health</option>
+                        <option value="Pulmonology / Respiratory">Pulmonology / Respiratory</option>
+                        <option value="Radiology / Imaging">Radiology / Imaging</option>
+                        <option value="Radiotherapy">Radiotherapy</option>
+                        <option value="Reproductive Health">Reproductive Health</option>
+                        <option value="Rheumatology">Rheumatology</option>
+                        <option value="Urology">Urology</option>
+                    </optgroup>
+                    <optgroup label="🩺 Critical & Specialised Care">
+                        <option value="Theatre (Operating Rooms)">Theatre (Operating Rooms)</option>
+                    </optgroup>
+                    <optgroup label="⚕️ Allied Health & Support">
+                        <option value="Dental / Oral Health">Dental / Oral Health</option>
+                        <option value="Laboratory (Pathology)">Laboratory (Pathology)</option>
+                        <option value="Nutrition & Dietetics">Nutrition & Dietetics</option>
+                        <option value="Occupational Therapy">Occupational Therapy</option>
+                        <option value="Optometry">Optometry</option>
+                        <option value="Pharmacy">Pharmacy</option>
+                        <option value="Physiotherapy / Rehabilitation">Physiotherapy / Rehabilitation</option>
+                        <option value="Social Work / Counselling">Social Work / Counselling</option>
+                        <option value="Speech Therapy">Speech Therapy</option>
+                    </optgroup>
+                    <optgroup label="⚙️ Technical & Engineering">
+                        <option value="Biomedical Engineering">Biomedical Engineering</option>
+                        <option value="Maintenance & Engineering">Maintenance & Engineering</option>
+                        <option value="Information Technology (IT)">Information Technology (IT)</option>
+                    </optgroup>
+                    <optgroup label="📋 Administrative & Corporate">
+                        <option value="Administration">Administration</option>
+                        <option value="Finance / Accounts">Finance / Accounts</option>
+                        <option value="Health Records / HIM">Health Records / HIM</option>
+                        <option value="Human Resources">Human Resources</option>
+                        <option value="Procurement / Supply Chain">Procurement / Supply Chain</option>
+                        <option value="Public Health / Community Health">Public Health / Community Health</option>
+                        <option value="Quality Assurance">Quality Assurance</option>
+                        <option value="Research & Training">Research & Training</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <!-- ===== MULTI-DEPARTMENT DROPDOWN FOR ENGINEERS – UPDATED WITH WARDS ===== -->
+            <div class="form-group" id="multiDeptContainer" style="display:none;">
+                <label>Select departments the engineer will handle (hold Ctrl/Cmd to choose multiple)</label>
+                <select id="newUserDepts" multiple size="5">
+                    <optgroup label="🏥 Wards & Units">
+                        <option value="General Ward - Male">General Ward - Male</option>
+                        <option value="General Ward - Female">General Ward - Female</option>
+                        <option value="Medical Ward">Medical Ward</option>
+                        <option value="Surgical Ward">Surgical Ward</option>
+                        <option value="Paediatric Ward">Paediatric Ward</option>
+                        <option value="Maternity Ward">Maternity Ward</option>
+                        <option value="High Dependency Unit (HDU)">High Dependency Unit (HDU)</option>
+                        <option value="ICU / HDU">ICU / HDU</option>
+                        <option value="Neonatal ICU (NICU)">Neonatal ICU (NICU)</option>
+                        <option value="Paediatric ICU (PICU)">Paediatric ICU (PICU)</option>
+                    </optgroup>
+                    <optgroup label="🩺 Clinical & Medical">
+                        <option value="Accident & Emergency (A&E)">Accident & Emergency (A&E)</option>
+                        <option value="Anaesthesia">Anaesthesia</option>
+                        <option value="Cardiology">Cardiology</option>
+                        <option value="Cardiothoracic Surgery">Cardiothoracic Surgery</option>
+                        <option value="Dermatology">Dermatology</option>
+                        <option value="Endocrinology">Endocrinology</option>
+                        <option value="ENT (Ear, Nose & Throat)">ENT (Ear, Nose & Throat)</option>
+                        <option value="Gastroenterology">Gastroenterology</option>
+                        <option value="General Medicine">General Medicine</option>
+                        <option value="General Surgery">General Surgery</option>
+                        <option value="Gynaecology">Gynaecology</option>
+                        <option value="Haematology">Haematology</option>
+                        <option value="Infectious Diseases">Infectious Diseases</option>
+                        <option value="Nephrology (Renal Unit)">Nephrology (Renal Unit)</option>
+                        <option value="Neurology">Neurology</option>
+                        <option value="Neurosurgery">Neurosurgery</option>
+                        <option value="Obstetrics">Obstetrics</option>
+                        <option value="Oncology">Oncology</option>
+                        <option value="Ophthalmology">Ophthalmology</option>
+                        <option value="Orthopaedics & Trauma">Orthopaedics & Trauma</option>
+                        <option value="Paediatrics">Paediatrics</option>
+                        <option value="Palliative Care">Palliative Care</option>
+                        <option value="Psychiatry / Mental Health">Psychiatry / Mental Health</option>
+                        <option value="Pulmonology / Respiratory">Pulmonology / Respiratory</option>
+                        <option value="Radiology / Imaging">Radiology / Imaging</option>
+                        <option value="Radiotherapy">Radiotherapy</option>
+                        <option value="Reproductive Health">Reproductive Health</option>
+                        <option value="Rheumatology">Rheumatology</option>
+                        <option value="Urology">Urology</option>
+                    </optgroup>
+                    <optgroup label="🩺 Critical & Specialised Care">
+                        <option value="Theatre (Operating Rooms)">Theatre (Operating Rooms)</option>
+                    </optgroup>
+                    <optgroup label="⚕️ Allied Health & Support">
+                        <option value="Dental / Oral Health">Dental / Oral Health</option>
+                        <option value="Laboratory (Pathology)">Laboratory (Pathology)</option>
+                        <option value="Nutrition & Dietetics">Nutrition & Dietetics</option>
+                        <option value="Occupational Therapy">Occupational Therapy</option>
+                        <option value="Optometry">Optometry</option>
+                        <option value="Pharmacy">Pharmacy</option>
+                        <option value="Physiotherapy / Rehabilitation">Physiotherapy / Rehabilitation</option>
+                        <option value="Social Work / Counselling">Social Work / Counselling</option>
+                        <option value="Speech Therapy">Speech Therapy</option>
+                    </optgroup>
+                    <optgroup label="⚙️ Technical & Engineering">
+                        <option value="Biomedical Engineering">Biomedical Engineering</option>
+                        <option value="Maintenance & Engineering">Maintenance & Engineering</option>
+                        <option value="Information Technology (IT)">Information Technology (IT)</option>
+                    </optgroup>
+                    <optgroup label="📋 Administrative & Corporate">
+                        <option value="Administration">Administration</option>
+                        <option value="Finance / Accounts">Finance / Accounts</option>
+                        <option value="Health Records / HIM">Health Records / HIM</option>
+                        <option value="Human Resources">Human Resources</option>
+                        <option value="Procurement / Supply Chain">Procurement / Supply Chain</option>
+                        <option value="Public Health / Community Health">Public Health / Community Health</option>
+                        <option value="Quality Assurance">Quality Assurance</option>
+                        <option value="Research & Training">Research & Training</option>
+                    </optgroup>
+                </select>
+                <small style="color:#6c757d;">Hold Ctrl (Windows) or Cmd (Mac) to select multiple.</small>
+            </div>
+
+            <div class="form-group" id="whatsappFieldContainer">
+                <label>WhatsApp Number (for maintenance)</label>
+                <div class="whatsapp-inline">
+                    <div class="field-group-small">
+                        <label>Country</label>
+                        <select id="newUserCountryCode">
+                            <option value="+254">🇰🇪 +254 (Kenya)</option>
+                            <option value="+256">🇺🇬 +256 (Uganda)</option>
+                            <option value="+255">🇹🇿 +255 (Tanzania)</option>
+                            <option value="+250">🇷🇼 +250 (Rwanda)</option>
+                            <option value="+1">🇺🇸 +1 (USA)</option>
+                            <option value="+44">🇬🇧 +44 (UK)</option>
+                            <option value="+91">🇮🇳 +91 (India)</option>
+                            <option value="+61">🇦🇺 +61 (Australia)</option>
+                            <option value="+234">🇳🇬 +234 (Nigeria)</option>
+                            <option value="+27">🇿🇦 +27 (South Africa)</option>
+                            <option value="+86">🇨🇳 +86 (China)</option>
+                            <option value="+81">🇯🇵 +81 (Japan)</option>
+                            <option value="+55">🇧🇷 +55 (Brazil)</option>
+                            <option value="+33">🇫🇷 +33 (France)</option>
+                            <option value="+49">🇩🇪 +49 (Germany)</option>
+                            <option value="+39">🇮🇹 +39 (Italy)</option>
+                            <option value="+34">🇪🇸 +34 (Spain)</option>
+                            <option value="+7">🇷🇺 +7 (Russia)</option>
+                            <option value="+52">🇲🇽 +52 (Mexico)</option>
+                            <option value="+63">🇵🇭 +63 (Philippines)</option>
+                            <option value="+62">🇮🇩 +62 (Indonesia)</option>
+                        </select>
+                    </div>
+                    <div class="field-group-small" style="flex:2;">
+                        <label>Number</label>
+                        <input type="text" id="newUserWhatsApp" placeholder="e.g. 712345678" />
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn btn-success" id="saveUserBtn" onclick="saveUser()"><i class="fas fa-save"></i> Save User</button>
+            <div id="userModalError" class="error-text"></div>
+            <div id="userModalSuccess" class="success-text"></div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL: Pending Approvals ===== -->
+    <div class="modal-overlay" id="approvalModal">
+        <div class="modal">
+            <button class="close-btn" onclick="closeApprovalModal()">&times;</button>
+            <h2><i class="fas fa-user-clock"></i> Pending Approvals</h2>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <span style="font-size:14px; color:var(--text-muted);">Users waiting for approval</span>
+                <button class="btn btn-outline btn-sm" onclick="showPendingUsers()"><i class="fas fa-sync-alt"></i> Refresh</button>
+            </div>
+            <div id="pendingList"><p>Loading...</p></div>
+        </div>
+    </div>
+
+    <!-- ===== QUICK LINKS ===== -->
+    <div style="margin-top:24px; text-align:right; padding:16px 20px; background:white; border-radius:var(--radius); box-shadow:var(--shadow); display:flex; flex-wrap:wrap; justify-content:flex-end; gap:12px;">
+        <button class="btn btn-outline btn-sm" onclick="window.location.href='analytics.html'"><i class="fas fa-chart-bar"></i> Analytics</button>
+        <button class="btn btn-primary btn-sm" onclick="window.location.href='report.html'"><i class="fas fa-file-alt"></i> Monthly Report</button>
+    </div>
+</div>
+
+<!-- ===== TOAST ===== -->
+<div id="toast" class="toast">Message</div>
+
+<!-- PDF Templates -->
+<div id="pdfTemplate"></div>
+<div id="requestPdfTemplate"></div>
+
+<script type="module">
+    // ============================================================
+    // FIREBASE CONFIG
+    // ============================================================
+    const firebaseConfig = {
+        apiKey: "AIzaSyDnsz1s-VnewbUszXNJptcdMZ_h0QsNHYQ",
+        authDomain: "moivoibiomed.firebaseapp.com",
+        databaseURL: "https://moivoibiomed-default-rtdb.firebaseio.com",
+        projectId: "moivoibiomed",
+        storageBucket: "moivoibiomed.firebasestorage.app",
+        messagingSenderId: "996551978571",
+        appId: "1:996551978571:web:f44941649a58e020f5e7ce"
+    };
+
+    import { initializeApp } from 'firebase/app';
+    import { getAuth, signOut, onAuthStateChanged, createUserWithEmailAndPassword } from 'firebase/auth';
+    import {
+        getFirestore,
+        collection,
+        getDocs,
+        getDoc,
+        doc,
+        setDoc,
+        updateDoc,
+        deleteDoc,
+        query,
+        orderBy,
+        where,
+        serverTimestamp
+    } from 'firebase/firestore';
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const USERS_COLL = 'users';
+    const REQUESTS_COLL = 'requests';
+    const JOBCARDS_COLL = 'jobcards';
+
+    console.log('🚀 Dashboard loaded');
+
+    let currentUser = null;
+    let userRole = '';
+    let allRequests = [];
+    let allJobCards = [];
+    let allUsers = [];
+    let pendingApprovalCount = 0;
+    let currentView = 'requests';
+
+    // DOM refs
+    const userNameDisplay = document.getElementById('userNameDisplay');
+    const userRoleDisplay = document.getElementById('userRoleDisplay');
+    const roleTag = document.getElementById('roleTag');
+    const statsContainer = document.getElementById('statsContainer');
+    const actionButtons = document.getElementById('actionButtons');
+    const tableTitle = document.getElementById('tableTitle');
+    const filterBar = document.getElementById('filterBar');
+    const tableBody = document.getElementById('tableBody');
+    const toast = document.getElementById('toast');
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    let statusChartInstance = null;
+    let trendChartInstance = null;
+
+    // ===== LOGOUT =====
+    logoutBtn.addEventListener('click', () => {
+        signOut(auth).then(() => window.location.href = 'login.html')
+            .catch(err => showToast('Logout error: ' + err.message, true));
+    });
+
+    // ===== TOAST =====
+    function showToast(msg, isError = false) {
+        toast.textContent = msg;
+        toast.style.borderLeftColor = isError ? '#ef4444' : '#C8102E';
+        toast.classList.add('show');
+        clearTimeout(toast._timer);
+        toast._timer = setTimeout(() => toast.classList.remove('show'), 3500);
+    }
+
+    function getStatusClass(status) {
+        if (!status) return 'pending';
+        const s = status.toLowerCase();
+        if (s === 'pending' || s === 'postponed') return 'pending';
+        if (s === 'completed') return 'completed';
+        if (s === 'written off') return 'writtenoff';
+        return 'open';
+    }
+
+    // ================================================================
+    // TOGGLE FIELDS
+    // ================================================================
+    function toggleRoleFields() {
+        const role = document.getElementById('newUserRole').value;
+        const deptContainer = document.getElementById('deptFieldContainer');
+        const multiDeptContainer = document.getElementById('multiDeptContainer');
+        const whatsappContainer = document.getElementById('whatsappFieldContainer');
+        const deptLabel = document.getElementById('deptLabel');
+        const passwordField = document.getElementById('passwordField');
+
+        deptContainer.style.display = 'none';
+        multiDeptContainer.style.display = 'none';
+        whatsappContainer.style.display = 'none';
+
+        const isEdit = document.getElementById('editUserId').value !== '';
+        passwordField.style.display = isEdit ? 'none' : 'block';
+
+        if (role === 'requester') {
+            deptContainer.style.display = 'block';
+            deptLabel.textContent = 'Department (for requester)';
+            document.getElementById('newUserDept').required = true;
+        } else if (role === 'maintenance') {
+            multiDeptContainer.style.display = 'block';
+            whatsappContainer.style.display = 'block';
+            document.getElementById('newUserWhatsApp').required = true;
+        }
+    }
+    window.toggleRoleFields = toggleRoleFields;
+
+    // ================================================================
+    // FETCH DATA
+    // ================================================================
+    async function fetchData() {
+        console.log('🔍 fetchData() called.');
+        try {
+            const isAdmin = userRole === 'admin';
+            const isMaintenance = userRole === 'maintenance';
+
+            const reqQuery = query(collection(db, REQUESTS_COLL), orderBy('createdAt', 'desc'));
+            const reqSnap = await getDocs(reqQuery);
+            allRequests = [];
+            reqSnap.forEach(doc => {
+                const data = doc.data();
+                data.id = doc.id;
+                allRequests.push(data);
+            });
+            console.log(`✅ Fetched ${allRequests.length} total requests.`);
+
+            const jobSnap = await getDocs(query(collection(db, JOBCARDS_COLL), orderBy('updatedAt', 'desc')));
+            allJobCards = [];
+            jobSnap.forEach(doc => {
+                const data = doc.data();
+                data.id = doc.id;
+                allJobCards.push(data);
+            });
+            console.log(`✅ Fetched ${allJobCards.length} jobcards.`);
+
+            const jobMap = new Map();
+            allJobCards.forEach(j => {
+                if (j.requestNo) jobMap.set(j.requestNo, j);
+            });
+            allRequests.forEach(r => {
+                const job = jobMap.get(r.requestNo);
+                if (job) {
+                    r.jobStatus = job.status || 'Pending';
+                    r.jobNo = job.jobNo;
+                    r.jobId = job.id;
+                } else {
+                    r.jobStatus = 'No Job';
+                    r.jobNo = null;
+                    r.jobId = null;
+                }
+            });
+
+            if (isAdmin || isMaintenance) {
+                const userSnap = await getDocs(collection(db, USERS_COLL));
+                allUsers = [];
+                userSnap.forEach(doc => {
+                    allUsers.push({ id: doc.id, ...doc.data() });
+                });
+                pendingApprovalCount = allUsers.filter(u => u.approved !== true).length;
+            } else {
+                allUsers = [];
+                pendingApprovalCount = 0;
+            }
+        } catch (err) {
+            console.error('❌ fetchData error:', err);
+            showToast('Error loading data: ' + err.message, true);
+        }
+    }
+
+    function getMyRequests() {
+        if (!currentUser || !currentUser.id) {
+            console.warn('⚠️ getMyRequests: currentUser or id missing');
+            return [];
+        }
+        const filtered = allRequests.filter(r => r.requesterId === currentUser.id);
+        console.log(`📋 getMyRequests: found ${filtered.length} requests for UID ${currentUser.id}`);
+        if (filtered.length === 0 && allRequests.length > 0) {
+            const sampleIds = allRequests.slice(0, 5).map(r => r.requesterId);
+            console.log('Sample requesterIds from allRequests:', sampleIds);
+            console.log('Current user ID:', currentUser.id);
+        }
+        return filtered;
+    }
+
+    function getDepartmentJobcards() {
+        if (!currentUser || !currentUser.department) return [];
+        return allJobCards.filter(j => j.unit === currentUser.department);
+    }
+
+    // ================================================================
+    // RENDER DASHBOARD
+    // ================================================================
+    function renderDashboard() {
+        if (!currentUser) return;
+        const isAdmin = userRole === 'admin';
+        const isMaintenance = userRole === 'maintenance';
+        const isRequester = userRole === 'requester';
+
+        const totalRequests = allRequests.length;
+        const totalJobcards = allJobCards.length;
+        const myRequests = getMyRequests();
+        const deptJobcards = getDepartmentJobcards();
+
+        const pendingReqs = allRequests.filter(r => r.jobStatus === 'Pending' || r.jobStatus === 'No Job').length;
+        const completedReqs = allRequests.filter(r => r.jobStatus === 'Completed').length;
+        const writtenOffReqs = allRequests.filter(r => r.jobStatus === 'Written Off').length;
+
+        let statsHtml = '';
+        if (isAdmin) {
+            statsHtml = `
+                <div class="stat-card total" onclick="switchView('requests')">
+                    <div class="stat-left"><div class="number">${totalRequests}</div><div class="label">📋 All Requests</div></div>
+                    <div class="stat-icon"><i class="fas fa-list"></i></div>
+                </div>
+                <div class="stat-card jobcards" onclick="switchView('jobcards')">
+                    <div class="stat-left"><div class="number">${totalJobcards}</div><div class="label">📋 All Jobcards</div></div>
+                    <div class="stat-icon"><i class="fas fa-tools"></i></div>
+                </div>
+                <div class="stat-card pending" onclick="applyFilter('pending')">
+                    <div class="stat-left"><div class="number">${pendingReqs}</div><div class="label">🕒 Pending Requests</div></div>
+                    <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                </div>
+                <div class="stat-card completed" onclick="applyFilter('completed')">
+                    <div class="stat-left"><div class="number">${completedReqs}</div><div class="label">✅ Completed Requests</div></div>
+                    <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                </div>
+                <div class="stat-card writtenoff" onclick="applyFilter('writtenoff')">
+                    <div class="stat-left"><div class="number">${writtenOffReqs}</div><div class="label">❌ Written Off</div></div>
+                    <div class="stat-icon"><i class="fas fa-times-circle"></i></div>
+                </div>
+                <div class="stat-card users" onclick="openUserModal()">
+                    <div class="stat-left"><div class="number">${allUsers.length}</div><div class="label">👤 Users</div></div>
+                    <div class="stat-icon"><i class="fas fa-users"></i></div>
+                </div>
+                <div class="stat-card pending-approval" onclick="showPendingUsers()">
+                    <div class="stat-left"><div class="number">${pendingApprovalCount}</div><div class="label">⏳ Pending Approvals</div></div>
+                    <div class="stat-icon"><i class="fas fa-user-clock"></i></div>
+                </div>
+            `;
+        } else if (isMaintenance) {
+            const newReqs = allRequests.filter(r => r.jobStatus === 'No Job').length;
+            statsHtml = `
+                <div class="stat-card total" onclick="switchView('requests')">
+                    <div class="stat-left"><div class="number">${totalRequests}</div><div class="label">📋 All Requests</div></div>
+                    <div class="stat-icon"><i class="fas fa-list"></i></div>
+                </div>
+                <div class="stat-card jobcards" onclick="switchView('jobcards')">
+                    <div class="stat-left"><div class="number">${totalJobcards}</div><div class="label">📋 All Jobcards</div></div>
+                    <div class="stat-icon"><i class="fas fa-tools"></i></div>
+                </div>
+                <div class="stat-card new" onclick="applyFilter('new')">
+                    <div class="stat-left"><div class="number">${newReqs}</div><div class="label">🆕 New (No Job)</div></div>
+                    <div class="stat-icon"><i class="fas fa-plus-circle"></i></div>
+                </div>
+                <div class="stat-card pending" onclick="applyFilter('pending')">
+                    <div class="stat-left"><div class="number">${pendingReqs}</div><div class="label">🕒 Pending</div></div>
+                    <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                </div>
+                <div class="stat-card completed" onclick="applyFilter('completed')">
+                    <div class="stat-left"><div class="number">${completedReqs}</div><div class="label">✅ Completed</div></div>
+                    <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                </div>
+            `;
+        } else { // Requester
+            statsHtml = `
+                <div class="stat-card myrequests" onclick="switchView('requests')">
+                    <div class="stat-left"><div class="number">${myRequests.length}</div><div class="label">📋 My Requests</div></div>
+                    <div class="stat-icon"><i class="fas fa-file-alt"></i></div>
+                </div>
+                <div class="stat-card jobcards" onclick="switchView('jobcards')">
+                    <div class="stat-left"><div class="number">${deptJobcards.length}</div><div class="label">📋 Dept. Jobcards</div></div>
+                    <div class="stat-icon"><i class="fas fa-tools"></i></div>
+                </div>
+                <div class="stat-card pending" onclick="applyFilter('pending')">
+                    <div class="stat-left"><div class="number">${myRequests.filter(r => r.jobStatus === 'Pending' || r.jobStatus === 'No Job').length}</div><div class="label">🕒 Pending</div></div>
+                    <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                </div>
+                <div class="stat-card completed" onclick="applyFilter('completed')">
+                    <div class="stat-left"><div class="number">${myRequests.filter(r => r.jobStatus === 'Completed').length}</div><div class="label">✅ Completed</div></div>
+                    <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                </div>
+                <div class="stat-card writtenoff" onclick="applyFilter('writtenoff')">
+                    <div class="stat-left"><div class="number">${myRequests.filter(r => r.jobStatus === 'Written Off').length}</div><div class="label">❌ Written Off</div></div>
+                    <div class="stat-icon"><i class="fas fa-times-circle"></i></div>
+                </div>
+            `;
+        }
+        statsContainer.innerHTML = statsHtml;
+
+        renderCharts();
+
+        let actionsHtml = '';
+        if (isRequester) {
+            actionsHtml = `
+                <button class="btn btn-primary" onclick="window.location.href='request.html'"><i class="fas fa-plus"></i> New Request</button>
+                <button class="btn btn-outline" onclick="refreshData()"><i class="fas fa-sync-alt"></i> Refresh</button>
+            `;
+        } else if (isMaintenance) {
+            actionsHtml = `
+                <button class="btn btn-success" onclick="window.location.href='jobcard.html'"><i class="fas fa-tools"></i> Create Job Card</button>
+                <button class="btn btn-outline" onclick="window.location.href='analytics.html'"><i class="fas fa-chart-bar"></i> Analytics</button>
+                <button class="btn btn-outline" onclick="refreshData()"><i class="fas fa-sync-alt"></i> Refresh</button>
+            `;
+        } else if (isAdmin) {
+            actionsHtml = `
+                <button class="btn btn-primary" onclick="window.location.href='request.html'"><i class="fas fa-plus"></i> New Request</button>
+                <button class="btn btn-success" onclick="window.location.href='jobcard.html'"><i class="fas fa-tools"></i> Create Job Card</button>
+                <button class="btn btn-outline" onclick="openUserModal()"><i class="fas fa-users-cog"></i> Manage Users</button>
+                <button class="btn btn-outline" onclick="showPendingUsers()"><i class="fas fa-user-check"></i> Approve Users</button>
+                <button class="btn btn-outline" onclick="window.location.href='analytics.html'"><i class="fas fa-chart-bar"></i> Analytics</button>
+                <button class="btn btn-outline" onclick="refreshData()"><i class="fas fa-sync-alt"></i> Refresh</button>
+            `;
+        }
+        actionButtons.innerHTML = actionsHtml;
+
+        buildFilterBar();
+        updateTableTitle();
+        applyFilters();
+    }
+
+    // ================================================================
+    // REFRESH DATA
+    // ================================================================
+    window.refreshData = function() {
+        showToast('🔄 Refreshing...');
+        fetchData().then(() => {
+            renderDashboard();
+            showToast('✅ Data refreshed.');
+        });
+    };
+
+    // ================================================================
+    // SWITCH VIEW
+    // ================================================================
+    window.switchView = function(view) {
+        currentView = view;
+        buildFilterBar();
+        updateTableTitle();
+        applyFilters();
+    };
+
+    // ================================================================
+    // BUILD FILTER BAR
+    // ================================================================
+    function buildFilterBar() {
+        const isAdmin = userRole === 'admin';
+        const isMaintenance = userRole === 'maintenance';
+
+        let filterHtml = '';
+        if (currentView === 'requests') {
+            if (isAdmin || isMaintenance) {
+                filterHtml = `
+                    <select id="statusFilter" onchange="applyFilters()">
+                        <option value="all">All Statuses</option>
+                        <option value="new">New (No Job)</option>
+                        <option value="pending">Pending</option>
+                        <option value="completed">Completed</option>
+                        <option value="postponed">Postponed</option>
+                        <option value="writtenoff">Written Off</option>
+                    </select>
+                    <input type="text" id="searchFilter" placeholder="Search request # or equipment..." oninput="applyFilters()" />
+                `;
+            } else {
+                filterHtml = `
+                    <input type="text" id="searchFilter" placeholder="Search request # or equipment..." oninput="applyFilters()" />
+                `;
+            }
+        } else {
+            filterHtml = `
+                <select id="statusFilter" onchange="applyFilters()">
+                    <option value="all">All Statuses</option>
+                    <option value="pending">Pending</option>
+                    <option value="completed">Completed</option>
+                    <option value="writtenoff">Written Off</option>
+                    <option value="postponed">Postponed</option>
+                </select>
+                <input type="text" id="searchFilter" placeholder="Search job # or equipment..." oninput="applyFilters()" />
+            `;
+        }
+        filterBar.innerHTML = filterHtml;
+    }
+
+    function updateTableTitle() {
+        const isRequester = userRole === 'requester';
+        let title = '';
+        if (currentView === 'requests') {
+            title = isRequester ? '📋 My Requests' : '📋 All Requests';
+        } else {
+            title = isRequester ? '📋 Department Jobcards' : '📋 All Jobcards';
+        }
+        tableTitle.textContent = title;
+    }
+
+    // ================================================================
+    // RENDER CHARTS
+    // ================================================================
+    function renderCharts() {
+        let requestsForCharts = [];
+        if (userRole === 'requester') {
+            requestsForCharts = getMyRequests();
+        } else {
+            requestsForCharts = allRequests;
+        }
+
+        const statusCounts = { 'Pending':0, 'Completed':0, 'Written Off':0, 'Postponed':0, 'No Job':0 };
+        requestsForCharts.forEach(r => {
+            const s = r.jobStatus || 'No Job';
+            if (statusCounts.hasOwnProperty(s)) statusCounts[s]++;
+            else statusCounts[s] = 1;
+        });
+        const labels = Object.keys(statusCounts);
+        const data = Object.values(statusCounts);
+        const colors = ['#f59e0b', '#22c55e', '#ef4444', '#f59e0b', '#6b7280'];
+
+        const ctx1 = document.getElementById('statusChart').getContext('2d');
+        if (statusChartInstance) statusChartInstance.destroy();
+        statusChartInstance = new Chart(ctx1, {
+            type: 'doughnut',
+            data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 2, borderColor: '#fff' }] },
+            options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 12, font: { size: 12 } } } }, cutout: '60%' }
+        });
+
+        const months = {};
+        requestsForCharts.forEach(r => {
+            const d = r.createdAt ? new Date(r.createdAt) : new Date();
+            const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+            months[key] = (months[key] || 0) + 1;
+        });
+        const sortedMonths = Object.keys(months).sort().slice(-6);
+        const trendData = sortedMonths.map(m => months[m]);
+        const ctx2 = document.getElementById('trendChart').getContext('2d');
+        if (trendChartInstance) trendChartInstance.destroy();
+        trendChartInstance = new Chart(ctx2, {
+            type: 'line',
+            data: { labels: sortedMonths, datasets: [{ label: 'Requests', data: trendData, borderColor: '#C8102E', backgroundColor: 'rgba(200,16,46,0.1)', fill: true, tension: 0.3, pointBackgroundColor: '#C8102E', pointBorderColor: '#fff', pointBorderWidth: 2, pointRadius: 4 }] },
+            options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+        });
+    }
+
+    // ================================================================
+    // APPLY FILTERS
+    // ================================================================
+    window.applyFilter = function(status) {
+        const select = document.getElementById('statusFilter');
+        if (select) { select.value = status; applyFilters(); }
+    };
+
+    window.applyFilters = function() {
+        const statusFilter = document.getElementById('statusFilter')?.value || 'all';
+        const searchFilter = document.getElementById('searchFilter')?.value?.toLowerCase() || '';
+
+        let data = [];
+        let isRequests = (currentView === 'requests');
+
+        if (isRequests) {
+            if (userRole === 'requester') {
+                data = getMyRequests();
+            } else {
+                data = allRequests;
+            }
+        } else {
+            if (userRole === 'requester') {
+                data = getDepartmentJobcards();
+            } else {
+                data = allJobCards;
+            }
+        }
+
+        if (statusFilter !== 'all') {
+            if (isRequests) {
+                if (statusFilter === 'new') {
+                    data = data.filter(item => item.jobStatus === 'No Job');
+                } else {
+                    data = data.filter(item => item.jobStatus && item.jobStatus.toLowerCase() === statusFilter);
+                }
+            } else {
+                data = data.filter(item => item.status && item.status.toLowerCase() === statusFilter);
+            }
+        }
+
+        if (searchFilter) {
+            if (isRequests) {
+                data = data.filter(item =>
+                    item.requestNo?.toLowerCase().includes(searchFilter) ||
+                    item.equipName?.toLowerCase().includes(searchFilter)
+                );
+            } else {
+                data = data.filter(item =>
+                    item.jobNo?.toLowerCase().includes(searchFilter) ||
+                    item.equipName?.toLowerCase().includes(searchFilter)
+                );
+            }
+        }
+
+        renderTable(data);
+    };
+
+    // ================================================================
+    // RENDER TABLE
+    // ================================================================
+    function renderTable(data) {
+        if (!data || data.length === 0) {
+            tableBody.innerHTML = '<p style="color:#9ca3af; padding:20px; text-align:center;">📭 No records found.</p>';
+            return;
+        }
+        if (currentView === 'requests') {
+            renderRequestsTable(data);
+        } else {
+            renderJobcardsTable(data);
+        }
+    }
+
+    // ================================================================
+    // RENDER REQUESTS TABLE
+    // ================================================================
+    function renderRequestsTable(requests) {
+        let html = `
+            <table>
+                <thead>
+                    <tr>
+                        <th>Request No.</th>
+                        <th>Requester</th>
+                        <th>Unit/Ward</th>
+                        <th>Equipment</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+        requests.forEach(r => {
+            const status = r.jobStatus || 'No Job';
+            const statusClass = getStatusClass(status);
+            let jobAction = '';
+            if (!r.jobId && (userRole === 'maintenance' || userRole === 'admin')) {
+                jobAction = `<button class="btn btn-success btn-sm" onclick="createJob('${r.requestNo}')"><i class="fas fa-tools"></i> Create Job</button>`;
+            }
+            const actions = `
+                <div class="table-actions">
+                    <button class="btn btn-info btn-sm" onclick="downloadRequestPDF('${r.id}')"><i class="fas fa-file-pdf"></i> PDF</button>
+                    ${jobAction}
+                </div>
+            `;
+            html += `
+                <tr>
+                    <td><strong>${r.requestNo}</strong></td>
+                    <td>${r.requesterName || 'N/A'}</td>
+                    <td>${r.unit || 'N/A'}</td>
+                    <td>${r.equipName || 'N/A'}</td>
+                    <td><span class="status-badge ${statusClass}">${status}</span></td>
+                    <td>${actions}</td>
+                </tr>
+            `;
+        });
+        html += '</tbody></table>';
+        tableBody.innerHTML = html;
+    }
+
+    // ================================================================
+    // RENDER JOBCARDS TABLE
+    // ================================================================
+    function renderJobcardsTable(jobcards) {
+        let html = `
+            <table>
+                <thead>
+                    <tr>
+                        <th>Job No.</th>
+                        <th>Request No.</th>
+                        <th>Equipment</th>
+                        <th>Unit/Ward</th>
+                        <th>Status</th>
+                        <th>Technician</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+        jobcards.forEach(j => {
+            const status = j.status || 'Pending';
+            const statusClass = getStatusClass(status);
+            const isEditable = (status === 'Pending' || status === 'Postponed');
+            const actions = `
+                <div class="table-actions">
+                    <button class="btn btn-info btn-sm" onclick="downloadJobcardPDF('${j.id}')"><i class="fas fa-file-pdf"></i> PDF</button>
+                    ${(isEditable && (userRole === 'admin' || userRole === 'maintenance')) ? `<button class="btn btn-outline btn-sm" onclick="editJobCard('${j.id}')"><i class="fas fa-edit"></i> Edit</button>` : ''}
+                </div>
+            `;
+            html += `
+                <tr>
+                    <td><strong>${j.jobNo || 'N/A'}</strong></td>
+                    <td>${j.requestNo || 'N/A'}</td>
+                    <td>${j.equipName || 'N/A'}</td>
+                    <td>${j.unit || 'N/A'}</td>
+                    <td><span class="status-badge ${statusClass}">${status}</span></td>
+                    <td>${j.techName || 'N/A'}</td>
+                    <td>${actions}</td>
+                </tr>
+            `;
+        });
+        html += '</tbody></table>';
+        tableBody.innerHTML = html;
+    }
+
+    // ================================================================
+    // ACTIONS
+    // ================================================================
+    window.viewRequest = (id) => window.open(`request.html?view=${id}`, '_blank');
+    window.viewJobPDF = (id) => window.open(`jobcard.html?view=${id}`, '_blank');
+    window.createJob = (requestNo) => window.location.href = `jobcard.html?request=${requestNo}`;
+    window.editJobCard = (id) => window.open(`jobcard.html?view=${id}`, '_blank');
+
+    // ================================================================
+    // SIGNATURE RENDERER
+    // ================================================================
+    function signatureToDataURL(signatureData, width = 400, height = 120) {
+        if (!signatureData) return null;
+        let strokes = signatureData;
+        if (!Array.isArray(strokes)) {
+            if (typeof strokes === 'object' && strokes.points) {
+                strokes = strokes.points;
+            } else if (typeof strokes === 'object' && strokes.data) {
+                strokes = strokes.data;
+            } else {
+                console.warn('Signature data is not an array:', strokes);
+                return null;
+            }
+        }
+        if (!Array.isArray(strokes) || strokes.length === 0) return null;
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, width, height);
+        ctx.strokeStyle = 'black';
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+
+        strokes.forEach(stroke => {
+            let points = stroke;
+            if (!Array.isArray(points)) {
+                if (points.points) points = points.points;
+                else if (points.data) points = points.data;
+                else {
+                    console.warn('Invalid stroke:', stroke);
+                    return;
+                }
+            }
+            if (!Array.isArray(points) || points.length === 0) return;
+            ctx.beginPath();
+            let first = true;
+            points.forEach(point => {
+                let x, y;
+                if (typeof point === 'object' && point !== null) {
+                    x = point.x;
+                    y = point.y;
+                    if (x === undefined && point[0] !== undefined) {
+                        x = point[0];
+                        y = point[1];
+                    }
+                } else if (Array.isArray(point) && point.length >= 2) {
+                    x = point[0];
+                    y = point[1];
+                } else {
+                    return;
+                }
+                if (x === undefined || y === undefined) return;
+                if (first) {
+                    ctx.moveTo(x, y);
+                    first = false;
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            });
+            ctx.stroke();
+        });
+
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const data = imageData.data;
+        let hasNonWhite = false;
+        for (let i = 0; i < data.length; i += 4) {
+            if (data[i] < 255 || data[i+1] < 255 || data[i+2] < 255) {
+                hasNonWhite = true;
+                break;
+            }
+        }
+        if (!hasNonWhite) return null;
+
+        return canvas.toDataURL('image/png');
+    }
+
+    // ================================================================
+    // CAPTURE AND SAVE PDF
+    // ================================================================
+    async function captureAndSavePDF(templateDiv, filename) {
+        templateDiv.style.position = 'fixed';
+        templateDiv.style.left = '0';
+        templateDiv.style.top = '0';
+        templateDiv.style.width = '800px';
+        templateDiv.style.height = 'auto';
+        templateDiv.style.overflow = 'visible';
+        templateDiv.style.opacity = '1';
+        templateDiv.style.pointerEvents = 'none';
+        templateDiv.style.zIndex = '9999';
+        templateDiv.style.background = 'white';
+        templateDiv.style.padding = '30px';
+
+        templateDiv.offsetHeight;
+        await new Promise(resolve => setTimeout(resolve, 600));
+
+        const canvas = await html2canvas(templateDiv, {
+            scale: 2,
+            useCORS: true,
+            logging: false,
+            backgroundColor: '#ffffff',
+            allowTaint: false,
+            width: 800,
+            height: templateDiv.scrollHeight,
+            windowWidth: 800,
+            windowHeight: templateDiv.scrollHeight,
+            scrollX: 0,
+            scrollY: 0,
+            onclone: (clonedDoc) => {
+                const clonedEl = clonedDoc.getElementById(templateDiv.id);
+                if (clonedEl) {
+                    clonedEl.style.height = 'auto';
+                    clonedEl.style.overflow = 'visible';
+                }
+            }
+        });
+
+        templateDiv.style.opacity = '0';
+        templateDiv.style.zIndex = '-1';
+        templateDiv.style.pointerEvents = 'none';
+
+        let imgData;
+        try {
+            imgData = canvas.toDataURL('image/png');
+            if (imgData.length < 1000) throw new Error('Empty PNG');
+        } catch (e) {
+            console.warn('PNG fallback to JPEG:', e);
+            imgData = canvas.toDataURL('image/jpeg', 0.95);
+        }
+
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const imgWidth = 210;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+        let remainingHeight = canvas.height;
+        let yOffset = 0;
+        const pageHeightPx = (297 * canvas.width) / 210;
+
+        while (remainingHeight > 0) {
+            const currentHeight = Math.min(remainingHeight, pageHeightPx);
+            const sliceCanvas = document.createElement('canvas');
+            sliceCanvas.width = canvas.width;
+            sliceCanvas.height = currentHeight;
+            const ctx = sliceCanvas.getContext('2d');
+            ctx.drawImage(canvas, 0, yOffset, canvas.width, currentHeight, 0, 0, canvas.width, currentHeight);
+            const sliceData = sliceCanvas.toDataURL('image/jpeg', 0.95);
+
+            if (yOffset > 0) pdf.addPage();
+            const sliceWidth = imgWidth;
+            const sliceHeight = (currentHeight * imgWidth) / canvas.width;
+            pdf.addImage(sliceData, 'JPEG', 0, 0, sliceWidth, sliceHeight);
+
+            yOffset += currentHeight;
+            remainingHeight -= currentHeight;
+        }
+
+        pdf.save(`${filename}.pdf`);
+    }
+
+    // ================================================================
+    // DOWNLOAD JOBCARD PDF
+    // ================================================================
+    window.downloadJobcardPDF = async function(jobcardId) {
+        showToast('Generating PDF...');
+        try {
+            const docSnap = await getDoc(doc(db, JOBCARDS_COLL, jobcardId));
+            if (!docSnap.exists()) {
+                showToast('Job card not found.', true);
+                return;
+            }
+            const job = docSnap.data();
+
+            const fmtDateTime = (val) => val ? new Date(val).toLocaleString() : 'N/A';
+            const fmtDate = (val) => val ? new Date(val).toLocaleDateString() : 'N/A';
+
+            const techSigImg = signatureToDataURL(job.techSignature);
+            const certSigImg = signatureToDataURL(job.certSignature);
+
+            const templateDiv = document.getElementById('pdfTemplate');
+
+            const field = (label, value) => `
+                <div><label style="font-size:11px; font-weight:600; color:#495057; text-transform:uppercase;">${label}</label>
+                <div style="padding:6px 0; font-weight:500;">${value || 'N/A'}</div></div>
+            `;
+
+            const techSigHtml = techSigImg ? `<img src="${techSigImg}" style="width:200px; height:60px; border:1px solid #ddd; border-radius:4px; background:white;" />` : 'No signature';
+            const certSigHtml = certSigImg ? `<img src="${certSigImg}" style="width:200px; height:60px; border:1px solid #ddd; border-radius:4px; background:white;" />` : 'No signature';
+
+            templateDiv.innerHTML = `
+                <div style="font-family:'Segoe UI',sans-serif; padding:20px; max-width:900px; margin:0 auto; background:white; border:1px solid #ccc; box-sizing:border-box; font-size:13px;">
+                    <!-- Header -->
+                    <div style="border-bottom:3px solid #C8102E; padding-bottom:10px; margin-bottom:20px; display:flex; justify-content:space-between;">
+                        <div>
+                            <h1 style="color:#C8102E; font-size:24px;">MOI COUNTY REFERRAL HOSPITAL</h1>
+                            <div style="font-size:13px;">P.O. BOX 18-80300 VOI | Email: biomedsmoivoi@gmail.com</div>
+                            <div style="font-size:13px; font-weight:600; color:#C8102E;">TAITA TAVETA COUNTY</div>
+                        </div>
+                        <span style="background:#C8102E; color:white; padding:4px 16px; border-radius:30px; font-size:14px; font-weight:600;">MINISTRY OF HEALTH</span>
+                    </div>
+
+                    <div style="display:flex; justify-content:space-between; background:#f8f9fc; padding:8px 16px; border-radius:8px; margin-bottom:18px;">
+                        <h2 style="font-size:20px;">⚙️ EQUIPMENT MAINTENANCE JOB CARD</h2>
+                        <span style="font-size:13px; padding:4px 14px; border-radius:20px; font-weight:600; background:${job.status === 'Completed' ? '#28a745' : (job.status === 'Written Off' ? '#dc3545' : '#ffc107')}; color:${job.status === 'Pending' ? '#1e2a3a' : 'white'};">● ${job.status || 'PENDING'}</span>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px 20px;">
+                        ${field('Job Card No.', job.jobNo)}
+                        ${field('Request No.', job.requestNo)}
+                        ${field('Reporting Date / Time', fmtDateTime(job.reportingDateTime))}
+                        ${field('Unit / Ward', job.unit)}
+                        ${field('Requester Name', job.requester)}
+                        ${field('Equipment Name', job.equipName)}
+                        ${field('Inventory / Asset No.', job.inventory)}
+                        ${field('Serial No.', job.serial)}
+                        ${field('Model / Make', job.modelMake)}
+                        <div style="grid-column:1/-1;">
+                            <label style="font-size:11px; font-weight:600; color:#495057; text-transform:uppercase;">Complaint</label>
+                            <div style="padding:6px 0; border:1px solid #ced4da; border-radius:4px; min-height:40px; padding:8px;">${job.complaint || 'N/A'}</div>
+                        </div>
+                        <div style="grid-column:1/-1;">
+                            <label style="font-size:11px; font-weight:600; color:#495057; text-transform:uppercase;">Diagnosis</label>
+                            <div style="padding:6px 0; border:1px solid #ced4da; border-radius:4px; min-height:40px; padding:8px;">${job.diagnosis || 'N/A'}</div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top:16px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px 20px; background:#f8f9fc; padding:12px 16px; border-radius:8px;">
+                        <div><label style="font-size:11px; font-weight:600; color:#495057;">Received from</label><div>${job.receivedFrom || 'N/A'}</div></div>
+                        <div><label style="font-size:11px; font-weight:600; color:#495057;">Date / Time Received</label><div>${fmtDateTime(job.receivedDateTime)}</div></div>
+                        <div><label style="font-size:11px; font-weight:600; color:#495057;">Received by</label><div>${job.receivedBy || 'N/A'}</div></div>
+                        <div><label style="font-size:11px; font-weight:600; color:#495057;">Handed back to</label><div>${job.handedTo || 'N/A'}</div></div>
+                        <div><label style="font-size:11px; font-weight:600; color:#495057;">Date / Time Handed</label><div>${fmtDateTime(job.handedDateTime)}</div></div>
+                        <div><label style="font-size:11px; font-weight:600; color:#495057;">Handed by</label><div>${job.handedBy || 'N/A'}</div></div>
+                    </div>
+
+                    <div style="margin-top:16px; background:#fafbfc; border:1px solid #e9ecef; border-radius:8px; padding:14px 16px;">
+                        <h3 style="font-size:14px; font-weight:600; border-left:4px solid #C8102E; padding-left:10px;">🛠️ Service & Timeline</h3>
+                        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px 20px; margin-top:8px;">
+                            ${field('Service Type', job.serviceType)}
+                            ${field('Job Started', fmtDateTime(job.startDateTime))}
+                            ${field('Job Completed', fmtDateTime(job.endDateTime))}
+                            ${field('Total Time', job.totalTime || '--:--')}
+                            ${field('Response Time', job.responseTime || '--:--')}
+                            ${field('Admin/Requisition Time', job.adminTime || 'N/A')}
+                        </div>
+                    </div>
+
+                    ${job.status === 'Pending' ? `
+                    <div style="margin-top:16px; background:#fff3cd; border:1px solid #ffc107; border-radius:8px; padding:14px 16px;">
+                        <h3 style="font-size:14px; font-weight:600;">⏳ Postponement Details</h3>
+                        ${field('Reason', job.postponeReason)}
+                        ${field('Expected Date', fmtDateTime(job.expectedDate))}
+                        ${field('Note', job.postponeNote)}
+                    </div>` : ''}
+                    ${job.status === 'Completed' ? `
+                    <div style="margin-top:16px; background:#d4edda; border:1px solid #28a745; border-radius:8px; padding:14px 16px;">
+                        <h3 style="font-size:14px; font-weight:600;">✅ Completion Details</h3>
+                        ${field('Defects Found', job.defects)}
+                        ${field('Action Taken', job.actionTaken)}
+                    </div>` : ''}
+                    ${job.status === 'Written Off' ? `
+                    <div style="margin-top:16px; background:#f8d7da; border:1px solid #dc3545; border-radius:8px; padding:14px 16px;">
+                        <h3 style="font-size:14px; font-weight:600;">❌ Write-Off Details</h3>
+                        ${field('Reason', job.writeOffReason)}
+                        ${field('Additional Comments', job.writeOffNote)}
+                    </div>` : ''}
+
+                    <div style="margin-top:16px; display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:8px; background:#f8f9fc; padding:12px 16px; border-radius:8px;">
+                        ${field('Current (A)', job.measureCurrent)}
+                        ${field('Voltage (V)', job.measureVoltage)}
+                        ${field('Insulation (MΩ)', job.measureInsulation)}
+                        ${field('Pressure (bar/mbar)', job.measurePressure)}
+                    </div>
+
+                    <div style="margin-top:16px; background:#fafbfc; border:1px solid #e9ecef; border-radius:8px; padding:14px 16px;">
+                        <h3 style="font-size:14px; font-weight:600; border-left:4px solid #C8102E; padding-left:10px;">✅ Final Verification</h3>
+                        <div style="display:flex; gap:20px; margin-top:8px;">
+                            <div><span style="font-weight:600;">Function O.K.:</span> ${job.functionOk ? '✅ Yes' : '❌ No'}</div>
+                            <div><span style="font-weight:600;">Safety O.K.:</span> ${job.safetyOk ? '✅ Yes' : '❌ No'}</div>
+                        </div>
+                        ${field('Comments', job.comments)}
+                    </div>
+
+                    <div style="margin-top:20px; border-top:2px dashed #dee2e6; padding-top:16px;">
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+                            <div>
+                                <h4 style="font-size:14px; color:#C8102E;">👨‍🔧 Technician</h4>
+                                ${field('Name', job.techName)}
+                                <div><strong>Signature:</strong></div>
+                                <div style="margin-top:4px;">${techSigHtml}</div>
+                                ${field('Date', fmtDate(job.techDate))}
+                            </div>
+                            <div>
+                                <h4 style="font-size:14px; color:#C8102E;">✅ Supervisor</h4>
+                                ${field('Name', job.certName)}
+                                <div><strong>Signature:</strong></div>
+                                <div style="margin-top:4px;">${certSigHtml}</div>
+                                ${field('Date', fmtDate(job.certDate))}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top:20px; font-size:11px; color:#6c757d; text-align:center; border-top:1px solid #e9ecef; padding-top:12px;">
+                        Generated from Firestore · Printed on ${new Date().toLocaleString()}
+                    </div>
+                </div>
+            `;
+
+            await captureAndSavePDF(templateDiv, `JobCard_${job.jobNo || 'export'}`);
+            showToast('✅ PDF downloaded.');
+        } catch (err) {
+            console.error(err);
+            showToast('Error generating PDF: ' + err.message, true);
+        }
+    };
+
+    // ================================================================
+    // DOWNLOAD REQUEST PDF
+    // ================================================================
+    window.downloadRequestPDF = async function(requestId) {
+        if (!requestId) {
+            showToast('Invalid request ID.', true);
+            return;
+        }
+        showToast('Generating request PDF...');
+        try {
+            const docSnap = await getDoc(doc(db, REQUESTS_COLL, requestId));
+            if (!docSnap.exists()) {
+                showToast('Request not found.', true);
+                return;
+            }
+            const req = docSnap.data();
+
+            const templateDiv = document.getElementById('requestPdfTemplate');
+
+            const fmtDateTime = (val) => val ? new Date(val).toLocaleString() : 'N/A';
+
+            templateDiv.innerHTML = `
+                <div style="font-family:'Segoe UI',sans-serif; padding:20px; max-width:800px; margin:0 auto; background:white; border:1px solid #ccc; box-sizing:border-box; font-size:13px;">
+                    <div style="border-bottom:3px solid #C8102E; padding-bottom:10px; margin-bottom:20px; display:flex; justify-content:space-between;">
+                        <div>
+                            <h1 style="color:#C8102E; font-size:24px;">MOI COUNTY REFERRAL HOSPITAL</h1>
+                            <div style="font-size:13px;">P.O. BOX 18-80300 VOI | Email: biomedsmoivoi@gmail.com</div>
+                            <div style="font-size:13px; font-weight:600; color:#C8102E;">TAITA TAVETA COUNTY</div>
+                        </div>
+                        <span style="background:#C8102E; color:white; padding:4px 16px; border-radius:30px; font-size:14px; font-weight:600;">MINISTRY OF HEALTH</span>
+                    </div>
+
+                    <div style="display:flex; justify-content:space-between; background:#f8f9fc; padding:8px 16px; border-radius:8px; margin-bottom:18px;">
+                        <h2 style="font-size:20px;">📋 SERVICE REQUEST SLIP</h2>
+                        <span style="font-size:13px; padding:4px 14px; border-radius:20px; font-weight:600; background:#17a2b8; color:white;">● ${req.status || 'OPEN'}</span>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px 20px;">
+                        <div><label style="font-size:11px; font-weight:600; color:#495057; text-transform:uppercase;">Request No.</label><div style="font-weight:500;">${req.requestNo || 'N/A'}</div></div>
+                        <div><label style="font-size:11px; font-weight:600; color:#495057; text-transform:uppercase;">Date</label><div>${fmtDateTime(req.dateTime)}</div></div>
+                        <div><label style="font-size:11px; font-weight:600; color:#495057; text-transform:uppercase;">Requester</label><div>${req.requesterName || 'N/A'}</div></div>
+                        <div><label style="font-size:11px; font-weight:600; color:#495057; text-transform:uppercase;">Unit / Ward</label><div>${req.unit || 'N/A'}</div></div>
+                        <div><label style="font-size:11px; font-weight:600; color:#495057; text-transform:uppercase;">Equipment Type</label><div>${req.type || 'N/A'}</div></div>
+                        <div><label style="font-size:11px; font-weight:600; color:#495057; text-transform:uppercase;">Equipment Name</label><div>${req.equipName || 'N/A'}</div></div>
+                        ${req.type === 'Equipment' ? `
+                        <div><label style="font-size:11px; font-weight:600; color:#495057; text-transform:uppercase;">Inventory / Asset</label><div>${req.inventory || 'N/A'}</div></div>
+                        <div><label style="font-size:11px; font-weight:600; color:#495057; text-transform:uppercase;">Serial No.</label><div>${req.serial || 'N/A'}</div></div>
+                        <div><label style="font-size:11px; font-weight:600; color:#495057; text-transform:uppercase;">Model / Make</label><div>${req.modelMake || 'N/A'}</div></div>
+                        ` : ''}
+                        <div style="grid-column:1/-1;">
+                            <label style="font-size:11px; font-weight:600; color:#495057; text-transform:uppercase;">Complaint</label>
+                            <div style="padding:6px 0; border:1px solid #ced4da; border-radius:4px; min-height:40px; padding:8px;">${req.complaint || 'N/A'}</div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top:20px; font-size:11px; color:#6c757d; text-align:center; border-top:1px solid #e9ecef; padding-top:12px;">
+                        Generated from Firestore · Printed on ${new Date().toLocaleString()}
+                    </div>
+                </div>
+            `;
+
+            await captureAndSavePDF(templateDiv, `RequestSlip_${req.requestNo || 'export'}`);
+            showToast('✅ Request PDF downloaded.');
+        } catch (err) {
+            console.error('PDF generation error:', err);
+            showToast('Error generating PDF: ' + err.message, true);
+        }
+    };
+
+    // ================================================================
+    // USER MANAGEMENT
+    // ================================================================
+    window.openUserModal = function() {
+        document.getElementById('editUserId').value = '';
+        document.getElementById('userModalTitle').innerHTML = '<i class="fas fa-users-cog"></i> Add New User';
+        document.getElementById('userFormTitle').textContent = '➕ Add New User';
+        document.getElementById('saveUserBtn').innerHTML = '<i class="fas fa-save"></i> Add User';
+        document.getElementById('newUserPassword').value = '';
+        document.getElementById('newUserPassword').required = true;
+        document.getElementById('passwordField').style.display = 'block';
+        document.getElementById('newUserName').value = '';
+        document.getElementById('newUserEmail').value = '';
+        document.getElementById('newUserDept').value = '';
+        document.getElementById('newUserDepts').selectedIndex = -1;
+        document.getElementById('newUserWhatsApp').value = '';
+        document.getElementById('newUserRole').value = 'requester';
+        toggleRoleFields();
+        document.getElementById('userModalError').textContent = '';
+        document.getElementById('userModalError').style.display = 'none';
+        document.getElementById('userModalSuccess').textContent = '';
+        document.getElementById('userModalSuccess').style.display = 'none';
+        document.getElementById('userModal').classList.add('show');
+        renderUserList();
+    };
+
+    window.editUser = async function(userId) {
+        try {
+            const userDoc = await getDoc(doc(db, USERS_COLL, userId));
+            if (!userDoc.exists()) {
+                showToast('User not found.', true);
+                return;
+            }
+            const userData = userDoc.data();
+
+            document.getElementById('editUserId').value = userId;
+            document.getElementById('userModalTitle').innerHTML = '<i class="fas fa-user-edit"></i> Edit User';
+            document.getElementById('userFormTitle').textContent = '✏️ Edit User Details';
+            document.getElementById('saveUserBtn').innerHTML = '<i class="fas fa-save"></i> Update User';
+
+            document.getElementById('newUserName').value = userData.name || '';
+            document.getElementById('newUserEmail').value = userData.email || '';
+            document.getElementById('newUserRole').value = userData.role || 'requester';
+            document.getElementById('newUserWhatsApp').value = userData.whatsapp || '';
+            if (userData.role === 'requester') {
+                document.getElementById('newUserDept').value = userData.department || '';
+            } else if (userData.role === 'maintenance') {
+                const depts = userData.departments || [];
+                const select = document.getElementById('newUserDepts');
+                Array.from(select.options).forEach(opt => {
+                    opt.selected = depts.includes(opt.value);
+                });
+            }
+
+            document.getElementById('passwordField').style.display = 'none';
+            document.getElementById('newUserPassword').required = false;
+
+            toggleRoleFields();
+            document.getElementById('userModalError').textContent = '';
+            document.getElementById('userModalError').style.display = 'none';
+            document.getElementById('userModalSuccess').textContent = '';
+            document.getElementById('userModalSuccess').style.display = 'none';
+
+            document.getElementById('userModal').classList.add('show');
+            renderUserList();
+        } catch (err) {
+            showToast('Error loading user: ' + err.message, true);
+        }
+    };
+
+    window.closeUserModal = function() {
+        document.getElementById('userModal').classList.remove('show');
+    };
+
+    window.saveUser = async function() {
+        const editId = document.getElementById('editUserId').value;
+        const email = document.getElementById('newUserEmail').value.trim();
+        const name = document.getElementById('newUserName').value.trim();
+        const password = document.getElementById('newUserPassword').value.trim();
+        const role = document.getElementById('newUserRole').value;
+        const countryCode = document.getElementById('newUserCountryCode').value;
+        const whatsappNumber = document.getElementById('newUserWhatsApp').value.trim();
+        const deptSingle = document.getElementById('newUserDept').value;
+        const deptSelect = document.getElementById('newUserDepts');
+        const selectedDepts = Array.from(deptSelect.selectedOptions).map(opt => opt.value);
+
+        const errorDiv = document.getElementById('userModalError');
+        const successDiv = document.getElementById('userModalSuccess');
+        errorDiv.style.display = 'none';
+        successDiv.style.display = 'none';
+
+        if (!email || !name || !role) {
+            errorDiv.textContent = 'Please fill in all required fields.';
+            errorDiv.style.display = 'block';
+            return;
+        }
+        if (!editId && password.length < 6) {
+            errorDiv.textContent = 'Password must be at least 6 characters.';
+            errorDiv.style.display = 'block';
+            return;
+        }
+        if (role === 'maintenance') {
+            if (!whatsappNumber) {
+                errorDiv.textContent = 'WhatsApp number is required for maintenance users.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            if (selectedDepts.length === 0) {
+                errorDiv.textContent = 'Please select at least one department for the engineer.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+        }
+        if (role === 'requester' && !deptSingle) {
+            errorDiv.textContent = 'Please select a department for the requester.';
+            errorDiv.style.display = 'block';
+            return;
+        }
+
+        showToast(editId ? 'Updating user...' : 'Creating user...');
+
+        try {
+            let userId = editId;
+            if (!editId) {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                userId = userCredential.user.uid;
+            }
+
+            const fullWhatsApp = role === 'maintenance' ? countryCode + whatsappNumber : '';
+
+            const userData = {
+                name: name,
+                email: email,
+                role: role,
+                whatsapp: fullWhatsApp,
+                updatedAt: serverTimestamp()
+            };
+
+            if (role === 'requester') {
+                userData.department = deptSingle;
+                userData.departments = null;
+            } else if (role === 'maintenance') {
+                userData.departments = selectedDepts;
+                userData.department = null;
+            } else {
+                userData.department = null;
+                userData.departments = null;
+            }
+
+            if (!editId) {
+                userData.approved = true;
+                userData.createdAt = serverTimestamp();
+                await setDoc(doc(db, USERS_COLL, userId), userData);
+                successDiv.textContent = `✅ User ${name} created successfully!`;
+            } else {
+                await updateDoc(doc(db, USERS_COLL, userId), userData);
+                successDiv.textContent = `✅ User ${name} updated successfully!`;
+            }
+
+            successDiv.style.display = 'block';
+
+            await fetchData();
+            renderUserList();
+            renderDashboard();
+            showToast(successDiv.textContent);
+
+            if (!editId) {
+                document.getElementById('newUserEmail').value = '';
+                document.getElementById('newUserName').value = '';
+                document.getElementById('newUserPassword').value = '';
+                document.getElementById('newUserWhatsApp').value = '';
+                document.getElementById('newUserDept').value = '';
+                document.getElementById('newUserDepts').selectedIndex = -1;
+                toggleRoleFields();
+            } else {
+                closeUserModal();
+            }
+        } catch (err) {
+            console.error(err);
+            let msg = 'Error: ' + err.message;
+            if (err.code === 'auth/email-already-in-use') {
+                msg = 'This email is already registered. Please use a different email.';
+            } else if (err.code === 'auth/weak-password') {
+                msg = 'Password is too weak. Use at least 6 characters.';
+            }
+            errorDiv.textContent = msg;
+            errorDiv.style.display = 'block';
+            showToast(msg, true);
+        }
+    };
+
+    function renderUserList() {
+        const list = document.getElementById('userList');
+        if (!allUsers.length) {
+            list.innerHTML = '<li>No users found.</li>';
+            return;
+        }
+        let html = '';
+        allUsers.forEach(u => {
+            const deptDisplay = u.role === 'requester' ? u.department : (u.departments ? u.departments.join(', ') : '');
+            html += `
+                <li>
+                    <div class="user-info">
+                        <strong>${u.name || 'Unnamed'}</strong> (${u.email})<br />
+                        <small>${u.role} | ${deptDisplay} ${u.whatsapp ? '📱 ' + u.whatsapp : ''}</small>
+                    </div>
+                    <div class="user-actions">
+                        <select class="role-select" onchange="updateUserRole('${u.id}', this.value)">
+                            <option value="requester" ${u.role === 'requester' ? 'selected' : ''}>Requester</option>
+                            <option value="maintenance" ${u.role === 'maintenance' ? 'selected' : ''}>Maintenance</option>
+                            <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>Admin</option>
+                        </select>
+                        <button class="edit-btn" onclick="editUser('${u.id}')"><i class="fas fa-edit"></i> Edit</button>
+                        ${!u.approved ? `<button class="approve-btn" onclick="approveUser('${u.id}')">Approve</button>` : ''}
+                        <button class="deny-btn" onclick="deleteUser('${u.id}')"><i class="fas fa-trash"></i></button>
+                    </div>
+                </li>
+            `;
+        });
+        list.innerHTML = html;
+    }
+
+    window.updateUserRole = async function(userId, newRole) {
+        try {
+            await updateDoc(doc(db, USERS_COLL, userId), { role: newRole });
+            showToast('User role updated.');
+            await fetchData();
+            renderUserList();
+            renderDashboard();
+        } catch (err) {
+            showToast('Error updating role: ' + err.message, true);
+        }
+    };
+
+    window.deleteUser = async function(userId) {
+        if (!confirm('Are you sure you want to delete this user?')) return;
+        try {
+            await deleteDoc(doc(db, USERS_COLL, userId));
+            showToast('User deleted.');
+            await fetchData();
+            renderUserList();
+            renderDashboard();
+        } catch (err) {
+            showToast('Error deleting user: ' + err.message, true);
+        }
+    };
+
+    window.approveUser = async function(userId) {
+        try {
+            await updateDoc(doc(db, USERS_COLL, userId), { approved: true });
+            showToast('✅ User approved successfully!');
+            await fetchData();
+            renderUserList();
+            renderDashboard();
+            if (document.getElementById('approvalModal').classList.contains('show')) {
+                showPendingUsers();
+            }
+        } catch (err) {
+            showToast('Error approving user: ' + err.message, true);
+        }
+    };
+
+    // ================================================================
+    // PENDING APPROVALS
+    // ================================================================
+    window.showPendingUsers = async function() {
+        const modal = document.getElementById('approvalModal');
+        modal.classList.add('show');
+        const list = document.getElementById('pendingList');
+        list.innerHTML = 'Loading...';
+        try {
+            const snap = await getDocs(collection(db, USERS_COLL));
+            const allUsersData = [];
+            snap.forEach(doc => { allUsersData.push({ id: doc.id, ...doc.data() }); });
+            const pending = allUsersData.filter(u => u.approved !== true);
+            if (pending.length === 0) {
+                list.innerHTML = `<p style="color:#9ca3af; text-align:center; padding:20px;">✅ No pending approvals.</p>
+                    <button class="btn btn-outline btn-sm" style="margin:12px auto; display:block;" onclick="showPendingUsers()"><i class="fas fa-sync-alt"></i> Refresh</button>
+                    <hr style="margin:16px 0;" />
+                    <p style="font-size:13px; font-weight:600;">All users:</p>
+                    ${allUsersData.map(u => `<div style="font-size:12px; padding:4px 0; border-bottom:1px solid #f1f3f5;">${u.name} - approved: ${u.approved} (${typeof u.approved})</div>`).join('')}`;
+                return;
+            }
+            let html = '';
+            pending.forEach(u => {
+                html += `
+                    <div class="pending-user-item">
+                        <div class="user-info">
+                            <strong>${u.name}</strong> (${u.email})<br />
+                            <small>${u.role} | ${u.department || u.departments?.join(', ') || ''} | WhatsApp: ${u.whatsapp || 'N/A'}</small>
+                        </div>
+                        <div>
+                            <button class="approve-btn" onclick="approveUser('${u.id}')"><i class="fas fa-check"></i> Approve</button>
+                            <button class="deny-btn" onclick="denyUser('${u.id}')"><i class="fas fa-times"></i> Deny</button>
+                        </div>
+                    </div>
+                `;
+            });
+            list.innerHTML = html;
+        } catch (err) {
+            list.innerHTML = '<p style="color:red;">Error loading users.</p>';
+            showToast('Error: ' + err.message, true);
+        }
+    };
+
+    window.denyUser = async function(userId) {
+        if (!confirm('Delete this user?')) return;
+        try {
+            await deleteDoc(doc(db, USERS_COLL, userId));
+            showToast('User deleted.');
+            await fetchData();
+            showPendingUsers();
+            renderDashboard();
+        } catch (err) {
+            showToast('Error: ' + err.message, true);
+        }
+    };
+
+    window.closeApprovalModal = function() {
+        document.getElementById('approvalModal').classList.remove('show');
+    };
+    document.getElementById('approvalModal').addEventListener('click', function(e) {
+        if (e.target === this) closeApprovalModal();
+    });
+    document.getElementById('userModal').addEventListener('click', function(e) {
+        if (e.target === this) closeUserModal();
+    });
+
+    // ================================================================
+    // AUTH STATE
+    // ================================================================
+    onAuthStateChanged(auth, async (user) => {
+        console.log('🔐 Auth state changed.');
+        if (!user) {
+            window.location.href = 'login.html';
+            return;
+        }
+        try {
+            const userDoc = await getDoc(doc(db, USERS_COLL, user.uid));
+            if (!userDoc.exists()) {
+                await signOut(auth);
+                window.location.href = 'login.html';
+                return;
+            }
+            const userData = userDoc.data();
+            if (!userData.approved) {
+                showToast('Your account is pending approval.', true);
+                await signOut(auth);
+                window.location.href = 'login.html';
+                return;
+            }
+            currentUser = { id: user.uid, ...userData };
+            userRole = currentUser.role || 'requester';
+            userNameDisplay.textContent = currentUser.name || 'User';
+            userRoleDisplay.textContent = currentUser.email || '';
+            roleTag.textContent = userRole;
+
+            await fetchData();
+            renderDashboard();
+        } catch (err) {
+            console.error(err);
+            showToast('Error loading profile: ' + err.message, true);
+        }
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MCRH - Request Slip</title>
+
+    <!-- Firebase v9 -->
+    <script type="importmap">
+        {
+            "imports": {
+                "firebase/app": "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js",
+                "firebase/auth": "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js",
+                "firebase/firestore": "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"
+            }
+        }
+    </script>
+
+    <style>
+        /* ===== STYLES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f4f6f9;
+            padding: 20px;
+            color: #1e2a3a;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 25px 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+        .hospital-header {
+            border-bottom: 4px solid #C8102E;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .logo-area .logo-icon {
+            font-size: 36px;
+            background: #C8102E;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+        .logo-area h1 {
+            font-size: 24px;
+            color: #C8102E;
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+        .logo-area .sub {
+            font-size: 13px;
+            color: #333;
+            font-weight: 500;
+        }
+        .hospital-header .badge {
+            background: #C8102E;
+            color: white;
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .card-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fc;
+            padding: 8px 16px;
+            border-radius: 8px;
+            margin-bottom: 18px;
+        }
+        .card-title h2 {
+            font-size: 20px;
+            color: #1e2a3a;
+            font-weight: 600;
+        }
+        .card-title .status {
+            font-size: 13px;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-weight: 600;
+            background: #28a745;
+            color: white;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px 24px;
+        }
+        .full-width {
+            grid-column: 1 / -1;
+        }
+        .field-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 4px;
+        }
+        .field-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 3px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        .field-group input,
+        .field-group select,
+        .field-group textarea {
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+            transition: 0.2s;
+            font-family: inherit;
+        }
+        .field-group input:focus,
+        .field-group select:focus,
+        .field-group textarea:focus {
+            border-color: #C8102E;
+            outline: 0;
+            box-shadow: 0 0 0 3px rgba(200, 16, 46, 0.15);
+        }
+        .field-group input[readonly] {
+            background: #e9ecef;
+            cursor: default;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 50px;
+        }
+        .action-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 20px 0 12px 0;
+            padding: 16px 0;
+            border-top: 1px solid #e9ecef;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #1e7e34;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid #6c757d;
+            color: #6c757d;
+        }
+        .btn-outline:hover {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-primary {
+            background: #C8102E;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #a00d24;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #b02a37;
+        }
+        .btn-whatsapp {
+            background: #25D366;
+            color: white;
+        }
+        .btn-whatsapp:hover {
+            background: #1ebe5b;
+        }
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+        .btn-info:hover {
+            background: #138496;
+        }
+        .btn-sm {
+            padding: 4px 12px;
+            font-size: 12px;
+            border-radius: 4px;
+        }
+
+        .whatsapp-note {
+            margin-top: 8px;
+            padding: 8px 14px;
+            background: #e8f5e9;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #2e7d32;
+            display: none;
+        }
+        .whatsapp-note.show {
+            display: block;
+        }
+        .engineer-info {
+            font-size: 13px;
+            color: #495057;
+            margin-top: 4px;
+            padding: 6px 12px;
+            background: #f8f9fc;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+            display: none;
+        }
+        .engineer-info.show {
+            display: block;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #1e2a3a;
+            color: white;
+            padding: 14px 28px;
+            border-radius: 8px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+            font-weight: 500;
+            z-index: 999;
+            transform: translateY(-20px);
+            opacity: 0;
+            transition: 0.3s ease;
+            border-left: 6px solid #C8102E;
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media print {
+            .action-bar,
+            .btn,
+            .no-print {
+                display: none !important;
+            }
+            .field-group input,
+            .field-group select,
+            .field-group textarea {
+                border: none;
+                background: transparent;
+                padding: 2px 0;
+                box-shadow: none;
+            }
+            .whatsapp-note {
+                display: none !important;
+            }
+            .container {
+                box-shadow: none;
+                padding: 10px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+            .container {
+                padding: 15px;
+            }
+            .hospital-header {
+                flex-direction: column;
+                align-items: start;
+                gap: 6px;
+            }
+            .action-bar {
+                flex-direction: column;
+            }
+            .action-bar .btn {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- HEADER -->
+        <header class="hospital-header">
+            <div class="logo-area">
+                <div class="logo-icon">M</div>
+                <div>
+                    <h1>MOI COUNTY REFERRAL HOSPITAL</h1>
+                    <div class="sub">P.O. BOX 18-80300 VOI | Email: biomedsmoivoi@gmail.com</div>
+                    <div style="font-size:14px; font-weight:600; color:#C8102E; margin-top:2px;">TAITA TAVETA COUNTY</div>
+                </div>
+            </div>
+            <span class="badge">MINISTRY OF HEALTH</span>
+        </header>
+
+        <div class="card-title">
+            <h2>📋 SERVICE REQUEST FORM</h2>
+            <span class="status" id="reqStatusBadge">● OPEN</span>
+            <button class="btn btn-danger btn-sm" onclick="logout()" style="margin-left:auto;">🚪 Logout</button>
+        </div>
+
+        <!-- REQUEST FORM -->
+        <form id="requestForm">
+            <div class="grid-2">
+                <div class="field-group">
+                    <label>Request No.</label>
+                    <input type="text" id="reqNo" readonly placeholder="Auto-generated" />
+                </div>
+                <div class="field-group">
+                    <label>Date</label>
+                    <input type="datetime-local" id="reqDateTime" />
+                </div>
+                <div class="field-group">
+                    <label>Requester Name</label>
+                    <input type="text" id="reqRequester" readonly placeholder="Auto-filled from profile" />
+                </div>
+                <div class="field-group">
+                    <label>Department / Unit / Ward</label>
+                    <input type="text" id="reqUnit" readonly placeholder="Auto-filled from profile" />
+                </div>
+                <div class="field-group">
+                    <label>Equipment / Item Type</label>
+                    <select id="reqType">
+                        <option value="Equipment">Equipment</option>
+                        <option value="Other">Other (e.g., tap, electrical)</option>
+                    </select>
+                </div>
+                <div class="field-group">
+                    <label>Equipment Name / Description</label>
+                    <input type="text" id="reqEquipName" placeholder="e.g. Ventilator or 'Tap repair'" />
+                </div>
+            </div>
+
+            <div id="reqEquipDetails" class="grid-2" style="display: none;">
+                <div class="field-group">
+                    <label>Inventory / Asset No. <span style="color:#6c757d; font-size:11px; font-weight:normal;">(Coming soon)</span></label>
+                    <input type="text" id="reqInventory" placeholder="Coming soon" readonly style="background:#f8f9fa; color:#6c757d;" />
+                </div>
+                <div class="field-group">
+                    <label>Serial No.</label>
+                    <input type="text" id="reqSerial" placeholder="e.g. SN-2024-8812" />
+                </div>
+                <div class="field-group">
+                    <label>Model / Make</label>
+                    <input type="text" id="reqModel" placeholder="e.g. DuraSink Pro-3000" />
+                </div>
+            </div>
+
+            <div class="field-group full-width">
+                <label>Description of Fault / Complaint</label>
+                <textarea id="reqComplaint" rows="3" placeholder="Describe the issue..."></textarea>
+            </div>
+
+            <!-- WhatsApp & Email Notifications -->
+            <div class="field-group full-width">
+                <label>📱 Notifications</label>
+                <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+                    <select id="whatsappNumber" style="flex:1; min-width:150px; padding: 8px 12px; border: 1px solid #ced4da; border-radius: 6px; font-size: 14px; background: white;">
+                        <option value="">-- Select Engineer --</option>
+                    </select>
+                    <button type="button" class="btn btn-whatsapp" onclick="sendWhatsAppNotification(false)">
+                        📲 Notify
+                    </button>
+                    <button type="button" class="btn btn-danger" onclick="sendWhatsAppNotification(true)">
+                        🔔 Remind
+                    </button>
+                    <button type="button" class="btn btn-info" onclick="sendEmailNotification()">
+                        📧 Email
+                    </button>
+                </div>
+                <div class="engineer-info" id="engineerInfo">
+                    <span id="engineerName"></span> — <span id="engineerPhone"></span>
+                </div>
+                <div class="whatsapp-note" id="whatsappNote">
+                    Select an engineer and use "Notify" or "Remind". Email opens your default mail client.
+                </div>
+            </div>
+
+            <div class="action-bar no-print">
+                <button type="button" class="btn btn-success" onclick="saveRequest()">💾 Save Request</button>
+                <button type="button" class="btn btn-outline" onclick="window.print()">📄 Print PDF</button>
+            </div>
+        </form>
+
+        <footer style="margin-top:22px;font-size:12px;color:#6c757d;text-align:center;border-top:1px solid #e9ecef;padding-top:14px;">
+            🔥 Firestore‑powered · 📲 WhatsApp & Email · MCRH Request Slip v6.0 (Simplified)
+        </footer>
+    </div>
+
+    <div id="toast" class="toast">Message</div>
+
+    <script type="module">
+        // ============================================================
+        // FIREBASE CONFIG
+        // ============================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyDnsz1s-VnewbUszXNJptcdMZ_h0QsNHYQ",
+            authDomain: "moivoibiomed.firebaseapp.com",
+            databaseURL: "https://moivoibiomed-default-rtdb.firebaseio.com",
+            projectId: "moivoibiomed",
+            storageBucket: "moivoibiomed.firebasestorage.app",
+            messagingSenderId: "996551978571",
+            appId: "1:996551978571:web:f44941649a58e020f5e7ce"
+        };
+
+        import { initializeApp } from 'firebase/app';
+        import {
+            getAuth,
+            onAuthStateChanged,
+            signOut
+        } from 'firebase/auth';
+        import {
+            getFirestore,
+            collection,
+            addDoc,
+            getDocs,
+            getDoc,
+            doc,
+            setDoc,
+            updateDoc,
+            query,
+            orderBy,
+            where,
+            runTransaction,
+            serverTimestamp
+        } from 'firebase/firestore';
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const REQUESTS_COLL = 'requests';
+        const JOBCARDS_COLL = 'jobcards';
+        const USERS_COLL = 'users';
+        const COUNTERS_COLL = 'counters';
+
+        // ============================================================
+        // GLOBALS
+        // ============================================================
+        let currentUser = null;
+        let currentRequestNo = '';
+        let currentDocId = null;
+        let allEngineers = [];
+
+        // ============================================================
+        // AUTHENTICATION & APPROVAL CHECK
+        // ============================================================
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            try {
+                const userDoc = await getDoc(doc(db, USERS_COLL, user.uid));
+                if (!userDoc.exists()) {
+                    await signOut(auth);
+                    window.location.href = 'login.html';
+                    return;
+                }
+                const userData = userDoc.data();
+                if (!userData.approved) {
+                    alert('Your account is pending approval. Please contact admin.');
+                    await signOut(auth);
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                currentUser = { id: user.uid, ...userData };
+                document.getElementById('reqRequester').value = currentUser.name || '';
+
+                console.log('✅ Authenticated user:', currentUser);
+                await init();
+
+            } catch (err) {
+                console.error('Auth error:', err);
+                window.location.href = 'login.html';
+            }
+        });
+
+        // ============================================================
+        // LOGOUT
+        // ============================================================
+        window.logout = function() {
+            signOut(auth).then(() => {
+                window.location.href = 'login.html';
+            });
+        };
+
+        // ============================================================
+        // TOAST
+        // ============================================================
+        function showToast(msg, isError = false) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.style.borderLeftColor = isError ? '#dc3545' : '#C8102E';
+            t.classList.add('show');
+            clearTimeout(t._timer);
+            t._timer = setTimeout(() => t.classList.remove('show'), 3500);
+        }
+
+        // ============================================================
+        // SEQUENTIAL REQUEST NUMBER GENERATOR (with fallback)
+        // ============================================================
+        async function getNextRequestNumber() {
+            const counterDocRef = doc(db, COUNTERS_COLL, 'requestCounter');
+
+            try {
+                const newNumber = await runTransaction(db, async (transaction) => {
+                    const docSnap = await transaction.get(counterDocRef);
+                    let currentCount;
+
+                    if (docSnap.exists()) {
+                        currentCount = docSnap.data().count || 3;
+                    } else {
+                        currentCount = 3;
+                        transaction.set(counterDocRef, { count: currentCount });
+                    }
+
+                    const next = currentCount + 1;
+                    transaction.update(counterDocRef, { count: next });
+                    return next;
+                });
+
+                return `REQ-${String(newNumber).padStart(3, '0')}`;
+            } catch (error) {
+                console.error('Error generating request number:', error);
+                const timestamp = Date.now().toString().slice(-6);
+                const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+                const fallback = `REQ-${timestamp}${random}`;
+                showToast('⚠️ Using fallback number due to counter error.', true);
+                return fallback;
+            }
+        }
+
+        // ============================================================
+        // TOGGLE EQUIPMENT DETAILS
+        // ============================================================
+        function toggleEquipFields() {
+            const type = document.getElementById('reqType').value;
+            const details = document.getElementById('reqEquipDetails');
+            if (type === 'Equipment') {
+                details.style.display = 'grid';
+            } else {
+                details.style.display = 'none';
+            }
+        }
+        document.getElementById('reqType').addEventListener('change', toggleEquipFields);
+
+        // ============================================================
+        // FETCH ENGINEERS – FILTER BY DEPARTMENT
+        // ============================================================
+        async function fetchEngineers() {
+            try {
+                const q = query(collection(db, USERS_COLL), where('role', '==', 'maintenance'));
+                const snap = await getDocs(q);
+                allEngineers = [];
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    if (data.whatsapp) {
+                        allEngineers.push({
+                            id: doc.id,
+                            name: data.name || 'Engineer',
+                            whatsapp: data.whatsapp,
+                            departments: data.departments || []
+                        });
+                    }
+                });
+                console.log(`✅ Found ${allEngineers.length} engineers with WhatsApp numbers.`);
+                populateEngineerDropdown();
+            } catch (err) {
+                console.error('Error fetching engineers:', err);
+                showToast('Could not load engineers. Please refresh.', true);
+            }
+        }
+
+        function populateEngineerDropdown() {
+            const select = document.getElementById('whatsappNumber');
+            select.innerHTML = '<option value="">-- Select Engineer --</option>';
+
+            let filteredEngineers = allEngineers;
+            if (currentUser && currentUser.role === 'requester') {
+                const userDept = currentUser.department;
+                if (userDept) {
+                    filteredEngineers = allEngineers.filter(eng =>
+                        eng.departments && eng.departments.includes(userDept)
+                    );
+                    console.log(`🔍 Filtered to ${filteredEngineers.length} engineers for department "${userDept}"`);
+                } else {
+                    console.warn('⚠️ Requester has no department set – showing all engineers.');
+                }
+            }
+
+            if (filteredEngineers.length === 0) {
+                select.innerHTML = '<option value="">-- No engineers available for your department --</option>';
+                return;
+            }
+
+            filteredEngineers.forEach(eng => {
+                const opt = document.createElement('option');
+                opt.value = eng.whatsapp;
+                opt.textContent = `${eng.name} (${eng.whatsapp})`;
+                opt.dataset.name = eng.name;
+                select.appendChild(opt);
+            });
+
+            select.addEventListener('change', function() {
+                const selected = this.options[this.selectedIndex];
+                const infoDiv = document.getElementById('engineerInfo');
+                const nameSpan = document.getElementById('engineerName');
+                const phoneSpan = document.getElementById('engineerPhone');
+                if (selected && selected.value) {
+                    nameSpan.textContent = selected.dataset.name || 'Engineer';
+                    phoneSpan.textContent = selected.value;
+                    infoDiv.classList.add('show');
+                } else {
+                    infoDiv.classList.remove('show');
+                }
+            });
+        }
+
+        // ============================================================
+        // SAVE REQUEST
+        // ============================================================
+        window.saveRequest = async function() {
+            const reqNo = document.getElementById('reqNo').value;
+            if (!reqNo) { showToast('Generate request number first.', true); return; }
+            const requester = document.getElementById('reqRequester').value.trim();
+            const unit = document.getElementById('reqUnit').value.trim();
+            const dateTime = document.getElementById('reqDateTime').value;
+            const type = document.getElementById('reqType').value;
+            const equipName = document.getElementById('reqEquipName').value.trim();
+            const inventory = document.getElementById('reqInventory').value.trim();
+            const serial = document.getElementById('reqSerial').value.trim();
+            const model = document.getElementById('reqModel').value.trim();
+            const complaint = document.getElementById('reqComplaint').value.trim();
+
+            if (!requester || !unit || !dateTime || !complaint) {
+                showToast('Fill all required fields.', true);
+                return;
+            }
+
+            const data = {
+                requestNo: reqNo,
+                requesterName: requester,
+                requesterId: currentUser.id,
+                unit,
+                dateTime,
+                type,
+                equipName: (type === 'Equipment') ? equipName : 'Other',
+                inventory: (type === 'Equipment') ? inventory : '',
+                serial: (type === 'Equipment') ? serial : '',
+                modelMake: (type === 'Equipment') ? model : '',
+                complaint,
+                status: 'Open',
+                createdAt: serverTimestamp()
+            };
+
+            console.log('📝 Saving request:', data);
+
+            try {
+                if (currentDocId) {
+                    showToast('⚠️ Retrieved records cannot be overwritten. Saving as new.', true);
+                }
+                await addDoc(collection(db, REQUESTS_COLL), data);
+                showToast(`✅ Request ${reqNo} saved.`);
+                currentRequestNo = reqNo;
+                document.getElementById('whatsappNote').classList.add('show');
+                // Reset form to a clean state (keep the request number for new)
+                resetRequestForm();
+                document.getElementById('reqNo').value = await getNextRequestNumber();
+                // Re-populate engineer dropdown (in case department changed)
+                populateEngineerDropdown();
+            } catch (err) {
+                console.error('❌ Save error:', err);
+                showToast('❌ Error: ' + err.message, true);
+            }
+        };
+
+        // ============================================================
+        // WHATSAPP NOTIFICATION
+        // ============================================================
+        window.sendWhatsAppNotification = function(isReminder = false) {
+            const reqNo = currentRequestNo || document.getElementById('reqNo').value;
+            const requester = document.getElementById('reqRequester').value || 'N/A';
+            const unit = document.getElementById('reqUnit').value || 'N/A';
+            const equipName = document.getElementById('reqEquipName').value || 'N/A';
+            const complaint = document.getElementById('reqComplaint').value || 'N/A';
+            const date = document.getElementById('reqDateTime').value ? new Date(document.getElementById('reqDateTime').value).toLocaleString() : 'N/A';
+
+            const phone = document.getElementById('whatsappNumber').value;
+            if (!phone) {
+                showToast('Please select an engineer from the list.', true);
+                return;
+            }
+
+            const selectedOpt = document.getElementById('whatsappNumber').selectedOptions[0];
+            const engineerName = selectedOpt ? selectedOpt.dataset.name || 'Engineer' : 'Engineer';
+
+            const reminderTag = isReminder ? '%0A%0A*⏰ REMINDER:* This request is still pending. Please respond. %0A%0A' : '%0A%0A';
+
+            const msg = `*${isReminder ? '⏰ REMINDER' : '🔧 NEW SERVICE REQUEST'}*%0A%0A` +
+                `*Request No.:* ${reqNo}%0A` +
+                `*Date:* ${date}%0A` +
+                `*Requester:* ${requester}%0A` +
+                `*Unit/Ward:* ${unit}%0A` +
+                `*Equipment:* ${equipName}%0A` +
+                `*Complaint:* ${complaint}%0A` +
+                reminderTag +
+                `Please attend to this request as soon as possible.`;
+
+            const url = `https://wa.me/${phone}?text=${msg}`;
+            window.open(url, '_blank');
+            showToast(`📲 ${isReminder ? 'Reminder' : 'Notification'} sent to ${engineerName} (${phone})`);
+        };
+
+        // ============================================================
+        // EMAIL NOTIFICATION
+        // ============================================================
+        window.sendEmailNotification = function() {
+            const reqNo = currentRequestNo || document.getElementById('reqNo').value;
+            const requester = document.getElementById('reqRequester').value || 'N/A';
+            const unit = document.getElementById('reqUnit').value || 'N/A';
+            const equipName = document.getElementById('reqEquipName').value || 'N/A';
+            const complaint = document.getElementById('reqComplaint').value || 'N/A';
+            const date = document.getElementById('reqDateTime').value ? new Date(document.getElementById('reqDateTime').value).toLocaleString() : 'N/A';
+
+            const subject = `Service Request ${reqNo} - ${equipName}`;
+            const body =
+                `Request No.: ${reqNo}%0A` +
+                `Date: ${date}%0A` +
+                `Requester: ${requester}%0A` +
+                `Unit/Ward: ${unit}%0A` +
+                `Equipment: ${equipName}%0A` +
+                `Complaint: ${complaint}%0A%0A` +
+                `Please attend to this request.`;
+
+            const mailto = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.open(mailto, '_blank');
+            showToast('📧 Opening email client...');
+        };
+
+        // ============================================================
+        // RESET FORM
+        // ============================================================
+        function resetRequestForm() {
+            document.getElementById('reqNo').value = '';
+            document.getElementById('reqRequester').value = currentUser ? currentUser.name : '';
+            if (currentUser && currentUser.role === 'requester' && currentUser.department) {
+                document.getElementById('reqUnit').value = currentUser.department;
+            } else {
+                document.getElementById('reqUnit').value = '';
+            }
+            document.getElementById('reqDateTime').value = new Date().toISOString().slice(0, 16);
+            document.getElementById('reqType').value = 'Equipment';
+            document.getElementById('reqEquipName').value = '';
+            document.getElementById('reqInventory').value = '';
+            document.getElementById('reqSerial').value = '';
+            document.getElementById('reqModel').value = '';
+            document.getElementById('reqComplaint').value = '';
+            document.getElementById('whatsappNote').classList.remove('show');
+            document.getElementById('whatsappNumber').value = '';
+            document.getElementById('engineerInfo').classList.remove('show');
+            toggleEquipFields();
+            // Generate a new number for the next request
+            getNextRequestNumber().then(num => document.getElementById('reqNo').value = num);
+            currentRequestNo = '';
+            currentDocId = null;
+            // Re-populate engineer dropdown (in case department changed)
+            populateEngineerDropdown();
+        }
+        window.resetRequestForm = resetRequestForm;
+
+        // ============================================================
+        // LOAD REQUEST VIA URL PARAM (for viewing/editing from dashboard)
+        // ============================================================
+        async function loadRequestFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const viewParam = urlParams.get('view');
+            if (!viewParam) return;
+
+            try {
+                const docSnap = await getDoc(doc(db, REQUESTS_COLL, viewParam));
+                if (!docSnap.exists()) {
+                    showToast('Request not found.', true);
+                    return;
+                }
+                const r = docSnap.data();
+                currentDocId = viewParam;
+                currentRequestNo = r.requestNo;
+
+                document.getElementById('reqNo').value = r.requestNo || '';
+                document.getElementById('reqDateTime').value = r.dateTime || '';
+                document.getElementById('reqRequester').value = r.requesterName || '';
+                document.getElementById('reqUnit').value = r.unit || '';
+                document.getElementById('reqType').value = r.type || 'Equipment';
+                document.getElementById('reqEquipName').value = r.equipName || '';
+                document.getElementById('reqInventory').value = r.inventory || '';
+                document.getElementById('reqSerial').value = r.serial || '';
+                document.getElementById('reqModel').value = r.modelMake || '';
+                document.getElementById('reqComplaint').value = r.complaint || '';
+
+                toggleEquipFields();
+                showToast(`📂 Request ${r.requestNo} loaded.`);
+            } catch (err) {
+                console.error(err);
+                showToast('Error loading request: ' + err.message, true);
+            }
+        }
+
+        // ============================================================
+        // INIT
+        // ============================================================
+        async function init() {
+            document.getElementById('reqDateTime').value = new Date().toISOString().slice(0, 16);
+            document.getElementById('reqNo').value = await getNextRequestNumber();
+            if (currentUser) {
+                document.getElementById('reqRequester').value = currentUser.name || '';
+                if (currentUser.role === 'requester' && currentUser.department) {
+                    document.getElementById('reqUnit').value = currentUser.department;
+                    console.log(`✅ Auto-filled department: ${currentUser.department}`);
+                }
+            }
+            await fetchEngineers();
+            toggleEquipFields();
+
+            // If URL has ?view=id, load that request for editing/printing
+            await loadRequestFromUrl();
+
+            console.log('✅ Request page ready (simplified).');
+        }
+
+        console.log('🚀 Request page loaded (simplified).');
+    </script>
+</body>
+</html>
