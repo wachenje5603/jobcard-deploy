@@ -188,13 +188,6 @@
             background: #6c757d;
             color: white;
         }
-        .btn-primary {
-            background: #C8102E;
-            color: white;
-        }
-        .btn-primary:hover {
-            background: #a00d24;
-        }
         .btn-danger {
             background: #dc3545;
             color: white;
@@ -304,7 +297,6 @@
                     <div style="font-size:14px; font-weight:600; color:#C8102E; margin-top:2px;">TAITA TAVETA COUNTY</div>
                 </div>
             </div>
-            <!-- UPDATED: Changed from MINISTRY OF HEALTH to DEPARTMENT OF HEALTH SERVICES -->
             <span class="badge">DEPARTMENT OF HEALTH SERVICES</span>
         </header>
 
@@ -319,7 +311,7 @@
             <div class="grid-2">
                 <div class="field-group">
                     <label>Request No.</label>
-                    <!-- UPDATED: Show placeholder until saved -->
+                    <!-- UPDATED: Placeholder until saved -->
                     <input type="text" id="reqNo" readonly placeholder="Will be assigned on save" />
                 </div>
                 <div class="field-group">
@@ -349,8 +341,8 @@
 
             <div id="reqEquipDetails" class="grid-2" style="display: none;">
                 <div class="field-group">
-                    <label>Inventory / Asset No. <span style="color:#6c757d; font-size:11px; font-weight:normal;">(Coming soon)</span></label>
-                    <input type="text" id="reqInventory" placeholder="Coming soon" readonly style="background:#f8f9fa; color:#6c757d;" />
+                    <label>Inventory / Asset No.</label>
+                    <input type="text" id="reqInventory" placeholder="e.g. INV-001" />
                 </div>
                 <div class="field-group">
                     <label>Serial No.</label>
@@ -367,7 +359,7 @@
                 <textarea id="reqComplaint" rows="3" placeholder="Describe the issue..."></textarea>
             </div>
 
-            <!-- ===== EMAIL NOTIFICATION ONLY – REMOVED WHATSAPP ===== -->
+            <!-- ===== EMAIL NOTIFICATION ONLY – WHATSAPP REMOVED ===== -->
             <div class="field-group full-width">
                 <label>📧 Send Email Notification</label>
                 <button type="button" class="btn btn-info" onclick="sendEmailNotification()">
@@ -381,11 +373,12 @@
             <div class="action-bar no-print">
                 <button type="button" class="btn btn-success" onclick="saveRequest()">💾 Save Request</button>
                 <button type="button" class="btn btn-outline" onclick="window.print()">📄 Print PDF</button>
+                <button type="button" class="btn btn-outline" onclick="resetRequestForm()">🔄 Reset Form</button>
             </div>
         </form>
 
         <footer style="margin-top:22px;font-size:12px;color:#6c757d;text-align:center;border-top:1px solid #e9ecef;padding-top:14px;">
-            🔥 Firestore‑powered · 📧 Email Notifications · MCRH Request Slip v7.0 (No WhatsApp)
+            🔥 Firestore‑powered · 📧 Email Notifications · MCRH Request Slip v8.0 (No WhatsApp, Fixed Numbering)
         </footer>
     </div>
 
@@ -415,7 +408,6 @@
             getFirestore,
             collection,
             addDoc,
-            getDocs,
             getDoc,
             doc,
             runTransaction,
@@ -495,7 +487,7 @@
         }
 
         // ============================================================
-        // SEQUENTIAL REQUEST NUMBER GENERATOR (increments only on save)
+        // SEQUENTIAL REQUEST NUMBER GENERATOR (Atomic Firestore Counter)
         // ============================================================
         async function getNextRequestNumber() {
             const counterDocRef = doc(db, COUNTERS_COLL, 'requestCounter');
@@ -543,7 +535,7 @@
         document.getElementById('reqType').addEventListener('change', toggleEquipFields);
 
         // ============================================================
-        // SAVE REQUEST – number is generated here, not on load
+        // SAVE REQUEST – NUMBER IS GENERATED ONLY HERE
         // ============================================================
         window.saveRequest = async function() {
             const requester = document.getElementById('reqRequester').value.trim();
@@ -561,7 +553,7 @@
                 return;
             }
 
-            // Generate a new number ONLY NOW
+            // ✅ GENERATE THE NUMBER ONLY NOW (on save)
             const reqNo = await getNextRequestNumber();
             document.getElementById('reqNo').value = reqNo; // update the field
 
@@ -585,28 +577,20 @@
 
             try {
                 await addDoc(collection(db, REQUESTS_COLL), data);
-                showToast(`✅ Request ${reqNo} saved.`);
-                // Reset form for a new request, keeping the generated number visible
-                // but we will clear it on next reset.
-                // We'll keep the number displayed so user knows it.
-                // Optionally, we can reset all fields except requester and unit.
-                // For convenience, we'll clear the form but keep the number.
-                resetRequestForm(false); // false = don't generate new number
-                // Re-populate requester and unit
-                document.getElementById('reqRequester').value = currentUser.name || '';
-                if (currentUser.role === 'requester' && currentUser.department) {
-                    document.getElementById('reqUnit').value = currentUser.department;
-                }
-                // Set a placeholder for the next request – we'll generate a new number on next save
-                document.getElementById('reqNo').value = 'Will be assigned on save';
+                showToast(`✅ Request ${reqNo} saved successfully.`);
+                // Reset form to a clean state for the next request
+                resetRequestForm();
+                // The reset will set the placeholder back.
             } catch (err) {
                 console.error('❌ Save error:', err);
                 showToast('❌ Error: ' + err.message, true);
+                // Revert the number field to placeholder if save failed
+                document.getElementById('reqNo').value = 'Will be assigned on save';
             }
         };
 
         // ============================================================
-        // EMAIL NOTIFICATION
+        // EMAIL NOTIFICATION (remains)
         // ============================================================
         window.sendEmailNotification = function() {
             const reqNo = document.getElementById('reqNo').value || 'New Request';
@@ -632,10 +616,9 @@
         };
 
         // ============================================================
-        // RESET FORM (with option to generate new number)
+        // RESET FORM – sets number to placeholder, does NOT increment counter
         // ============================================================
-        function resetRequestForm(generateNewNumber = true) {
-            // We'll clear all fields except requester and unit (will be re-filled by init)
+        function resetRequestForm() {
             document.getElementById('reqDateTime').value = new Date().toISOString().slice(0, 16);
             document.getElementById('reqType').value = 'Equipment';
             document.getElementById('reqEquipName').value = '';
@@ -643,20 +626,23 @@
             document.getElementById('reqSerial').value = '';
             document.getElementById('reqModel').value = '';
             document.getElementById('reqComplaint').value = '';
+            // ✅ Reset number to placeholder – NO COUNTER INCREMENT
+            document.getElementById('reqNo').value = 'Will be assigned on save';
             toggleEquipFields();
             currentDocId = null;
-            if (generateNewNumber) {
-                // We will not generate a number; we'll set placeholder
-                document.getElementById('reqNo').value = 'Will be assigned on save';
-            } else {
-                // Keep the current number (shown after save)
-                // Do nothing.
+            // Re-populate requester and unit
+            if (currentUser) {
+                document.getElementById('reqRequester').value = currentUser.name || '';
+                if (currentUser.role === 'requester' && currentUser.department) {
+                    document.getElementById('reqUnit').value = currentUser.department;
+                }
             }
+            showToast('🔄 Form reset. New number will be assigned on save.');
         }
         window.resetRequestForm = resetRequestForm;
 
         // ============================================================
-        // LOAD REQUEST VIA URL PARAM (for viewing only, not editing)
+        // LOAD REQUEST VIA URL PARAM (for viewing/printing only)
         // ============================================================
         async function loadRequestFromUrl() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -684,8 +670,7 @@
                 document.getElementById('reqComplaint').value = r.complaint || '';
 
                 toggleEquipFields();
-                // Disable editing? We'll allow but show as loaded.
-                showToast(`📂 Request ${r.requestNo} loaded. You can edit and resave, but it will create a new request (not update).`);
+                showToast(`📂 Request ${r.requestNo} loaded for viewing.`);
             } catch (err) {
                 console.error(err);
                 showToast('Error loading request: ' + err.message, true);
@@ -693,11 +678,11 @@
         }
 
         // ============================================================
-        // INIT – no number generation on load
+        // INIT – NO NUMBER GENERATION ON LOAD
         // ============================================================
         async function init() {
             document.getElementById('reqDateTime').value = new Date().toISOString().slice(0, 16);
-            // Set placeholder for request number
+            // ✅ Set placeholder – absolutely NO counter call here
             document.getElementById('reqNo').value = 'Will be assigned on save';
             if (currentUser) {
                 document.getElementById('reqRequester').value = currentUser.name || '';
@@ -710,10 +695,10 @@
             // If URL has ?view=id, load that request for viewing/printing
             await loadRequestFromUrl();
 
-            console.log('✅ Request page ready (no auto-numbering until save).');
+            console.log('✅ Request page ready. Numbering only on save.');
         }
 
-        console.log('🚀 Request page loaded (simplified).');
+        console.log('🚀 Request page loaded (fixed numbering & no WhatsApp).');
     </script>
 </body>
 </html>
