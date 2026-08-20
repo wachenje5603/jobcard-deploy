@@ -185,16 +185,8 @@
             box-shadow: 0 0 0 3px rgba(200, 16, 46, 0.15);
         }
         @media (max-width: 500px) {
-            .whatsapp-inline {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .whatsapp-inline select,
-            .whatsapp-inline input {
-                width: 100%;
-                flex: none;
-                min-width: unset;
-            }
+            .whatsapp-inline { flex-direction: column; align-items: stretch; }
+            .whatsapp-inline select, .whatsapp-inline input { width:100%; flex:none; min-width:unset; }
         }
 
         /* ===== TOAST ===== */
@@ -300,161 +292,119 @@
                 </select>
             </div>
 
-            <!-- ===== DEPARTMENT DROPDOWN (SINGLE) – UPDATED WITH WARDS ===== -->
+            <!-- ===== RESTRUCTURED SINGLE DEPARTMENT DROPDOWN ===== -->
             <div class="form-group" id="deptFieldContainer" style="display:block;">
                 <label id="deptLabel">Department (for requester)</label>
                 <select id="newUserDept">
                     <option value="">-- Select department --</option>
-                    <optgroup label="🏥 Wards & Units">
-                        <option value="General Ward - Male">General Ward - Male</option>
-                        <option value="General Ward - Female">General Ward - Female</option>
-                        <option value="Medical Ward">Medical Ward</option>
-                        <option value="Surgical Ward">Surgical Ward</option>
-                        <option value="Paediatric Ward">Paediatric Ward</option>
-                        <option value="Maternity Ward">Maternity Ward</option>
-                        <option value="High Dependency Unit (HDU)">High Dependency Unit (HDU)</option>
-                        <option value="ICU / HDU">ICU / HDU</option>
-                        <option value="Neonatal ICU (NICU)">Neonatal ICU (NICU)</option>
-                        <option value="Paediatric ICU (PICU)">Paediatric ICU (PICU)</option>
+                    
+                    <optgroup label="🏥 CURATIVE & CLINICAL WARDS">
+                        <option value="ACCIDENTS AND EMERGENCY">ACCIDENTS AND EMERGENCY</option>
+                        <option value="TRIAGE">TRIAGE</option>
+                        <option value="MEDICAL">MEDICAL</option>
+                        <option value="SURGICAL">SURGICAL</option>
+                        <option value="MATERNITY">MATERNITY</option>
+                        <option value="PEDIATRIC">PEDIATRIC</option>
+                        <option value="ORTHOPAEDIC AND TRAUMA">ORTHOPAEDIC AND TRAUMA</option>
+                        <option value="THEATRE">THEATRE</option>
+                        <option value="MANAGE WARD">MANAGE WARD</option>
+                        <option value="FEMALE WARD">FEMALE WARD</option>
+                        <option value="MENTAL HEALTH">MENTAL HEALTH</option>
                     </optgroup>
-                    <optgroup label="🩺 Clinical & Medical">
-                        <option value="Accident & Emergency (A&E)">Accident & Emergency (A&E)</option>
-                        <option value="Anaesthesia">Anaesthesia</option>
-                        <option value="Cardiology">Cardiology</option>
-                        <option value="Cardiothoracic Surgery">Cardiothoracic Surgery</option>
-                        <option value="Dermatology">Dermatology</option>
-                        <option value="Endocrinology">Endocrinology</option>
-                        <option value="ENT (Ear, Nose & Throat)">ENT (Ear, Nose & Throat)</option>
-                        <option value="Gastroenterology">Gastroenterology</option>
-                        <option value="General Medicine">General Medicine</option>
-                        <option value="General Surgery">General Surgery</option>
-                        <option value="Gynaecology">Gynaecology</option>
-                        <option value="Haematology">Haematology</option>
-                        <option value="Infectious Diseases">Infectious Diseases</option>
-                        <option value="Nephrology (Renal Unit)">Nephrology (Renal Unit)</option>
-                        <option value="Neurology">Neurology</option>
-                        <option value="Neurosurgery">Neurosurgery</option>
-                        <option value="Obstetrics">Obstetrics</option>
-                        <option value="Oncology">Oncology</option>
-                        <option value="Ophthalmology">Ophthalmology</option>
-                        <option value="Orthopaedics & Trauma">Orthopaedics & Trauma</option>
-                        <option value="Paediatrics">Paediatrics</option>
-                        <option value="Palliative Care">Palliative Care</option>
-                        <option value="Psychiatry / Mental Health">Psychiatry / Mental Health</option>
-                        <option value="Pulmonology / Respiratory">Pulmonology / Respiratory</option>
-                        <option value="Radiology / Imaging">Radiology / Imaging</option>
-                        <option value="Radiotherapy">Radiotherapy</option>
-                        <option value="Reproductive Health">Reproductive Health</option>
-                        <option value="Rheumatology">Rheumatology</option>
-                        <option value="Urology">Urology</option>
+
+                    <optgroup label="🧪 ALLIED HEALTH & RECORDS">
+                        <option value="HMIS RECORDS">HMIS RECORDS</option>
+                        <option value="DIAGNOSTIC">DIAGNOSTIC</option>
+                        <option value="PREWORM & REHAB SERVICES">PREWORM & REHAB SERVICES</option>
+                        <option value="PHYSIOTHERAPY">PHYSIOTHERAPY</option>
+                        <option value="OCCUPATIONAL THERAPY">OCCUPATIONAL THERAPY</option>
+                        <option value="MCHIP">MCHIP</option>
+                        <option value="PURPLE HEALTH">PURPLE HEALTH</option>
+                        <option value="NCT">NCT</option>
+                        <option value="LAB SERVICE">LAB SERVICE</option>
+                        <option value="XRAY SERVICE">XRAY SERVICE</option>
                     </optgroup>
-                    <optgroup label="🩺 Critical & Specialised Care">
-                        <option value="Theatre (Operating Rooms)">Theatre (Operating Rooms)</option>
+
+                    <optgroup label="📋 ADMINISTRATION & SUPPORT">
+                        <option value="ADMINISTRATION">ADMINISTRATION</option>
+                        <option value="HUMAN RESOURCE">HUMAN RESOURCE</option>
+                        <option value="PERSONNEL">PERSONNEL</option>
+                        <option value="SHA">SHA</option>
+                        <option value="SOCIAL SERVICES">SOCIAL SERVICES</option>
+                        <option value="SUPPLANT SERVICES">SUPPLANT SERVICES</option>
+                        <option value="KITCHEN">KITCHEN</option>
+                        <option value="LAUNDRY">LAUNDRY</option>
+                        <option value="HMU">HMU</option>
+                        <option value="MORTUARY">MORTUARY</option>
+                        <option value="TRANSPORT">TRANSPORT</option>
+                        <option value="COMMUNICATION">COMMUNICATION</option>
                     </optgroup>
-                    <optgroup label="⚕️ Allied Health & Support">
-                        <option value="Dental / Oral Health">Dental / Oral Health</option>
-                        <option value="Laboratory (Pathology)">Laboratory (Pathology)</option>
-                        <option value="Nutrition & Dietetics">Nutrition & Dietetics</option>
-                        <option value="Occupational Therapy">Occupational Therapy</option>
-                        <option value="Optometry">Optometry</option>
-                        <option value="Pharmacy">Pharmacy</option>
-                        <option value="Physiotherapy / Rehabilitation">Physiotherapy / Rehabilitation</option>
-                        <option value="Social Work / Counselling">Social Work / Counselling</option>
-                        <option value="Speech Therapy">Speech Therapy</option>
-                    </optgroup>
-                    <optgroup label="⚙️ Technical & Engineering">
-                        <option value="Biomedical Engineering">Biomedical Engineering</option>
-                        <option value="Maintenance & Engineering">Maintenance & Engineering</option>
-                        <option value="Information Technology (IT)">Information Technology (IT)</option>
-                    </optgroup>
-                    <optgroup label="📋 Administrative & Corporate">
-                        <option value="Administration">Administration</option>
-                        <option value="Finance / Accounts">Finance / Accounts</option>
-                        <option value="Health Records / HIM">Health Records / HIM</option>
-                        <option value="Human Resources">Human Resources</option>
-                        <option value="Procurement / Supply Chain">Procurement / Supply Chain</option>
-                        <option value="Public Health / Community Health">Public Health / Community Health</option>
-                        <option value="Quality Assurance">Quality Assurance</option>
-                        <option value="Research & Training">Research & Training</option>
+
+                    <optgroup label="🩺 SPECIALIZED CLINICS & UNITS">
+                        <option value="CSSD">CSSD</option>
+                        <option value="CCC">CCC</option>
+                        <option value="HOSPICE">HOSPICE</option>
+                        <option value="OUTPATIENT DEPARTMENT">OUTPATIENT DEPARTMENT</option>
+                        <option value="DOCTORS CLINIC">DOCTORS CLINIC</option>
+                        <option value="ENT CLINIC">ENT CLINIC</option>
+                        <option value="DERMATOLOGY CLINIC">DERMATOLOGY CLINIC</option>
+                        <option value="EYE CENTER">EYE CENTER</option>
                     </optgroup>
                 </select>
             </div>
 
-            <!-- ===== MULTI-DEPARTMENT DROPDOWN FOR ENGINEERS – UPDATED WITH WARDS ===== -->
+            <!-- ===== RESTRUCTURED MULTI-DEPARTMENT DROPDOWN ===== -->
             <div class="form-group" id="multiDeptContainer" style="display:none;">
                 <label>Select departments the engineer will handle (hold Ctrl/Cmd to choose multiple)</label>
                 <select id="newUserDepts" multiple size="5">
-                    <optgroup label="🏥 Wards & Units">
-                        <option value="General Ward - Male">General Ward - Male</option>
-                        <option value="General Ward - Female">General Ward - Female</option>
-                        <option value="Medical Ward">Medical Ward</option>
-                        <option value="Surgical Ward">Surgical Ward</option>
-                        <option value="Paediatric Ward">Paediatric Ward</option>
-                        <option value="Maternity Ward">Maternity Ward</option>
-                        <option value="High Dependency Unit (HDU)">High Dependency Unit (HDU)</option>
-                        <option value="ICU / HDU">ICU / HDU</option>
-                        <option value="Neonatal ICU (NICU)">Neonatal ICU (NICU)</option>
-                        <option value="Paediatric ICU (PICU)">Paediatric ICU (PICU)</option>
+                    <optgroup label="🏥 CURATIVE & CLINICAL WARDS">
+                        <option value="ACCIDENTS AND EMERGENCY">ACCIDENTS AND EMERGENCY</option>
+                        <option value="TRIAGE">TRIAGE</option>
+                        <option value="MEDICAL">MEDICAL</option>
+                        <option value="SURGICAL">SURGICAL</option>
+                        <option value="MATERNITY">MATERNITY</option>
+                        <option value="PEDIATRIC">PEDIATRIC</option>
+                        <option value="ORTHOPAEDIC AND TRAUMA">ORTHOPAEDIC AND TRAUMA</option>
+                        <option value="THEATRE">THEATRE</option>
+                        <option value="MANAGE WARD">MANAGE WARD</option>
+                        <option value="FEMALE WARD">FEMALE WARD</option>
+                        <option value="MENTAL HEALTH">MENTAL HEALTH</option>
                     </optgroup>
-                    <optgroup label="🩺 Clinical & Medical">
-                        <option value="Accident & Emergency (A&E)">Accident & Emergency (A&E)</option>
-                        <option value="Anaesthesia">Anaesthesia</option>
-                        <option value="Cardiology">Cardiology</option>
-                        <option value="Cardiothoracic Surgery">Cardiothoracic Surgery</option>
-                        <option value="Dermatology">Dermatology</option>
-                        <option value="Endocrinology">Endocrinology</option>
-                        <option value="ENT (Ear, Nose & Throat)">ENT (Ear, Nose & Throat)</option>
-                        <option value="Gastroenterology">Gastroenterology</option>
-                        <option value="General Medicine">General Medicine</option>
-                        <option value="General Surgery">General Surgery</option>
-                        <option value="Gynaecology">Gynaecology</option>
-                        <option value="Haematology">Haematology</option>
-                        <option value="Infectious Diseases">Infectious Diseases</option>
-                        <option value="Nephrology (Renal Unit)">Nephrology (Renal Unit)</option>
-                        <option value="Neurology">Neurology</option>
-                        <option value="Neurosurgery">Neurosurgery</option>
-                        <option value="Obstetrics">Obstetrics</option>
-                        <option value="Oncology">Oncology</option>
-                        <option value="Ophthalmology">Ophthalmology</option>
-                        <option value="Orthopaedics & Trauma">Orthopaedics & Trauma</option>
-                        <option value="Paediatrics">Paediatrics</option>
-                        <option value="Palliative Care">Palliative Care</option>
-                        <option value="Psychiatry / Mental Health">Psychiatry / Mental Health</option>
-                        <option value="Pulmonology / Respiratory">Pulmonology / Respiratory</option>
-                        <option value="Radiology / Imaging">Radiology / Imaging</option>
-                        <option value="Radiotherapy">Radiotherapy</option>
-                        <option value="Reproductive Health">Reproductive Health</option>
-                        <option value="Rheumatology">Rheumatology</option>
-                        <option value="Urology">Urology</option>
+                    <optgroup label="🧪 ALLIED HEALTH & RECORDS">
+                        <option value="HMIS RECORDS">HMIS RECORDS</option>
+                        <option value="DIAGNOSTIC">DIAGNOSTIC</option>
+                        <option value="PREWORM & REHAB SERVICES">PREWORM & REHAB SERVICES</option>
+                        <option value="PHYSIOTHERAPY">PHYSIOTHERAPY</option>
+                        <option value="OCCUPATIONAL THERAPY">OCCUPATIONAL THERAPY</option>
+                        <option value="MCHIP">MCHIP</option>
+                        <option value="PURPLE HEALTH">PURPLE HEALTH</option>
+                        <option value="NCT">NCT</option>
+                        <option value="LAB SERVICE">LAB SERVICE</option>
+                        <option value="XRAY SERVICE">XRAY SERVICE</option>
                     </optgroup>
-                    <optgroup label="🩺 Critical & Specialised Care">
-                        <option value="Theatre (Operating Rooms)">Theatre (Operating Rooms)</option>
+                    <optgroup label="📋 ADMINISTRATION & SUPPORT">
+                        <option value="ADMINISTRATION">ADMINISTRATION</option>
+                        <option value="HUMAN RESOURCE">HUMAN RESOURCE</option>
+                        <option value="PERSONNEL">PERSONNEL</option>
+                        <option value="SHA">SHA</option>
+                        <option value="SOCIAL SERVICES">SOCIAL SERVICES</option>
+                        <option value="SUPPLANT SERVICES">SUPPLANT SERVICES</option>
+                        <option value="KITCHEN">KITCHEN</option>
+                        <option value="LAUNDRY">LAUNDRY</option>
+                        <option value="HMU">HMU</option>
+                        <option value="MORTUARY">MORTUARY</option>
+                        <option value="TRANSPORT">TRANSPORT</option>
+                        <option value="COMMUNICATION">COMMUNICATION</option>
                     </optgroup>
-                    <optgroup label="⚕️ Allied Health & Support">
-                        <option value="Dental / Oral Health">Dental / Oral Health</option>
-                        <option value="Laboratory (Pathology)">Laboratory (Pathology)</option>
-                        <option value="Nutrition & Dietetics">Nutrition & Dietetics</option>
-                        <option value="Occupational Therapy">Occupational Therapy</option>
-                        <option value="Optometry">Optometry</option>
-                        <option value="Pharmacy">Pharmacy</option>
-                        <option value="Physiotherapy / Rehabilitation">Physiotherapy / Rehabilitation</option>
-                        <option value="Social Work / Counselling">Social Work / Counselling</option>
-                        <option value="Speech Therapy">Speech Therapy</option>
-                    </optgroup>
-                    <optgroup label="⚙️ Technical & Engineering">
-                        <option value="Biomedical Engineering">Biomedical Engineering</option>
-                        <option value="Maintenance & Engineering">Maintenance & Engineering</option>
-                        <option value="Information Technology (IT)">Information Technology (IT)</option>
-                    </optgroup>
-                    <optgroup label="📋 Administrative & Corporate">
-                        <option value="Administration">Administration</option>
-                        <option value="Finance / Accounts">Finance / Accounts</option>
-                        <option value="Health Records / HIM">Health Records / HIM</option>
-                        <option value="Human Resources">Human Resources</option>
-                        <option value="Procurement / Supply Chain">Procurement / Supply Chain</option>
-                        <option value="Public Health / Community Health">Public Health / Community Health</option>
-                        <option value="Quality Assurance">Quality Assurance</option>
-                        <option value="Research & Training">Research & Training</option>
+                    <optgroup label="🩺 SPECIALIZED CLINICS & UNITS">
+                        <option value="CSSD">CSSD</option>
+                        <option value="CCC">CCC</option>
+                        <option value="HOSPICE">HOSPICE</option>
+                        <option value="OUTPATIENT DEPARTMENT">OUTPATIENT DEPARTMENT</option>
+                        <option value="DOCTORS CLINIC">DOCTORS CLINIC</option>
+                        <option value="ENT CLINIC">ENT CLINIC</option>
+                        <option value="DERMATOLOGY CLINIC">DERMATOLOGY CLINIC</option>
+                        <option value="EYE CENTER">EYE CENTER</option>
                     </optgroup>
                 </select>
                 <small style="color:#6c757d;">Hold Ctrl (Windows) or Cmd (Mac) to select multiple.</small>
@@ -616,9 +566,9 @@
         return 'open';
     }
 
-    // ================================================================
+    // ============================================================
     // TOGGLE FIELDS
-    // ================================================================
+    // ============================================================
     function toggleRoleFields() {
         const role = document.getElementById('newUserRole').value;
         const deptContainer = document.getElementById('deptFieldContainer');
@@ -646,9 +596,9 @@
     }
     window.toggleRoleFields = toggleRoleFields;
 
-    // ================================================================
+    // ============================================================
     // FETCH DATA
-    // ================================================================
+    // ============================================================
     async function fetchData() {
         console.log('🔍 fetchData() called.');
         try {
@@ -708,6 +658,25 @@
         }
     }
 
+    // ============================================================
+    // FILTER HELPERS
+    // ============================================================
+    function getMaintenanceRequests() {
+        if (!currentUser || !currentUser.departments || userRole !== 'maintenance') {
+            return allRequests;
+        }
+        const depts = currentUser.departments;
+        return allRequests.filter(r => r.unit && depts.includes(r.unit));
+    }
+
+    function getMaintenanceJobcards() {
+        if (!currentUser || !currentUser.departments || userRole !== 'maintenance') {
+            return allJobCards;
+        }
+        const depts = currentUser.departments;
+        return allJobCards.filter(j => j.unit && depts.includes(j.unit));
+    }
+
     function getMyRequests() {
         if (!currentUser || !currentUser.id) {
             console.warn('⚠️ getMyRequests: currentUser or id missing');
@@ -715,11 +684,6 @@
         }
         const filtered = allRequests.filter(r => r.requesterId === currentUser.id);
         console.log(`📋 getMyRequests: found ${filtered.length} requests for UID ${currentUser.id}`);
-        if (filtered.length === 0 && allRequests.length > 0) {
-            const sampleIds = allRequests.slice(0, 5).map(r => r.requesterId);
-            console.log('Sample requesterIds from allRequests:', sampleIds);
-            console.log('Current user ID:', currentUser.id);
-        }
         return filtered;
     }
 
@@ -728,23 +692,33 @@
         return allJobCards.filter(j => j.unit === currentUser.department);
     }
 
-    // ================================================================
+    // ============================================================
     // RENDER DASHBOARD
-    // ================================================================
+    // ============================================================
     function renderDashboard() {
         if (!currentUser) return;
         const isAdmin = userRole === 'admin';
         const isMaintenance = userRole === 'maintenance';
         const isRequester = userRole === 'requester';
 
-        const totalRequests = allRequests.length;
-        const totalJobcards = allJobCards.length;
+        let requestsForStats = allRequests;
+        let jobcardsForStats = allJobCards;
+        if (isMaintenance) {
+            requestsForStats = getMaintenanceRequests();
+            jobcardsForStats = getMaintenanceJobcards();
+        } else if (isRequester) {
+            requestsForStats = getMyRequests();
+            jobcardsForStats = getDepartmentJobcards();
+        }
+
+        const totalRequests = requestsForStats.length;
+        const totalJobcards = jobcardsForStats.length;
         const myRequests = getMyRequests();
         const deptJobcards = getDepartmentJobcards();
 
-        const pendingReqs = allRequests.filter(r => r.jobStatus === 'Pending' || r.jobStatus === 'No Job').length;
-        const completedReqs = allRequests.filter(r => r.jobStatus === 'Completed').length;
-        const writtenOffReqs = allRequests.filter(r => r.jobStatus === 'Written Off').length;
+        const pendingReqs = requestsForStats.filter(r => r.jobStatus === 'Pending' || r.jobStatus === 'No Job').length;
+        const completedReqs = requestsForStats.filter(r => r.jobStatus === 'Completed').length;
+        const writtenOffReqs = requestsForStats.filter(r => r.jobStatus === 'Written Off').length;
 
         let statsHtml = '';
         if (isAdmin) {
@@ -779,14 +753,14 @@
                 </div>
             `;
         } else if (isMaintenance) {
-            const newReqs = allRequests.filter(r => r.jobStatus === 'No Job').length;
+            const newReqs = requestsForStats.filter(r => r.jobStatus === 'No Job').length;
             statsHtml = `
                 <div class="stat-card total" onclick="switchView('requests')">
-                    <div class="stat-left"><div class="number">${totalRequests}</div><div class="label">📋 All Requests</div></div>
+                    <div class="stat-left"><div class="number">${totalRequests}</div><div class="label">📋 Dept. Requests</div></div>
                     <div class="stat-icon"><i class="fas fa-list"></i></div>
                 </div>
                 <div class="stat-card jobcards" onclick="switchView('jobcards')">
-                    <div class="stat-left"><div class="number">${totalJobcards}</div><div class="label">📋 All Jobcards</div></div>
+                    <div class="stat-left"><div class="number">${totalJobcards}</div><div class="label">📋 Dept. Jobcards</div></div>
                     <div class="stat-icon"><i class="fas fa-tools"></i></div>
                 </div>
                 <div class="stat-card new" onclick="applyFilter('new')">
@@ -802,7 +776,7 @@
                     <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
                 </div>
             `;
-        } else { // Requester
+        } else {
             statsHtml = `
                 <div class="stat-card myrequests" onclick="switchView('requests')">
                     <div class="stat-left"><div class="number">${myRequests.length}</div><div class="label">📋 My Requests</div></div>
@@ -859,9 +833,9 @@
         applyFilters();
     }
 
-    // ================================================================
+    // ============================================================
     // REFRESH DATA
-    // ================================================================
+    // ============================================================
     window.refreshData = function() {
         showToast('🔄 Refreshing...');
         fetchData().then(() => {
@@ -870,9 +844,9 @@
         });
     };
 
-    // ================================================================
+    // ============================================================
     // SWITCH VIEW
-    // ================================================================
+    // ============================================================
     window.switchView = function(view) {
         currentView = view;
         buildFilterBar();
@@ -880,9 +854,9 @@
         applyFilters();
     };
 
-    // ================================================================
+    // ============================================================
     // BUILD FILTER BAR
-    // ================================================================
+    // ============================================================
     function buildFilterBar() {
         const isAdmin = userRole === 'admin';
         const isMaintenance = userRole === 'maintenance';
@@ -925,20 +899,22 @@
         const isRequester = userRole === 'requester';
         let title = '';
         if (currentView === 'requests') {
-            title = isRequester ? '📋 My Requests' : '📋 All Requests';
+            title = isRequester ? '📋 My Requests' : '📋 Requests';
         } else {
-            title = isRequester ? '📋 Department Jobcards' : '📋 All Jobcards';
+            title = isRequester ? '📋 Department Jobcards' : '📋 Jobcards';
         }
         tableTitle.textContent = title;
     }
 
-    // ================================================================
+    // ============================================================
     // RENDER CHARTS
-    // ================================================================
+    // ============================================================
     function renderCharts() {
         let requestsForCharts = [];
         if (userRole === 'requester') {
             requestsForCharts = getMyRequests();
+        } else if (userRole === 'maintenance') {
+            requestsForCharts = getMaintenanceRequests();
         } else {
             requestsForCharts = allRequests;
         }
@@ -978,9 +954,9 @@
         });
     }
 
-    // ================================================================
+    // ============================================================
     // APPLY FILTERS
-    // ================================================================
+    // ============================================================
     window.applyFilter = function(status) {
         const select = document.getElementById('statusFilter');
         if (select) { select.value = status; applyFilters(); }
@@ -996,12 +972,16 @@
         if (isRequests) {
             if (userRole === 'requester') {
                 data = getMyRequests();
+            } else if (userRole === 'maintenance') {
+                data = getMaintenanceRequests();
             } else {
                 data = allRequests;
             }
         } else {
             if (userRole === 'requester') {
                 data = getDepartmentJobcards();
+            } else if (userRole === 'maintenance') {
+                data = getMaintenanceJobcards();
             } else {
                 data = allJobCards;
             }
@@ -1036,9 +1016,9 @@
         renderTable(data);
     };
 
-    // ================================================================
+    // ============================================================
     // RENDER TABLE
-    // ================================================================
+    // ============================================================
     function renderTable(data) {
         if (!data || data.length === 0) {
             tableBody.innerHTML = '<p style="color:#9ca3af; padding:20px; text-align:center;">📭 No records found.</p>';
@@ -1051,9 +1031,9 @@
         }
     }
 
-    // ================================================================
+    // ============================================================
     // RENDER REQUESTS TABLE
-    // ================================================================
+    // ============================================================
     function renderRequestsTable(requests) {
         let html = `
             <table>
@@ -1097,9 +1077,9 @@
         tableBody.innerHTML = html;
     }
 
-    // ================================================================
-    // RENDER JOBCARDS TABLE
-    // ================================================================
+    // ============================================================
+    // RENDER JOBCARDS TABLE - ENHANCED WITH EDIT FEATURE
+    // ============================================================
     function renderJobcardsTable(jobcards) {
         let html = `
             <table>
@@ -1120,10 +1100,23 @@
             const status = j.status || 'Pending';
             const statusClass = getStatusClass(status);
             const isEditable = (status === 'Pending' || status === 'Postponed');
+            const canEdit = (isEditable && (userRole === 'admin' || userRole === 'maintenance'));
+            
             const actions = `
                 <div class="table-actions">
-                    <button class="btn btn-info btn-sm" onclick="downloadJobcardPDF('${j.id}')"><i class="fas fa-file-pdf"></i> PDF</button>
-                    ${(isEditable && (userRole === 'admin' || userRole === 'maintenance')) ? `<button class="btn btn-outline btn-sm" onclick="editJobCard('${j.id}')"><i class="fas fa-edit"></i> Edit</button>` : ''}
+                    <button class="btn btn-info btn-sm" onclick="downloadJobcardPDF('${j.id}')" title="Download PDF">
+                        <i class="fas fa-file-pdf"></i> PDF
+                    </button>
+                    ${canEdit ? `
+                        <button class="btn btn-primary btn-sm" onclick="editJobCard('${j.id}')" title="Edit job details and change status">
+                            <i class="fas fa-edit"></i> Edit / Complete
+                        </button>
+                    ` : ''}
+                    ${(!isEditable && (userRole === 'admin' || userRole === 'maintenance')) ? `
+                        <span style="font-size:11px; color:#6c757d; padding:4px 8px; background:#f1f3f5; border-radius:4px;">
+                            <i class="fas fa-lock"></i> Locked
+                        </span>
+                    ` : ''}
                 </div>
             `;
             html += `
@@ -1142,17 +1135,17 @@
         tableBody.innerHTML = html;
     }
 
-    // ================================================================
+    // ============================================================
     // ACTIONS
-    // ================================================================
+    // ============================================================
     window.viewRequest = (id) => window.open(`request.html?view=${id}`, '_blank');
     window.viewJobPDF = (id) => window.open(`jobcard.html?view=${id}`, '_blank');
     window.createJob = (requestNo) => window.location.href = `jobcard.html?request=${requestNo}`;
     window.editJobCard = (id) => window.open(`jobcard.html?view=${id}`, '_blank');
 
-    // ================================================================
-    // SIGNATURE RENDERER
-    // ================================================================
+    // ============================================================
+    // PDF FUNCTIONS
+    // ============================================================
     function signatureToDataURL(signatureData, width = 400, height = 120) {
         if (!signatureData) return null;
         let strokes = signatureData;
@@ -1232,9 +1225,6 @@
         return canvas.toDataURL('image/png');
     }
 
-    // ================================================================
-    // CAPTURE AND SAVE PDF
-    // ================================================================
     async function captureAndSavePDF(templateDiv, filename) {
         templateDiv.style.position = 'fixed';
         templateDiv.style.left = '0';
@@ -1315,9 +1305,6 @@
         pdf.save(`${filename}.pdf`);
     }
 
-    // ================================================================
-    // DOWNLOAD JOBCARD PDF
-    // ================================================================
     window.downloadJobcardPDF = async function(jobcardId) {
         showToast('Generating PDF...');
         try {
@@ -1349,11 +1336,11 @@
                     <!-- Header -->
                     <div style="border-bottom:3px solid #C8102E; padding-bottom:10px; margin-bottom:20px; display:flex; justify-content:space-between;">
                         <div>
-                            <h1 style="color:#C8102E; font-size:24px;">MOI COUNTY REFERRAL HOSPITAL</h1>
+                            <h1 style="color:#C8102E; font-size:24px;">MOI VOI COUNTY REFERRAL HOSPITAL</h1>
                             <div style="font-size:13px;">P.O. BOX 18-80300 VOI | Email: biomedsmoivoi@gmail.com</div>
                             <div style="font-size:13px; font-weight:600; color:#C8102E;">TAITA TAVETA COUNTY</div>
                         </div>
-                        <span style="background:#C8102E; color:white; padding:4px 16px; border-radius:30px; font-size:14px; font-weight:600;">MINISTRY OF HEALTH</span>
+                        <span style="background:#C8102E; color:white; padding:4px 16px; border-radius:30px; font-size:14px; font-weight:600;">DEPARTMENT OF HEALTH SERVICES</span>
                     </div>
 
                     <div style="display:flex; justify-content:space-between; background:#f8f9fc; padding:8px 16px; border-radius:8px; margin-bottom:18px;">
@@ -1382,12 +1369,12 @@
                     </div>
 
                     <div style="margin-top:16px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px 20px; background:#f8f9fc; padding:12px 16px; border-radius:8px;">
-                        <div><label style="font-size:11px; font-weight:600; color:#495057;">Received from</label><div>${job.receivedFrom || 'N/A'}</div></div>
-                        <div><label style="font-size:11px; font-weight:600; color:#495057;">Date / Time Received</label><div>${fmtDateTime(job.receivedDateTime)}</div></div>
-                        <div><label style="font-size:11px; font-weight:600; color:#495057;">Received by</label><div>${job.receivedBy || 'N/A'}</div></div>
-                        <div><label style="font-size:11px; font-weight:600; color:#495057;">Handed back to</label><div>${job.handedTo || 'N/A'}</div></div>
-                        <div><label style="font-size:11px; font-weight:600; color:#495057;">Date / Time Handed</label><div>${fmtDateTime(job.handedDateTime)}</div></div>
-                        <div><label style="font-size:11px; font-weight:600; color:#495057;">Handed by</label><div>${job.handedBy || 'N/A'}</div></div>
+                        ${field('Received from', job.receivedFrom)}
+                        ${field('Date / Time Received', fmtDateTime(job.receivedDateTime))}
+                        ${field('Received by', job.receivedBy)}
+                        ${field('Handed back to', job.handedTo)}
+                        ${field('Date / Time Handed', fmtDateTime(job.handedDateTime))}
+                        ${field('Handed by', job.handedBy)}
                     </div>
 
                     <div style="margin-top:16px; background:#fafbfc; border:1px solid #e9ecef; border-radius:8px; padding:14px 16px;">
@@ -1471,9 +1458,6 @@
         }
     };
 
-    // ================================================================
-    // DOWNLOAD REQUEST PDF
-    // ================================================================
     window.downloadRequestPDF = async function(requestId) {
         if (!requestId) {
             showToast('Invalid request ID.', true);
@@ -1496,11 +1480,11 @@
                 <div style="font-family:'Segoe UI',sans-serif; padding:20px; max-width:800px; margin:0 auto; background:white; border:1px solid #ccc; box-sizing:border-box; font-size:13px;">
                     <div style="border-bottom:3px solid #C8102E; padding-bottom:10px; margin-bottom:20px; display:flex; justify-content:space-between;">
                         <div>
-                            <h1 style="color:#C8102E; font-size:24px;">MOI COUNTY REFERRAL HOSPITAL</h1>
+                            <h1 style="color:#C8102E; font-size:24px;">MOI VOI COUNTY REFERRAL HOSPITAL</h1>
                             <div style="font-size:13px;">P.O. BOX 18-80300 VOI | Email: biomedsmoivoi@gmail.com</div>
                             <div style="font-size:13px; font-weight:600; color:#C8102E;">TAITA TAVETA COUNTY</div>
                         </div>
-                        <span style="background:#C8102E; color:white; padding:4px 16px; border-radius:30px; font-size:14px; font-weight:600;">MINISTRY OF HEALTH</span>
+                        <span style="background:#C8102E; color:white; padding:4px 16px; border-radius:30px; font-size:14px; font-weight:600;">DEPARTMENT OF HEALTH SERVICES</span>
                     </div>
 
                     <div style="display:flex; justify-content:space-between; background:#f8f9fc; padding:8px 16px; border-radius:8px; margin-bottom:18px;">
@@ -1540,9 +1524,9 @@
         }
     };
 
-    // ================================================================
+    // ============================================================
     // USER MANAGEMENT
-    // ================================================================
+    // ============================================================
     window.openUserModal = function() {
         document.getElementById('editUserId').value = '';
         document.getElementById('userModalTitle').innerHTML = '<i class="fas fa-users-cog"></i> Add New User';
@@ -1802,9 +1786,9 @@
         }
     };
 
-    // ================================================================
+    // ============================================================
     // PENDING APPROVALS
-    // ================================================================
+    // ============================================================
     window.showPendingUsers = async function() {
         const modal = document.getElementById('approvalModal');
         modal.classList.add('show');
@@ -1868,9 +1852,9 @@
         if (e.target === this) closeUserModal();
     });
 
-    // ================================================================
+    // ============================================================
     // AUTH STATE
-    // ================================================================
+    // ============================================================
     onAuthStateChanged(auth, async (user) => {
         console.log('🔐 Auth state changed.');
         if (!user) {

@@ -202,13 +202,6 @@
         .btn-danger:hover {
             background: #b02a37;
         }
-        .btn-whatsapp {
-            background: #25D366;
-            color: white;
-        }
-        .btn-whatsapp:hover {
-            background: #1ebe5b;
-        }
         .btn-info {
             background: #17a2b8;
             color: white;
@@ -220,32 +213,6 @@
             padding: 4px 12px;
             font-size: 12px;
             border-radius: 4px;
-        }
-
-        .whatsapp-note {
-            margin-top: 8px;
-            padding: 8px 14px;
-            background: #e8f5e9;
-            border-radius: 6px;
-            font-size: 13px;
-            color: #2e7d32;
-            display: none;
-        }
-        .whatsapp-note.show {
-            display: block;
-        }
-        .engineer-info {
-            font-size: 13px;
-            color: #495057;
-            margin-top: 4px;
-            padding: 6px 12px;
-            background: #f8f9fc;
-            border-radius: 6px;
-            border: 1px solid #e9ecef;
-            display: none;
-        }
-        .engineer-info.show {
-            display: block;
         }
 
         .toast {
@@ -297,9 +264,6 @@
                 padding: 2px 0;
                 box-shadow: none;
             }
-            .whatsapp-note {
-                display: none !important;
-            }
             .container {
                 box-shadow: none;
                 padding: 10px;
@@ -335,12 +299,13 @@
             <div class="logo-area">
                 <div class="logo-icon">M</div>
                 <div>
-                    <h1>MOI COUNTY REFERRAL HOSPITAL</h1>
+                    <h1>MOI VOI COUNTY REFERRAL HOSPITAL</h1>
                     <div class="sub">P.O. BOX 18-80300 VOI | Email: biomedsmoivoi@gmail.com</div>
                     <div style="font-size:14px; font-weight:600; color:#C8102E; margin-top:2px;">TAITA TAVETA COUNTY</div>
                 </div>
             </div>
-            <span class="badge">MINISTRY OF HEALTH</span>
+            <!-- UPDATED: Changed from MINISTRY OF HEALTH to DEPARTMENT OF HEALTH SERVICES -->
+            <span class="badge">DEPARTMENT OF HEALTH SERVICES</span>
         </header>
 
         <div class="card-title">
@@ -354,7 +319,8 @@
             <div class="grid-2">
                 <div class="field-group">
                     <label>Request No.</label>
-                    <input type="text" id="reqNo" readonly placeholder="Auto-generated" />
+                    <!-- UPDATED: Show placeholder until saved -->
+                    <input type="text" id="reqNo" readonly placeholder="Will be assigned on save" />
                 </div>
                 <div class="field-group">
                     <label>Date</label>
@@ -401,28 +367,14 @@
                 <textarea id="reqComplaint" rows="3" placeholder="Describe the issue..."></textarea>
             </div>
 
-            <!-- WhatsApp & Email Notifications -->
+            <!-- ===== EMAIL NOTIFICATION ONLY – REMOVED WHATSAPP ===== -->
             <div class="field-group full-width">
-                <label>📱 Notifications</label>
-                <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-                    <select id="whatsappNumber" style="flex:1; min-width:150px; padding: 8px 12px; border: 1px solid #ced4da; border-radius: 6px; font-size: 14px; background: white;">
-                        <option value="">-- Select Engineer --</option>
-                    </select>
-                    <button type="button" class="btn btn-whatsapp" onclick="sendWhatsAppNotification(false)">
-                        📲 Notify
-                    </button>
-                    <button type="button" class="btn btn-danger" onclick="sendWhatsAppNotification(true)">
-                        🔔 Remind
-                    </button>
-                    <button type="button" class="btn btn-info" onclick="sendEmailNotification()">
-                        📧 Email
-                    </button>
-                </div>
-                <div class="engineer-info" id="engineerInfo">
-                    <span id="engineerName"></span> — <span id="engineerPhone"></span>
-                </div>
-                <div class="whatsapp-note" id="whatsappNote">
-                    Select an engineer and use "Notify" or "Remind". Email opens your default mail client.
+                <label>📧 Send Email Notification</label>
+                <button type="button" class="btn btn-info" onclick="sendEmailNotification()">
+                    📧 Send Email
+                </button>
+                <div style="font-size:13px; color:#6c757d; margin-top:4px;">
+                    Opens your default email client with the request details.
                 </div>
             </div>
 
@@ -433,7 +385,7 @@
         </form>
 
         <footer style="margin-top:22px;font-size:12px;color:#6c757d;text-align:center;border-top:1px solid #e9ecef;padding-top:14px;">
-            🔥 Firestore‑powered · 📲 WhatsApp & Email · MCRH Request Slip v6.0 (Simplified)
+            🔥 Firestore‑powered · 📧 Email Notifications · MCRH Request Slip v7.0 (No WhatsApp)
         </footer>
     </div>
 
@@ -466,11 +418,6 @@
             getDocs,
             getDoc,
             doc,
-            setDoc,
-            updateDoc,
-            query,
-            orderBy,
-            where,
             runTransaction,
             serverTimestamp
         } from 'firebase/firestore';
@@ -479,7 +426,6 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         const REQUESTS_COLL = 'requests';
-        const JOBCARDS_COLL = 'jobcards';
         const USERS_COLL = 'users';
         const COUNTERS_COLL = 'counters';
 
@@ -487,9 +433,7 @@
         // GLOBALS
         // ============================================================
         let currentUser = null;
-        let currentRequestNo = '';
         let currentDocId = null;
-        let allEngineers = [];
 
         // ============================================================
         // AUTHENTICATION & APPROVAL CHECK
@@ -517,8 +461,10 @@
 
                 currentUser = { id: user.uid, ...userData };
                 document.getElementById('reqRequester').value = currentUser.name || '';
+                if (currentUser.role === 'requester' && currentUser.department) {
+                    document.getElementById('reqUnit').value = currentUser.department;
+                }
 
-                console.log('✅ Authenticated user:', currentUser);
                 await init();
 
             } catch (err) {
@@ -549,7 +495,7 @@
         }
 
         // ============================================================
-        // SEQUENTIAL REQUEST NUMBER GENERATOR (with fallback)
+        // SEQUENTIAL REQUEST NUMBER GENERATOR (increments only on save)
         // ============================================================
         async function getNextRequestNumber() {
             const counterDocRef = doc(db, COUNTERS_COLL, 'requestCounter');
@@ -597,83 +543,9 @@
         document.getElementById('reqType').addEventListener('change', toggleEquipFields);
 
         // ============================================================
-        // FETCH ENGINEERS – FILTER BY DEPARTMENT
-        // ============================================================
-        async function fetchEngineers() {
-            try {
-                const q = query(collection(db, USERS_COLL), where('role', '==', 'maintenance'));
-                const snap = await getDocs(q);
-                allEngineers = [];
-                snap.forEach(doc => {
-                    const data = doc.data();
-                    if (data.whatsapp) {
-                        allEngineers.push({
-                            id: doc.id,
-                            name: data.name || 'Engineer',
-                            whatsapp: data.whatsapp,
-                            departments: data.departments || []
-                        });
-                    }
-                });
-                console.log(`✅ Found ${allEngineers.length} engineers with WhatsApp numbers.`);
-                populateEngineerDropdown();
-            } catch (err) {
-                console.error('Error fetching engineers:', err);
-                showToast('Could not load engineers. Please refresh.', true);
-            }
-        }
-
-        function populateEngineerDropdown() {
-            const select = document.getElementById('whatsappNumber');
-            select.innerHTML = '<option value="">-- Select Engineer --</option>';
-
-            let filteredEngineers = allEngineers;
-            if (currentUser && currentUser.role === 'requester') {
-                const userDept = currentUser.department;
-                if (userDept) {
-                    filteredEngineers = allEngineers.filter(eng =>
-                        eng.departments && eng.departments.includes(userDept)
-                    );
-                    console.log(`🔍 Filtered to ${filteredEngineers.length} engineers for department "${userDept}"`);
-                } else {
-                    console.warn('⚠️ Requester has no department set – showing all engineers.');
-                }
-            }
-
-            if (filteredEngineers.length === 0) {
-                select.innerHTML = '<option value="">-- No engineers available for your department --</option>';
-                return;
-            }
-
-            filteredEngineers.forEach(eng => {
-                const opt = document.createElement('option');
-                opt.value = eng.whatsapp;
-                opt.textContent = `${eng.name} (${eng.whatsapp})`;
-                opt.dataset.name = eng.name;
-                select.appendChild(opt);
-            });
-
-            select.addEventListener('change', function() {
-                const selected = this.options[this.selectedIndex];
-                const infoDiv = document.getElementById('engineerInfo');
-                const nameSpan = document.getElementById('engineerName');
-                const phoneSpan = document.getElementById('engineerPhone');
-                if (selected && selected.value) {
-                    nameSpan.textContent = selected.dataset.name || 'Engineer';
-                    phoneSpan.textContent = selected.value;
-                    infoDiv.classList.add('show');
-                } else {
-                    infoDiv.classList.remove('show');
-                }
-            });
-        }
-
-        // ============================================================
-        // SAVE REQUEST
+        // SAVE REQUEST – number is generated here, not on load
         // ============================================================
         window.saveRequest = async function() {
-            const reqNo = document.getElementById('reqNo').value;
-            if (!reqNo) { showToast('Generate request number first.', true); return; }
             const requester = document.getElementById('reqRequester').value.trim();
             const unit = document.getElementById('reqUnit').value.trim();
             const dateTime = document.getElementById('reqDateTime').value;
@@ -688,6 +560,10 @@
                 showToast('Fill all required fields.', true);
                 return;
             }
+
+            // Generate a new number ONLY NOW
+            const reqNo = await getNextRequestNumber();
+            document.getElementById('reqNo').value = reqNo; // update the field
 
             const data = {
                 requestNo: reqNo,
@@ -708,18 +584,21 @@
             console.log('📝 Saving request:', data);
 
             try {
-                if (currentDocId) {
-                    showToast('⚠️ Retrieved records cannot be overwritten. Saving as new.', true);
-                }
                 await addDoc(collection(db, REQUESTS_COLL), data);
                 showToast(`✅ Request ${reqNo} saved.`);
-                currentRequestNo = reqNo;
-                document.getElementById('whatsappNote').classList.add('show');
-                // Reset form to a clean state (keep the request number for new)
-                resetRequestForm();
-                document.getElementById('reqNo').value = await getNextRequestNumber();
-                // Re-populate engineer dropdown (in case department changed)
-                populateEngineerDropdown();
+                // Reset form for a new request, keeping the generated number visible
+                // but we will clear it on next reset.
+                // We'll keep the number displayed so user knows it.
+                // Optionally, we can reset all fields except requester and unit.
+                // For convenience, we'll clear the form but keep the number.
+                resetRequestForm(false); // false = don't generate new number
+                // Re-populate requester and unit
+                document.getElementById('reqRequester').value = currentUser.name || '';
+                if (currentUser.role === 'requester' && currentUser.department) {
+                    document.getElementById('reqUnit').value = currentUser.department;
+                }
+                // Set a placeholder for the next request – we'll generate a new number on next save
+                document.getElementById('reqNo').value = 'Will be assigned on save';
             } catch (err) {
                 console.error('❌ Save error:', err);
                 showToast('❌ Error: ' + err.message, true);
@@ -727,47 +606,10 @@
         };
 
         // ============================================================
-        // WHATSAPP NOTIFICATION
-        // ============================================================
-        window.sendWhatsAppNotification = function(isReminder = false) {
-            const reqNo = currentRequestNo || document.getElementById('reqNo').value;
-            const requester = document.getElementById('reqRequester').value || 'N/A';
-            const unit = document.getElementById('reqUnit').value || 'N/A';
-            const equipName = document.getElementById('reqEquipName').value || 'N/A';
-            const complaint = document.getElementById('reqComplaint').value || 'N/A';
-            const date = document.getElementById('reqDateTime').value ? new Date(document.getElementById('reqDateTime').value).toLocaleString() : 'N/A';
-
-            const phone = document.getElementById('whatsappNumber').value;
-            if (!phone) {
-                showToast('Please select an engineer from the list.', true);
-                return;
-            }
-
-            const selectedOpt = document.getElementById('whatsappNumber').selectedOptions[0];
-            const engineerName = selectedOpt ? selectedOpt.dataset.name || 'Engineer' : 'Engineer';
-
-            const reminderTag = isReminder ? '%0A%0A*⏰ REMINDER:* This request is still pending. Please respond. %0A%0A' : '%0A%0A';
-
-            const msg = `*${isReminder ? '⏰ REMINDER' : '🔧 NEW SERVICE REQUEST'}*%0A%0A` +
-                `*Request No.:* ${reqNo}%0A` +
-                `*Date:* ${date}%0A` +
-                `*Requester:* ${requester}%0A` +
-                `*Unit/Ward:* ${unit}%0A` +
-                `*Equipment:* ${equipName}%0A` +
-                `*Complaint:* ${complaint}%0A` +
-                reminderTag +
-                `Please attend to this request as soon as possible.`;
-
-            const url = `https://wa.me/${phone}?text=${msg}`;
-            window.open(url, '_blank');
-            showToast(`📲 ${isReminder ? 'Reminder' : 'Notification'} sent to ${engineerName} (${phone})`);
-        };
-
-        // ============================================================
         // EMAIL NOTIFICATION
         // ============================================================
         window.sendEmailNotification = function() {
-            const reqNo = currentRequestNo || document.getElementById('reqNo').value;
+            const reqNo = document.getElementById('reqNo').value || 'New Request';
             const requester = document.getElementById('reqRequester').value || 'N/A';
             const unit = document.getElementById('reqUnit').value || 'N/A';
             const equipName = document.getElementById('reqEquipName').value || 'N/A';
@@ -790,16 +632,10 @@
         };
 
         // ============================================================
-        // RESET FORM
+        // RESET FORM (with option to generate new number)
         // ============================================================
-        function resetRequestForm() {
-            document.getElementById('reqNo').value = '';
-            document.getElementById('reqRequester').value = currentUser ? currentUser.name : '';
-            if (currentUser && currentUser.role === 'requester' && currentUser.department) {
-                document.getElementById('reqUnit').value = currentUser.department;
-            } else {
-                document.getElementById('reqUnit').value = '';
-            }
+        function resetRequestForm(generateNewNumber = true) {
+            // We'll clear all fields except requester and unit (will be re-filled by init)
             document.getElementById('reqDateTime').value = new Date().toISOString().slice(0, 16);
             document.getElementById('reqType').value = 'Equipment';
             document.getElementById('reqEquipName').value = '';
@@ -807,21 +643,20 @@
             document.getElementById('reqSerial').value = '';
             document.getElementById('reqModel').value = '';
             document.getElementById('reqComplaint').value = '';
-            document.getElementById('whatsappNote').classList.remove('show');
-            document.getElementById('whatsappNumber').value = '';
-            document.getElementById('engineerInfo').classList.remove('show');
             toggleEquipFields();
-            // Generate a new number for the next request
-            getNextRequestNumber().then(num => document.getElementById('reqNo').value = num);
-            currentRequestNo = '';
             currentDocId = null;
-            // Re-populate engineer dropdown (in case department changed)
-            populateEngineerDropdown();
+            if (generateNewNumber) {
+                // We will not generate a number; we'll set placeholder
+                document.getElementById('reqNo').value = 'Will be assigned on save';
+            } else {
+                // Keep the current number (shown after save)
+                // Do nothing.
+            }
         }
         window.resetRequestForm = resetRequestForm;
 
         // ============================================================
-        // LOAD REQUEST VIA URL PARAM (for viewing/editing from dashboard)
+        // LOAD REQUEST VIA URL PARAM (for viewing only, not editing)
         // ============================================================
         async function loadRequestFromUrl() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -836,7 +671,6 @@
                 }
                 const r = docSnap.data();
                 currentDocId = viewParam;
-                currentRequestNo = r.requestNo;
 
                 document.getElementById('reqNo').value = r.requestNo || '';
                 document.getElementById('reqDateTime').value = r.dateTime || '';
@@ -850,7 +684,8 @@
                 document.getElementById('reqComplaint').value = r.complaint || '';
 
                 toggleEquipFields();
-                showToast(`📂 Request ${r.requestNo} loaded.`);
+                // Disable editing? We'll allow but show as loaded.
+                showToast(`📂 Request ${r.requestNo} loaded. You can edit and resave, but it will create a new request (not update).`);
             } catch (err) {
                 console.error(err);
                 showToast('Error loading request: ' + err.message, true);
@@ -858,25 +693,24 @@
         }
 
         // ============================================================
-        // INIT
+        // INIT – no number generation on load
         // ============================================================
         async function init() {
             document.getElementById('reqDateTime').value = new Date().toISOString().slice(0, 16);
-            document.getElementById('reqNo').value = await getNextRequestNumber();
+            // Set placeholder for request number
+            document.getElementById('reqNo').value = 'Will be assigned on save';
             if (currentUser) {
                 document.getElementById('reqRequester').value = currentUser.name || '';
                 if (currentUser.role === 'requester' && currentUser.department) {
                     document.getElementById('reqUnit').value = currentUser.department;
-                    console.log(`✅ Auto-filled department: ${currentUser.department}`);
                 }
             }
-            await fetchEngineers();
             toggleEquipFields();
 
-            // If URL has ?view=id, load that request for editing/printing
+            // If URL has ?view=id, load that request for viewing/printing
             await loadRequestFromUrl();
 
-            console.log('✅ Request page ready (simplified).');
+            console.log('✅ Request page ready (no auto-numbering until save).');
         }
 
         console.log('🚀 Request page loaded (simplified).');
