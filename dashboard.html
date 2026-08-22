@@ -600,7 +600,7 @@
     window.toggleRoleFields = toggleRoleFields;
 
     // ================================================================
-    // FETCH DATA (with history for maintenance & requester)
+    // FETCH DATA (with debug logs for admin)
     // ================================================================
     async function fetchData() {
         console.log('🔍 fetchData() called.');
@@ -642,18 +642,25 @@
             let jobcards = [];
 
             if (isAdmin) {
-                const snap = await getDocs(query(collection(db, JOBCARDS_COLL), orderBy('updatedAt', 'desc')));
-                snap.forEach(doc => { jobcards.push({ id: doc.id, ...doc.data() }); });
+                // 🔥 FIX: Fetch all jobcards without orderBy to avoid index issues
+                const snap = await getDocs(collection(db, JOBCARDS_COLL));
+                console.log('🔍 Admin jobcards snapshot size:', snap.size);
+                if (snap.size > 0) {
+                    console.log('📄 First jobcard:', snap.docs[0].data());
+                }
+                snap.forEach(doc => { 
+                    jobcards.push({ id: doc.id, ...doc.data() }); 
+                });
+                allJobCards = jobcards;
+                console.log(`✅ Admin fetched ${allJobCards.length} jobcards.`);
             } else if (isMaintenance) {
                 const depts = currentUser?.departments || [];
                 if (depts.length > 0) {
                     const snap1 = await getDocs(query(collection(db, JOBCARDS_COLL), where('unit', 'in', depts), orderBy('updatedAt', 'desc')));
                     snap1.forEach(doc => { jobcards.push({ id: doc.id, ...doc.data() }); });
                 }
-                // History: all jobcards where this user is the technician
                 const snap2 = await getDocs(query(collection(db, JOBCARDS_COLL), where('techId', '==', currentUser.id), orderBy('updatedAt', 'desc')));
                 snap2.forEach(doc => { jobcards.push({ id: doc.id, ...doc.data() }); });
-                // Deduplicate
                 const seen = new Set();
                 allJobCards = jobcards.filter(j => {
                     if (seen.has(j.id)) return false;
@@ -667,14 +674,12 @@
                 if (dept) {
                     queries.push(query(collection(db, JOBCARDS_COLL), where('unit', '==', dept), orderBy('updatedAt', 'desc')));
                 }
-                // History: all jobcards where this user is the requester
                 queries.push(query(collection(db, JOBCARDS_COLL), where('requesterId', '==', currentUser.id), orderBy('updatedAt', 'desc')));
 
                 for (const q of queries) {
                     const snap = await getDocs(q);
                     snap.forEach(doc => { jobcards.push({ id: doc.id, ...doc.data() }); });
                 }
-                // Deduplicate
                 const seen = new Set();
                 allJobCards = jobcards.filter(j => {
                     if (seen.has(j.id)) return false;
@@ -920,7 +925,7 @@
     }
 
     // ================================================================
-    // UPDATE TABLE TITLE – updated for requester
+    // UPDATE TABLE TITLE
     // ================================================================
     function updateTableTitle() {
         const isAdmin = userRole === 'admin';
@@ -1006,7 +1011,7 @@
             if (userRole === 'requester') data = getMyRequests();
             else data = allRequests;
         } else {
-            if (userRole === 'requester') data = allJobCards; // now includes history
+            if (userRole === 'requester') data = allJobCards;
             else data = allJobCards;
         }
 
@@ -1059,7 +1064,7 @@
     }
 
     // ================================================================
-    // RENDER REQUESTS TABLE – with receiving
+    // RENDER REQUESTS TABLE
     // ================================================================
     function renderRequestsTable(requests) {
         let html = `
@@ -1192,7 +1197,7 @@
     window.editJobCard = (id) => window.open(`jobcard.html?view=${id}`, '_blank');
 
     // ================================================================
-    // PDF FUNCTIONS (fully restored)
+    // PDF FUNCTIONS (fully restored - same as before)
     // ================================================================
     function signatureToDataURL(signatureData, width = 400, height = 120) {
         if (!signatureData) return null;
@@ -1274,6 +1279,7 @@
     }
 
     async function captureAndSavePDF(templateDiv, filename) {
+        // (same as previous – unchanged)
         templateDiv.style.position = 'fixed';
         templateDiv.style.left = '0';
         templateDiv.style.top = '0';
@@ -1354,6 +1360,7 @@
     }
 
     window.downloadJobcardPDF = async function(jobcardId) {
+        // (same as before)
         showToast('Generating PDF...');
         try {
             const docSnap = await getDoc(doc(db, JOBCARDS_COLL, jobcardId));
@@ -1647,6 +1654,7 @@
     };
 
     window.saveUser = async function() {
+        // (same as before – unchanged)
         const editId = document.getElementById('editUserId').value;
         const email = document.getElementById('newUserEmail').value.trim();
         const name = document.getElementById('newUserName').value.trim();
