@@ -15,7 +15,6 @@
         }
     </script>
 
-    <!-- Chart.js and PDF libraries -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -96,7 +95,7 @@
         .status-badge.writtenoff { background:#fee2e2; color:#b91c1c; }
         .status-badge.postponed { background:#fef3c7; color:#b45309; }
         .status-badge.open { background:#dbeafe; color:#1d4ed8; }
-        .status-badge.received { background:#d1fae5; color:#065f46; } /* Added for received status */
+        .status-badge.received { background:#d1fae5; color:#065f46; }
         .table-actions { display:flex; flex-wrap:wrap; gap:6px; }
 
         /* ===== MODALS ===== */
@@ -601,110 +600,128 @@
     window.toggleRoleFields = toggleRoleFields;
 
     // ================================================================
-    // FETCH DATA
+    // FETCH DATA (with history for maintenance & requester)
     // ================================================================
-  async function fetchData() {
-    console.log('🔍 fetchData() called.');
-    try {
-        const isAdmin = userRole === 'admin';
-        const isMaintenance = userRole === 'maintenance';
-        const isRequester = userRole === 'requester';
+    async function fetchData() {
+        console.log('🔍 fetchData() called.');
+        try {
+            const isAdmin = userRole === 'admin';
+            const isMaintenance = userRole === 'maintenance';
+            const isRequester = userRole === 'requester';
 
-        let reqQuery = null;
-        let jobQuery = null;
+            let reqQuery = null;
+            if (isAdmin) {
+                reqQuery = query(collection(db, REQUESTS_COLL), orderBy('createdAt', 'desc'));
+            } else if (isMaintenance) {
+                const depts = currentUser?.departments || [];
+                if (depts.length > 0) {
+                    reqQuery = query(collection(db, REQUESTS_COLL), where('unit', 'in', depts), orderBy('createdAt', 'desc'));
+                } else {
+                    reqQuery = null;
+                }
+            } else if (isRequester) {
+                reqQuery = query(collection(db, REQUESTS_COLL), where('requesterId', '==', currentUser.id), orderBy('createdAt', 'desc'));
+            }
 
-        if (isAdmin) {
-            reqQuery = query(collection(db, REQUESTS_COLL), orderBy('createdAt', 'desc'));
-            jobQuery = query(collection(db, JOBCARDS_COLL), orderBy('updatedAt', 'desc'));
-        } else if (isMaintenance) {
-            const depts = currentUser?.departments || [];
-            if (depts.length > 0) {
-                // Only fetch requests for departments assigned to this engineer
-                reqQuery = query(collection(db, REQUESTS_COLL), where('unit', 'in', depts), orderBy('createdAt', 'desc'));
-                jobQuery = query(collection(db, JOBCARDS_COLL), where('unit', 'in', depts), orderBy('updatedAt', 'desc'));
-            } else {
-                // No departments assigned – show nothing
+            // ---- Fetch requests ----
+            if (reqQuery) {
+                const reqSnap = await getDocs(reqQuery);
                 allRequests = [];
+                reqSnap.forEach(doc => {
+                    const data = doc.data();
+                    data.id = doc.id;
+                    if (data.received === undefined) data.received = false;
+                    allRequests.push(data);
+                });
+                console.log(`✅ Fetched ${allRequests.length} requests.`);
+            } else {
+                allRequests = [];
+            }
+
+            // ---- Fetch jobcards ----
+            let jobcards = [];
+
+            if (isAdmin) {
+                const snap = await getDocs(query(collection(db, JOBCARDS_COLL), orderBy('updatedAt', 'desc')));
+                snap.forEach(doc => { jobcards.push({ id: doc.id, ...doc.data() }); });
+            } else if (isMaintenance) {
+                const depts = currentUser?.departments || [];
+                if (depts.length > 0) {
+                    const snap1 = await getDocs(query(collection(db, JOBCARDS_COLL), where('unit', 'in', depts), orderBy('updatedAt', 'desc')));
+                    snap1.forEach(doc => { jobcards.push({ id: doc.id, ...doc.data() }); });
+                }
+                // History: all jobcards where this user is the technician
+                const snap2 = await getDocs(query(collection(db, JOBCARDS_COLL), where('techId', '==', currentUser.id), orderBy('updatedAt', 'desc')));
+                snap2.forEach(doc => { jobcards.push({ id: doc.id, ...doc.data() }); });
+                // Deduplicate
+                const seen = new Set();
+                allJobCards = jobcards.filter(j => {
+                    if (seen.has(j.id)) return false;
+                    seen.add(j.id);
+                    return true;
+                });
+                console.log(`✅ Fetched ${allJobCards.length} jobcards for maintenance (including history).`);
+            } else if (isRequester) {
+                const dept = currentUser?.department;
+                let queries = [];
+                if (dept) {
+                    queries.push(query(collection(db, JOBCARDS_COLL), where('unit', '==', dept), orderBy('updatedAt', 'desc')));
+                }
+                // History: all jobcards where this user is the requester
+                queries.push(query(collection(db, JOBCARDS_COLL), where('requesterId', '==', currentUser.id), orderBy('updatedAt', 'desc')));
+
+                for (const q of queries) {
+                    const snap = await getDocs(q);
+                    snap.forEach(doc => { jobcards.push({ id: doc.id, ...doc.data() }); });
+                }
+                // Deduplicate
+                const seen = new Set();
+                allJobCards = jobcards.filter(j => {
+                    if (seen.has(j.id)) return false;
+                    seen.add(j.id);
+                    return true;
+                });
+                console.log(`✅ Fetched ${allJobCards.length} jobcards for requester (including history).`);
+            } else {
                 allJobCards = [];
-                // Still need to fetch users for management
             }
-        } else if (isRequester) {
-            reqQuery = query(collection(db, REQUESTS_COLL), where('requesterId', '==', currentUser.id), orderBy('createdAt', 'desc'));
-            const dept = currentUser?.department;
-            if (dept) {
-                jobQuery = query(collection(db, JOBCARDS_COLL), where('unit', '==', dept), orderBy('updatedAt', 'desc'));
+
+            // Map job status to requests
+            const jobMap = new Map();
+            allJobCards.forEach(j => {
+                if (j.requestNo) jobMap.set(j.requestNo, j);
+            });
+            allRequests.forEach(r => {
+                const job = jobMap.get(r.requestNo);
+                if (job) {
+                    r.jobStatus = job.status || 'Pending';
+                    r.jobNo = job.jobNo;
+                    r.jobId = job.id;
+                } else {
+                    r.jobStatus = 'No Job';
+                    r.jobNo = null;
+                    r.jobId = null;
+                }
+            });
+
+            // ---- Fetch users (admin/maintenance only) ----
+            if (isAdmin || isMaintenance) {
+                const userSnap = await getDocs(collection(db, USERS_COLL));
+                allUsers = [];
+                userSnap.forEach(doc => {
+                    allUsers.push({ id: doc.id, ...doc.data() });
+                });
+                pendingApprovalCount = allUsers.filter(u => u.approved !== true).length;
+                console.log(`✅ Fetched ${allUsers.length} users, ${pendingApprovalCount} pending.`);
             } else {
-                jobQuery = query(collection(db, JOBCARDS_COLL), orderBy('updatedAt', 'desc'));
+                allUsers = [];
+                pendingApprovalCount = 0;
             }
+        } catch (err) {
+            console.error('❌ fetchData error:', err);
+            showToast('Error loading data: ' + err.message, true);
         }
-
-        // Execute request query
-        if (reqQuery) {
-            const reqSnap = await getDocs(reqQuery);
-            allRequests = [];
-            reqSnap.forEach(doc => {
-                const data = doc.data();
-                data.id = doc.id;
-                // Ensure received field exists
-                if (data.received === undefined) data.received = false;
-                allRequests.push(data);
-            });
-            console.log(`✅ Fetched ${allRequests.length} requests.`);
-        } else {
-            allRequests = [];
-        }
-
-        // Execute jobcard query
-        if (jobQuery) {
-            const jobSnap = await getDocs(jobQuery);
-            allJobCards = [];
-            jobSnap.forEach(doc => {
-                const data = doc.data();
-                data.id = doc.id;
-                allJobCards.push(data);
-            });
-            console.log(`✅ Fetched ${allJobCards.length} jobcards.`);
-        } else {
-            allJobCards = [];
-        }
-
-        // Map job status to requests (only for the requests we fetched)
-        const jobMap = new Map();
-        allJobCards.forEach(j => {
-            if (j.requestNo) jobMap.set(j.requestNo, j);
-        });
-        allRequests.forEach(r => {
-            const job = jobMap.get(r.requestNo);
-            if (job) {
-                r.jobStatus = job.status || 'Pending';
-                r.jobNo = job.jobNo;
-                r.jobId = job.id;
-            } else {
-                r.jobStatus = 'No Job';
-                r.jobNo = null;
-                r.jobId = null;
-            }
-        });
-
-        // Fetch users (only admin/maintenance need this)
-        if (isAdmin || isMaintenance) {
-            const userSnap = await getDocs(collection(db, USERS_COLL));
-            allUsers = [];
-            userSnap.forEach(doc => {
-                allUsers.push({ id: doc.id, ...doc.data() });
-            });
-            pendingApprovalCount = allUsers.filter(u => u.approved !== true).length;
-            console.log(`✅ Fetched ${allUsers.length} users, ${pendingApprovalCount} pending.`);
-        } else {
-            allUsers = [];
-            pendingApprovalCount = 0;
-        }
-    } catch (err) {
-        console.error('❌ fetchData error:', err);
-        showToast('Error loading data: ' + err.message, true);
     }
-}
-       
 
     function getMyRequests() {
         if (!currentUser || !currentUser.id) return [];
@@ -770,11 +787,11 @@
             const newReqs = allRequests.filter(r => r.jobStatus === 'No Job').length;
             statsHtml = `
                 <div class="stat-card total" onclick="switchView('requests')">
-                    <div class="stat-left"><div class="number">${totalRequests}</div><div class="label">📋 All Requests</div></div>
+                    <div class="stat-left"><div class="number">${totalRequests}</div><div class="label">📋 Dept. Requests</div></div>
                     <div class="stat-icon"><i class="fas fa-list"></i></div>
                 </div>
                 <div class="stat-card jobcards" onclick="switchView('jobcards')">
-                    <div class="stat-left"><div class="number">${totalJobcards}</div><div class="label">📋 All Jobcards</div></div>
+                    <div class="stat-left"><div class="number">${totalJobcards}</div><div class="label">📋 My Jobcards</div></div>
                     <div class="stat-icon"><i class="fas fa-tools"></i></div>
                 </div>
                 <div class="stat-card new" onclick="applyFilter('new')">
@@ -790,14 +807,14 @@
                     <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
                 </div>
             `;
-        } else { // Requester
+        } else { // Requester – updated stats
             statsHtml = `
                 <div class="stat-card myrequests" onclick="switchView('requests')">
                     <div class="stat-left"><div class="number">${myRequests.length}</div><div class="label">📋 My Requests</div></div>
                     <div class="stat-icon"><i class="fas fa-file-alt"></i></div>
                 </div>
                 <div class="stat-card jobcards" onclick="switchView('jobcards')">
-                    <div class="stat-left"><div class="number">${deptJobcards.length}</div><div class="label">📋 Dept. Jobcards</div></div>
+                    <div class="stat-left"><div class="number">${totalJobcards}</div><div class="label">📋 My Jobcards</div></div>
                     <div class="stat-icon"><i class="fas fa-tools"></i></div>
                 </div>
                 <div class="stat-card pending" onclick="applyFilter('pending')">
@@ -837,7 +854,7 @@
         }
         actionButtons.innerHTML = actionsHtml;
 
-        // Attach event listeners (fixes onclick issues)
+        // Attach event listeners
         document.getElementById('manageUsersBtn')?.addEventListener('click', openUserModal);
         document.getElementById('approveUsersBtn')?.addEventListener('click', showPendingUsers);
         document.getElementById('newRequestBtn')?.addEventListener('click', () => window.location.href='request.html');
@@ -860,7 +877,7 @@
     };
 
     // ================================================================
-    // BUILD FILTER BAR – added received and pending-receiving options
+    // BUILD FILTER BAR
     // ================================================================
     function buildFilterBar() {
         const isAdmin = userRole === 'admin';
@@ -902,6 +919,9 @@
         filterBar.innerHTML = filterHtml;
     }
 
+    // ================================================================
+    // UPDATE TABLE TITLE – updated for requester
+    // ================================================================
     function updateTableTitle() {
         const isAdmin = userRole === 'admin';
         const isMaintenance = userRole === 'maintenance';
@@ -912,7 +932,7 @@
             if (isRequester) title = '📋 My Requests';
             else title = '📋 All Requests';
         } else {
-            if (isRequester) title = '📋 Department Jobcards';
+            if (isRequester) title = '📋 My Jobcards';
             else title = '📋 All Jobcards';
         }
         tableTitle.textContent = title;
@@ -932,7 +952,6 @@
         const statusCounts = { 'Pending':0, 'Completed':0, 'Written Off':0, 'Postponed':0, 'No Job':0, 'Received':0 };
         requestsForCharts.forEach(r => {
             let s = r.jobStatus || 'No Job';
-            // If received and no job, treat as "Received" for chart
             if (r.received === true && (s === 'No Job' || s === 'Pending')) {
                 s = 'Received';
             }
@@ -969,7 +988,7 @@
     }
 
     // ================================================================
-    // APPLY FILTERS – added received and pending-receiving
+    // APPLY FILTERS
     // ================================================================
     window.applyFilter = function(status) {
         const select = document.getElementById('statusFilter');
@@ -987,7 +1006,7 @@
             if (userRole === 'requester') data = getMyRequests();
             else data = allRequests;
         } else {
-            if (userRole === 'requester') data = getDepartmentJobcards();
+            if (userRole === 'requester') data = allJobCards; // now includes history
             else data = allJobCards;
         }
 
@@ -1040,7 +1059,7 @@
     }
 
     // ================================================================
-    // RENDER REQUESTS TABLE – added Receiving column and Mark Received button
+    // RENDER REQUESTS TABLE – with receiving
     // ================================================================
     function renderRequestsTable(requests) {
         let html = `
@@ -1090,7 +1109,6 @@
         html += '</tbody></table>';
         tableBody.innerHTML = html;
 
-        // Attach receive event listeners
         document.querySelectorAll('.receive-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 const id = this.dataset.id;
@@ -1100,7 +1118,7 @@
     }
 
     // ================================================================
-    // MARK AS RECEIVED FUNCTION
+    // MARK AS RECEIVED
     // ================================================================
     async function markAsReceived(requestId) {
         if (!requestId) return;
@@ -1112,7 +1130,6 @@
                 receivedByName: currentUser?.name || 'Unknown'
             });
             showToast('✅ Request marked as Received.');
-            // Refresh data and re-render
             await fetchData();
             applyFilters();
         } catch (err) {
@@ -1122,7 +1139,7 @@
     }
 
     // ================================================================
-    // RENDER JOBCARDS TABLE - with Edit/Complete and PDF
+    // RENDER JOBCARDS TABLE
     // ================================================================
     function renderJobcardsTable(jobcards) {
         let html = `
@@ -1175,7 +1192,7 @@
     window.editJobCard = (id) => window.open(`jobcard.html?view=${id}`, '_blank');
 
     // ================================================================
-    // PDF FUNCTIONS (full restored)
+    // PDF FUNCTIONS (fully restored)
     // ================================================================
     function signatureToDataURL(signatureData, width = 400, height = 120) {
         if (!signatureData) return null;
@@ -1555,7 +1572,7 @@
     };
 
     // ================================================================
-    // USER MANAGEMENT
+    // USER MANAGEMENT (unchanged)
     // ================================================================
     window.openUserModal = function() {
         console.log('🔓 Opening user modal');

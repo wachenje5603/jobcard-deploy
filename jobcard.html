@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MCRH · Job Card</title>
+    <title>MCRH - Job Card</title>
 
     <!-- Firebase v9 -->
     <script type="importmap">
@@ -24,599 +24,184 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-    <!-- Font Awesome 6 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-    <!-- Google Font: Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
-
     <style>
-        /* ===== GLOBAL ===== */
         * { margin:0; padding:0; box-sizing:border-box; }
-        :root {
-            --primary: #C8102E;
-            --primary-dark: #a00d24;
-            --primary-light: #fce8ea;
-            --primary-gradient: linear-gradient(135deg, #C8102E 0%, #e81a3f 100%);
-            --bg: #f0f2f8;
-            --card-bg: rgba(255,255,255,0.88);
-            --glass-border: rgba(255,255,255,0.30);
-            --text: #0b132b;
-            --text-muted: #6c7a8a;
-            --shadow-sm: 0 4px 16px rgba(0,0,0,0.06);
-            --shadow-md: 0 8px 32px rgba(0,0,0,0.10);
-            --shadow-lg: 0 16px 48px rgba(0,0,0,0.14);
-            --radius: 20px;
-            --radius-sm: 12px;
-            --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            padding: 20px;
-            min-height: 100vh;
-            background-image: radial-gradient(circle at 10% 20%, rgba(200,16,46,0.04) 0%, transparent 60%),
-                              radial-gradient(circle at 90% 80%, rgba(200,16,46,0.03) 0%, transparent 60%);
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: var(--card-bg);
-            backdrop-filter: blur(8px);
-            border: 1px solid var(--glass-border);
-            border-radius: var(--radius);
-            padding: 28px 32px;
-            box-shadow: var(--shadow-md);
-            transition: var(--transition);
-        }
-        .container:hover { box-shadow: var(--shadow-lg); }
+        body { font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#f4f6f9; padding:20px; color:#1e2a3a; }
+        .container { max-width:1200px; margin:0 auto; background:white; padding:25px 30px; border-radius:12px; box-shadow:0 8px 30px rgba(0,0,0,0.12); }
+        .hospital-header { border-bottom:4px solid #C8102E; padding-bottom:12px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; }
+        .logo-area { display:flex; align-items:center; gap:15px; }
+        .logo-area .logo-icon { font-size:36px; background:#C8102E; color:white; width:60px; height:60px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; }
+        .logo-area h1 { font-size:24px; color:#C8102E; letter-spacing:1px; font-weight:700; }
+        .logo-area .sub { font-size:13px; color:#333; font-weight:500; }
+        .hospital-header .badge { background:#C8102E; color:white; padding:6px 16px; border-radius:30px; font-size:14px; font-weight:600; }
+        .card-title { display:flex; justify-content:space-between; align-items:center; background:#f8f9fc; padding:8px 16px; border-radius:8px; margin-bottom:18px; }
+        .card-title h2 { font-size:20px; color:#1e2a3a; font-weight:600; }
+        .card-title .status { font-size:13px; padding:4px 14px; border-radius:20px; font-weight:600; }
+        .status.pending { background:#ffc107; color:#1e2a3a; }
+        .status.completed { background:#28a745; color:white; }
+        .status.writtenoff { background:#dc3545; color:white; }
+        .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:14px 24px; }
+        .grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px 20px; }
+        .grid-4 { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px 16px; }
+        .full-width { grid-column:1 / -1; }
+        .field-group { display:flex; flex-direction:column; margin-bottom:4px; }
+        .field-group label { font-size:12px; font-weight:600; color:#495057; margin-bottom:3px; text-transform:uppercase; letter-spacing:0.4px; }
+        .field-group input, .field-group select, .field-group textarea { padding:8px 12px; border:1px solid #ced4da; border-radius:6px; font-size:14px; background:white; transition:0.2s; font-family:inherit; }
+        .field-group input:focus, .field-group select:focus, .field-group textarea:focus { border-color:#C8102E; outline:0; box-shadow:0 0 0 3px rgba(200,16,46,0.15); }
+        .field-group input[readonly] { background:#e9ecef; cursor:default; }
+        textarea { resize:vertical; min-height:50px; }
+        .section-block { background:#fafbfc; border:1px solid #e9ecef; border-radius:10px; padding:18px 20px; margin-top:18px; }
+        .section-block h3 { font-size:16px; font-weight:600; color:#1e2a3a; margin-bottom:14px; border-left:4px solid #C8102E; padding-left:12px; }
+        .inline-group { display:flex; flex-wrap:wrap; gap:20px 30px; align-items:center; }
+        .inline-group label { display:flex; align-items:center; gap:6px; font-size:14px; font-weight:500; cursor:pointer; }
+        .inline-group input[type="radio"] { width:18px; height:18px; accent-color:#C8102E; cursor:pointer; }
+        .signature-area { border-top:2px dashed #dee2e6; padding-top:20px; margin-top:18px; }
+        .signature-grid { display:grid; grid-template-columns:1fr 1fr; gap:30px; }
+        .signature-box { background:#f8f9fa; padding:16px 18px; border-radius:8px; }
+        .signature-box h4 { font-size:14px; margin-bottom:12px; color:#C8102E; }
+        .sig-pad-wrapper { border:2px solid #ced4da; border-radius:6px; background:white; margin:6px 0 8px 0; touch-action:none; position:relative; }
+        .sig-pad-wrapper canvas { display:block; width:100%; height:auto; touch-action:none; cursor:crosshair; }
+        .sig-pad-wrapper .sig-placeholder { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:#adb5bd; font-size:14px; pointer-events:none; }
+        .sig-actions { display:flex; gap:8px; margin-top:6px; }
+        .sig-actions .btn-sm { padding:4px 14px; font-size:12px; border:none; border-radius:4px; cursor:pointer; font-weight:500; transition:0.2s; }
+        .sig-actions .btn-clear { background:#dc3545; color:white; }
+        .sig-actions .btn-undo { background:#ffc107; color:#1e2a3a; }
+        .sig-status { font-size:12px; color:#28a745; margin-top:4px; display:none; }
+        .sig-status.show { display:block; }
+        .sig-status.signed { color:#28a745; }
+        .sig-status.empty { color:#dc3545; }
 
-        /* ===== SCROLLBAR ===== */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #e9ecef; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--primary-dark); }
+        .action-bar { display:flex; flex-wrap:wrap; gap:12px; margin:20px 0 12px 0; padding:16px 0; border-top:1px solid #e9ecef; border-bottom:1px solid #e9ecef; }
+        .btn { padding:10px 24px; border:none; border-radius:6px; font-weight:600; font-size:14px; cursor:pointer; transition:0.2s; display:inline-flex; align-items:center; gap:8px; }
+        .btn-primary { background:#C8102E; color:white; }
+        .btn-primary:hover { background:#a00d24; transform:translateY(-1px); box-shadow:0 4px 12px rgba(200,16,46,0.3); }
+        .btn-success { background:#28a745; color:white; }
+        .btn-success:hover { background:#1e7e34; }
+        .btn-outline { background:transparent; border:1.5px solid #6c757d; color:#6c757d; }
+        .btn-outline:hover { background:#6c757d; color:white; }
+        .btn-danger { background:#dc3545; color:white; }
+        .btn-danger:hover { background:#b02a37; }
+        .btn:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
+        .btn-sm { padding:4px 12px; font-size:12px; border-radius:4px; }
 
-        /* ===== HEADER ===== */
-        .hospital-header {
-            border-bottom: 4px solid var(--primary);
-            padding-bottom: 14px;
-            margin-bottom: 22px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-        .logo-area {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-        .logo-area .logo-icon {
-            font-size: 32px;
-            background: var(--primary-gradient);
-            color: white;
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            box-shadow: 0 4px 12px rgba(200,16,46,0.25);
-        }
-        .logo-area h1 {
-            font-size: 24px;
-            color: var(--primary);
-            letter-spacing: -0.5px;
-            font-weight: 700;
-        }
-        .logo-area .sub {
-            font-size: 13px;
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-        .hospital-header .badge {
-            background: var(--primary-gradient);
-            color: white;
-            padding: 6px 18px;
-            border-radius: 30px;
-            font-size: 13px;
-            font-weight: 600;
-            letter-spacing: 0.3px;
-            box-shadow: 0 4px 12px rgba(200,16,46,0.2);
-            border: 1px solid rgba(255,255,255,0.15);
-        }
+        .toast { position:fixed; top:20px; right:20px; background:#1e2a3a; color:white; padding:14px 28px; border-radius:8px; box-shadow:0 6px 20px rgba(0,0,0,0.25); font-weight:500; z-index:999; transform:translateY(-20px); opacity:0; transition:0.3s ease; border-left:6px solid #C8102E; max-width:380px; }
+        .toast.show { transform:translateY(0); opacity:1; }
+        .loading-spinner { display:inline-block; width:16px; height:16px; border:3px solid rgba(255,255,255,0.3); border-radius:50%; border-top-color:#fff; animation:spin 0.8s linear infinite; }
+        @keyframes spin { to { transform:rotate(360deg); } }
 
-        /* ===== CARD TITLE ===== */
-        .card-title {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #f8f9fc;
-            padding: 10px 18px;
-            border-radius: var(--radius-sm);
-            margin-bottom: 22px;
-            border: 1px solid #eef1f4;
-        }
-        .card-title h2 {
-            font-size: 20px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .card-title h2 i { color: var(--primary); }
-        .card-title .status {
-            font-size: 13px;
-            padding: 4px 16px;
-            border-radius: 30px;
-            font-weight: 600;
-            letter-spacing: 0.3px;
-        }
-        .status.pending { background: #fef3c7; color: #b45309; }
-        .status.completed { background: #dcfce7; color: #15803d; }
-        .status.writtenoff { background: #fee2e2; color: #b91c1c; }
-        .btn-logout {
-            background: #6c757d;
-            color: white;
-            padding: 6px 16px;
-            border: none;
-            border-radius: 30px;
-            font-weight: 600;
-            font-size: 13px;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .btn-logout:hover { background: #5a6268; transform: scale(1.04); }
-
-        /* ===== GRIDS ===== */
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 24px; }
-        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px 20px; }
-        .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px 16px; }
-        .full-width { grid-column: 1 / -1; }
-
-        /* ===== FIELD GROUPS ===== */
-        .field-group {
-            display: flex;
-            flex-direction: column;
-            margin-bottom: 2px;
-        }
-        .field-group label {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-muted);
-            margin-bottom: 4px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .field-group input,
-        .field-group select,
-        .field-group textarea {
-            padding: 9px 14px;
-            border: 1px solid #e5e7eb;
-            border-radius: var(--radius-sm);
-            font-size: 14px;
-            background: white;
-            transition: var(--transition);
-            font-family: inherit;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-        }
-        .field-group input:focus,
-        .field-group select:focus,
-        .field-group textarea:focus {
-            border-color: var(--primary);
-            outline: 0;
-            box-shadow: 0 0 0 3px rgba(200,16,46,0.12);
-        }
-        .field-group input[readonly] {
-            background: #f1f3f5;
-            cursor: default;
-            color: #1e2a3a;
-        }
-        textarea { resize: vertical; min-height: 50px; }
-
-        /* ===== SECTION BLOCKS ===== */
-        .section-block {
-            background: #fafbfc;
-            border: 1px solid #eef1f4;
-            border-radius: var(--radius-sm);
-            padding: 18px 22px;
-            margin-top: 20px;
-            transition: var(--transition);
-        }
-        .section-block:hover { border-color: #dde1e6; }
-        .section-block h3 {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--text);
-            margin-bottom: 14px;
-            border-left: 4px solid var(--primary);
-            padding-left: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .section-block h3 i { color: var(--primary); }
-
-        /* ===== INLINE GROUP (radio) ===== */
-        .inline-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 18px 32px;
-            align-items: center;
-        }
-        .inline-group label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-        }
-        .inline-group input[type="radio"] {
-            width: 18px;
-            height: 18px;
-            accent-color: var(--primary);
-            cursor: pointer;
-        }
-        .inline-group input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            accent-color: var(--primary);
-            cursor: pointer;
-        }
-
-        /* ===== SIGNATURES ===== */
-        .signature-area {
-            border-top: 2px dashed #dee2e6;
-            padding-top: 22px;
-            margin-top: 20px;
-        }
-        .signature-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-        }
-        .signature-box {
-            background: #f8f9fc;
-            padding: 18px 20px;
-            border-radius: var(--radius-sm);
-            border: 1px solid #eef1f4;
-            transition: var(--transition);
-        }
-        .signature-box:hover { border-color: #dde1e6; }
-        .signature-box h4 {
-            font-size: 14px;
-            margin-bottom: 14px;
-            color: var(--primary);
-            font-weight: 700;
-        }
-        .sig-pad-wrapper {
-            border: 2px solid #e5e7eb;
-            border-radius: var(--radius-sm);
-            background: white;
-            margin: 6px 0 8px 0;
-            touch-action: none;
-            position: relative;
-            transition: var(--transition);
-        }
-        .sig-pad-wrapper:hover { border-color: var(--primary); }
-        .sig-pad-wrapper canvas {
-            display: block;
-            width: 100%;
-            height: auto;
-            touch-action: none;
-            cursor: crosshair;
-            border-radius: var(--radius-sm);
-        }
-        .sig-pad-wrapper .sig-placeholder {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #adb5bd;
-            font-size: 14px;
-            pointer-events: none;
-        }
-        .sig-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 6px;
-        }
-        .sig-actions .btn-sm {
-            padding: 4px 14px;
-            font-size: 12px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: var(--transition);
-        }
-        .sig-actions .btn-clear { background: #dc3545; color: white; }
-        .sig-actions .btn-clear:hover { background: #b02a37; }
-        .sig-actions .btn-undo { background: #ffc107; color: #1e2a3a; }
-        .sig-actions .btn-undo:hover { background: #e0a800; }
-        .sig-status {
-            font-size: 12px;
-            margin-top: 4px;
-            display: none;
-        }
-        .sig-status.show { display: block; }
-        .sig-status.signed { color: #22c55e; }
-        .sig-status.empty { color: #dc3545; }
-
-        /* ===== ACTION BAR ===== */
-        .action-bar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin: 24px 0 12px 0;
-            padding: 18px 0;
-            border-top: 1px solid #eef1f4;
-            border-bottom: 1px solid #eef1f4;
-        }
-
-        /* ===== BUTTONS ===== */
-        .btn {
-            padding: 10px 24px;
-            border: none;
-            border-radius: 40px;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            text-decoration: none;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-        }
-        .btn-primary {
-            background: var(--primary-gradient);
-            color: white;
-            box-shadow: 0 4px 14px rgba(200,16,46,0.25);
-        }
-        .btn-primary:hover {
-            transform: translateY(-2px) scale(1.02);
-            box-shadow: 0 8px 28px rgba(200,16,46,0.35);
-        }
-        .btn-success {
-            background: #22c55e;
-            color: white;
-        }
-        .btn-success:hover {
-            background: #16a34a;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(34,197,94,0.3);
-        }
-        .btn-outline {
-            background: transparent;
-            border: 1.5px solid #d1d5db;
-            color: var(--text);
-        }
-        .btn-outline:hover {
-            background: #f3f4f6;
-            border-color: #9ca3af;
-            transform: translateY(-2px);
-        }
-        .btn-danger {
-            background: #ef4444;
-            color: white;
-        }
-        .btn-danger:hover {
-            background: #dc2626;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(239,68,68,0.25);
-        }
-        .btn-sm {
-            padding: 6px 16px;
-            font-size: 12px;
-            border-radius: 30px;
-        }
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-
-        /* ===== TOAST ===== */
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: #1e2a3a;
-            color: white;
-            padding: 14px 28px;
-            border-radius: var(--radius-sm);
-            font-weight: 500;
-            z-index: 9999;
-            transform: translateY(80px);
-            opacity: 0;
-            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            border-left: 6px solid var(--primary);
-            max-width: 380px;
-            box-shadow: 0 12px 40px rgba(0,0,0,0.2);
-            font-size: 14px;
-            backdrop-filter: blur(8px);
-        }
-        .toast.show {
-            transform: translateY(0);
-            opacity: 1;
-        }
-        .loading-spinner {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 3px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* ===== FOOTER ===== */
-        .footer {
-            margin-top: 24px;
-            font-size: 12px;
-            color: var(--text-muted);
-            text-align: center;
-            border-top: 1px solid #eef1f4;
-            padding-top: 16px;
-        }
-
-        /* ===== PRINT ===== */
-        @media print {
-            .action-bar, .btn, .sig-actions, .no-print { display: none !important; }
-            .sig-pad-wrapper canvas { border: 1px solid #000; max-width: 200px; }
-            .field-group input, .field-group select, .field-group textarea {
-                border: none; background: transparent !important; padding: 2px 0;
-                box-shadow: none; color: #000 !important; font-weight: 500;
-            }
-            .field-group input[readonly] { background: transparent !important; }
-            .field-group select { -webkit-appearance: none; appearance: none; border: none; background: transparent; color: #000; font-weight: 500; }
-            .section-block { border: 1px solid #ccc; background: #fafafa; break-inside: avoid; }
-            .sig-placeholder { display: none !important; }
-            .sig-status { display: none !important; }
-            .container { box-shadow: none; padding: 15px; background: white !important; backdrop-filter: none; }
-            .sig-pad-wrapper canvas { border: 1px solid #ddd; background: white; }
-            .hospital-header .badge { box-shadow: none; }
-        }
-
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 768px) {
-            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
-            .signature-grid { grid-template-columns: 1fr; }
-            .container { padding: 16px; }
-            .hospital-header { flex-direction: column; align-items: start; gap: 8px; }
-            .action-bar { flex-direction: column; }
-            .action-bar .btn { justify-content: center; }
-            .card-title { flex-wrap: wrap; gap: 8px; }
-            .card-title h2 { font-size: 17px; }
-        }
-        @media (max-width: 480px) {
-            .logo-area h1 { font-size: 20px; }
-            .logo-area .logo-icon { width: 44px; height: 44px; font-size: 24px; }
-            .container { padding: 12px; }
-        }
+        @media print { .action-bar,.btn,.sig-actions,.no-print { display:none !important; } .sig-pad-wrapper canvas { border:1px solid #000; max-width:200px; } .field-group input,.field-group select,.field-group textarea { border:none; background:transparent !important; padding:2px 0; box-shadow:none; color:#000 !important; font-weight:500; } .field-group input[readonly] { background:transparent !important; } .field-group select { -webkit-appearance:none; appearance:none; border:none; background:transparent; color:#000; font-weight:500; } .section-block { border:1px solid #ccc; background:#fafafa; break-inside:avoid; } .sig-placeholder { display:none !important; } .sig-status { display:none !important; } .container { box-shadow:none; padding:15px; } .sig-pad-wrapper canvas { border:1px solid #ddd; background:white; } }
+        @media (max-width:768px) { .grid-2,.grid-3,.grid-4 { grid-template-columns:1fr; } .signature-grid { grid-template-columns:1fr; } .container { padding:15px; } .hospital-header { flex-direction:column; align-items:start; gap:6px; } .action-bar { flex-direction:column; } .action-bar .btn { justify-content:center; } }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <!-- ===== HEADER ===== -->
+        <!-- HEADER -->
         <header class="hospital-header">
             <div class="logo-area">
                 <div class="logo-icon">M</div>
                 <div>
                     <h1>MOI VOI COUNTY REFERRAL HOSPITAL</h1>
-                    <div class="sub">P.O. BOX 18-80300 VOI · biomedsmoivoi@gmail.com</div>
-                    <div style="font-size:14px; font-weight:600; color:var(--primary); margin-top:2px;">TAITA TAVETA COUNTY</div>
+                    <div class="sub">P.O. BOX 18-80300 VOI | Email: biomedsmoivoi@gmail.com</div>
+                    <div style="font-size:14px; font-weight:600; color:#C8102E; margin-top:2px;">TAITA TAVETA COUNTY</div>
                 </div>
             </div>
             <span class="badge">DEPARTMENT OF HEALTH SERVICES</span>
         </header>
 
-        <!-- ===== CARD TITLE ===== -->
         <div class="card-title">
-            <h2><i class="fas fa-tools"></i> Equipment Maintenance Job Card</h2>
+            <h2>⚙️ EQUIPMENT MAINTENANCE JOB CARD</h2>
             <span class="status pending" id="jobStatusBadge">● PENDING</span>
-            <button class="btn-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            <button class="btn btn-danger btn-sm" onclick="logout()" style="margin-left:auto;">🚪 Logout</button>
         </div>
 
-        <!-- ===== FORM ===== -->
         <form id="jobcardForm">
-
-            <!-- ===== REQUEST INFO ===== -->
+            <!-- AUTO-FILLED FROM REQUEST -->
             <div class="grid-2">
                 <div class="field-group">
-                    <label><i class="fas fa-hashtag"></i> Job Card No.</label>
+                    <label>Job Card No.</label>
                     <input type="text" id="jobNo" readonly placeholder="Auto-generated" />
                 </div>
                 <div class="field-group">
-                    <label><i class="fas fa-file-alt"></i> Request No.</label>
+                    <label>Request No.</label>
                     <select id="jobRequestNo" onchange="loadRequestData()">
                         <option value="">-- Select Request --</option>
                     </select>
                 </div>
                 <div class="field-group">
-                    <label><i class="fas fa-calendar-alt"></i> Reporting Date / Time</label>
+                    <label>Reporting Date / Time</label>
                     <input type="datetime-local" id="jobReportingDateTime" readonly />
                 </div>
                 <div class="field-group">
-                    <label><i class="fas fa-building"></i> Unit / Ward</label>
+                    <label>Unit / Ward</label>
                     <input type="text" id="jobUnit" readonly />
                 </div>
                 <div class="field-group">
-                    <label><i class="fas fa-user-md"></i> Requester Name</label>
+                    <label>Requester Name</label>
                     <input type="text" id="jobRequester" readonly />
                 </div>
                 <div class="field-group">
-                    <label><i class="fas fa-microscope"></i> Equipment Name</label>
+                    <label>Equipment Name</label>
                     <input type="text" id="jobEquipName" readonly />
                 </div>
                 <div class="field-group">
-                    <label><i class="fas fa-barcode"></i> Inventory / Asset No.</label>
+                    <label>Inventory / Asset No.</label>
                     <input type="text" id="jobInventory" readonly />
                 </div>
                 <div class="field-group">
-                    <label><i class="fas fa-hashtag"></i> Serial No.</label>
+                    <label>Serial No.</label>
                     <input type="text" id="jobSerial" readonly />
                 </div>
                 <div class="field-group">
-                    <label><i class="fas fa-tag"></i> Model / Make</label>
+                    <label>Model / Make</label>
                     <input type="text" id="jobModel" readonly />
                 </div>
                 <div class="field-group full-width">
-                    <label><i class="fas fa-exclamation-triangle"></i> Complaint by User (from request)</label>
+                    <label>Complaint by User (from request)</label>
                     <textarea id="jobComplaint" readonly rows="2"></textarea>
                 </div>
                 <div class="field-group full-width">
-                    <label><i class="fas fa-stethoscope"></i> Diagnosis by Maintenance Team</label>
+                    <label>🩺 Diagnosis by Maintenance Team</label>
                     <textarea id="jobDiagnosis" rows="2" placeholder="Preliminary diagnosis..."></textarea>
                 </div>
             </div>
 
-            <!-- ===== HANDOVER ===== -->
-            <section class="section-block">
-                <h3><i class="fas fa-handshake"></i> Handover Details</h3>
-                <div class="grid-3">
-                    <div class="field-group">
-                        <label>Received from (Requester)</label>
-                        <input type="text" id="jobReceivedFrom" readonly />
-                    </div>
-                    <div class="field-group">
-                        <label>Date / Time Received</label>
-                        <input type="datetime-local" id="jobReceivedDateTime" />
-                    </div>
-                    <div class="field-group">
-                        <label>Received by (Technician)</label>
-                        <input type="text" id="jobReceivedBy" readonly />
-                    </div>
-                    <div class="field-group">
-                        <label>Handed back to (User)</label>
-                        <select id="jobHandedTo">
-                            <option value="">-- Select --</option>
-                        </select>
-                    </div>
-                    <div class="field-group">
-                        <label>Date / Time Handed</label>
-                        <input type="datetime-local" id="jobHandedDateTime" />
-                    </div>
-                    <div class="field-group">
-                        <label>Handed by (Technician)</label>
-                        <input type="text" id="jobHandedBy" readonly />
-                    </div>
-                </div>
-            </section>
+            <!-- ===== HIDDEN REQUESTER ID ===== -->
+            <input type="hidden" id="jobRequesterId" />
 
-            <!-- ===== SERVICE TYPE ===== -->
+            <!-- HANDOVER -->
+            <div class="grid-3">
+                <div class="field-group">
+                    <label>Received from (Requester)</label>
+                    <input type="text" id="jobReceivedFrom" readonly />
+                </div>
+                <div class="field-group">
+                    <label>Date / Time Received</label>
+                    <input type="datetime-local" id="jobReceivedDateTime" />
+                </div>
+                <div class="field-group">
+                    <label>Received by (Technician)</label>
+                    <input type="text" id="jobReceivedBy" readonly />
+                </div>
+                <div class="field-group">
+                    <label>Handed back to (User)</label>
+                    <select id="jobHandedTo">
+                        <option value="">-- Select --</option>
+                    </select>
+                </div>
+                <div class="field-group">
+                    <label>Date / Time Handed</label>
+                    <input type="datetime-local" id="jobHandedDateTime" />
+                </div>
+                <div class="field-group">
+                    <label>Handed by (Technician)</label>
+                    <input type="text" id="jobHandedBy" readonly />
+                </div>
+            </div>
+
+            <!-- SERVICE TYPE -->
             <section class="section-block">
-                <h3><i class="fas fa-wrench"></i> Service Type</h3>
+                <h3>🛠️ Service Type</h3>
                 <div class="inline-group">
                     <label><input type="radio" name="serviceType" value="General Service/Overhaul" checked /> General Service/Overhaul</label>
                     <label><input type="radio" name="serviceType" value="Repair" /> Repair</label>
@@ -625,9 +210,9 @@
                 </div>
             </section>
 
-            <!-- ===== TIMELINE ===== -->
+            <!-- TIMELINE -->
             <section class="section-block">
-                <h3><i class="fas fa-clock"></i> Technician Timeline & Effort</h3>
+                <h3>⏱️ Technician Timeline & Effort</h3>
                 <div class="grid-3">
                     <div class="field-group">
                         <label>Job Started</label>
@@ -652,9 +237,9 @@
                 </div>
             </section>
 
-            <!-- ===== STATUS ===== -->
+            <!-- STATUS & COMPLETION -->
             <section class="section-block">
-                <h3><i class="fas fa-tasks"></i> Job Status & Completion</h3>
+                <h3>📌 Job Status & Completion</h3>
                 <div class="field-group">
                     <label>Status</label>
                     <select id="jobStatus" onchange="toggleStatusFields()">
@@ -664,7 +249,7 @@
                     </select>
                 </div>
 
-                <div id="pendingFields" style="margin-top: 12px;">
+                <div id="pendingFields" style="margin-top:12px;">
                     <div class="grid-2">
                         <div class="field-group">
                             <label>Reason for Postponement</label>
@@ -686,7 +271,7 @@
                     </div>
                 </div>
 
-                <div id="completedFields" style="display: none; margin-top: 12px;">
+                <div id="completedFields" style="display:none; margin-top:12px;">
                     <div class="field-group">
                         <label>🔧 Defects Found</label>
                         <textarea id="jobDefects" rows="2" placeholder="List defects..."></textarea>
@@ -697,7 +282,7 @@
                     </div>
                 </div>
 
-                <div id="writtenOffFields" style="display: none; margin-top: 12px;">
+                <div id="writtenOffFields" style="display:none; margin-top:12px;">
                     <div class="field-group">
                         <label>Reason for Write‑Off</label>
                         <select id="jobWriteOffReason">
@@ -718,20 +303,17 @@
                 </div>
             </section>
 
-            <!-- ===== MEASUREMENTS ===== -->
-            <section class="section-block">
-                <h3><i class="fas fa-ruler"></i> Measurements</h3>
-                <div class="grid-4">
-                    <div class="field-group"><label>Current (A)</label><input type="text" id="jobMeasureCurrent" placeholder="N/A" /></div>
-                    <div class="field-group"><label>Voltage (V)</label><input type="text" id="jobMeasureVoltage" placeholder="N/A" /></div>
-                    <div class="field-group"><label>Insulation (MΩ)</label><input type="text" id="jobMeasureInsulation" placeholder="N/A" /></div>
-                    <div class="field-group"><label>Pressure (bar/mbar)</label><input type="text" id="jobMeasurePressure" placeholder="N/A" /></div>
-                </div>
+            <!-- MEASUREMENTS -->
+            <section class="grid-4">
+                <div class="field-group"><label>Current (A)</label><input type="text" id="jobMeasureCurrent" placeholder="N/A" /></div>
+                <div class="field-group"><label>Voltage (V)</label><input type="text" id="jobMeasureVoltage" placeholder="N/A" /></div>
+                <div class="field-group"><label>Insulation (MΩ)</label><input type="text" id="jobMeasureInsulation" placeholder="N/A" /></div>
+                <div class="field-group"><label>Pressure (bar/mbar)</label><input type="text" id="jobMeasurePressure" placeholder="N/A" /></div>
             </section>
 
-            <!-- ===== FINAL VERIFICATION ===== -->
+            <!-- FINAL CHECKS -->
             <section class="section-block">
-                <h3><i class="fas fa-check-circle"></i> Final Verification</h3>
+                <h3>✅ Final Verification</h3>
                 <div class="inline-group" style="margin-bottom:12px;">
                     <label><input type="checkbox" id="jobFunctionOk" checked /> Function O.K.</label>
                     <label><input type="checkbox" id="jobSafetyOk" checked /> Safety O.K.</label>
@@ -742,11 +324,11 @@
                 </div>
             </section>
 
-            <!-- ===== SIGNATURES ===== -->
+            <!-- SIGNATURES -->
             <section class="signature-area">
                 <div class="signature-grid">
                     <div class="signature-box">
-                        <h4><i class="fas fa-user-cog"></i> Technician Signature</h4>
+                        <h4>👨‍🔧 Technician Signature</h4>
                         <div class="field-group">
                             <label>Name</label>
                             <select id="jobTechName">
@@ -771,7 +353,7 @@
                         </div>
                     </div>
                     <div class="signature-box">
-                        <h4><i class="fas fa-user-check"></i> Supervisor Signature</h4>
+                        <h4>✅ Supervisor Signature</h4>
                         <div class="field-group">
                             <label>Name</label>
                             <select id="jobCertName">
@@ -798,21 +380,19 @@
                 </div>
             </section>
 
-            <!-- ===== ACTION BAR ===== -->
+            <!-- ACTION BAR -->
             <div class="action-bar no-print">
-                <button class="btn btn-success" onclick="saveJobCard()"><i class="fas fa-save"></i> Save Job Card</button>
-                <button class="btn btn-outline" onclick="window.print()"><i class="fas fa-print"></i> Print Job Card</button>
-                <button class="btn btn-outline" onclick="resetJobCardForm()"><i class="fas fa-undo-alt"></i> Reset Form</button>
+                <button class="btn btn-success" onclick="saveJobCard()">💾 Save Job Card</button>
+                <button class="btn btn-outline" onclick="window.print()">📄 Print Job Card</button>
+                <button class="btn btn-outline" onclick="resetJobCardForm()">🔄 Reset Form</button>
             </div>
         </form>
 
-        <!-- ===== FOOTER ===== -->
-        <div class="footer">
-            <i class="fas fa-fire"></i> Firestore‑powered &nbsp;·&nbsp; <i class="fas fa-pen-fancy"></i> Drawable Signatures &nbsp;·&nbsp; MCRH Job Card v8.0
-        </div>
+        <footer style="margin-top:22px;font-size:12px;color:#6c757d;text-align:center;border-top:1px solid #e9ecef;padding-top:14px;">
+            🔥 Firestore‑powered · ✍️ Drawable Signatures · MCRH Job Card v7.0
+        </footer>
     </div>
 
-    <!-- ===== TOAST ===== -->
     <div id="toast" class="toast">Message</div>
 
     <script type="module">
@@ -830,11 +410,7 @@
         };
 
         import { initializeApp } from 'firebase/app';
-        import {
-            getAuth,
-            onAuthStateChanged,
-            signOut
-        } from 'firebase/auth';
+        import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
         import {
             getFirestore,
             collection,
@@ -875,7 +451,6 @@
                 window.location.href = 'login.html';
                 return;
             }
-
             try {
                 const userDoc = await getDoc(doc(db, USERS_COLL, user.uid));
                 if (!userDoc.exists()) {
@@ -890,17 +465,14 @@
                     window.location.href = 'login.html';
                     return;
                 }
-
                 const role = userData.role || 'requester';
                 if (role !== 'maintenance' && role !== 'admin') {
                     alert('You do not have permission to access this page.');
                     window.location.href = 'dashboard.html';
                     return;
                 }
-
                 currentUser = { id: user.uid, ...userData };
                 await initPage();
-
             } catch (err) {
                 console.error('Auth error:', err);
                 window.location.href = 'login.html';
@@ -911,9 +483,7 @@
         // LOGOUT
         // ============================================================
         window.logout = function() {
-            signOut(auth).then(() => {
-                window.location.href = 'login.html';
-            });
+            signOut(auth).then(() => window.location.href = 'login.html');
         };
 
         // ============================================================
@@ -937,7 +507,7 @@
                 const diffMs = e - s;
                 const hrs = Math.floor(diffMs / 3600000);
                 const mins = Math.floor((diffMs % 3600000) / 60000);
-                return `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
+                return `${String(hrs).padStart(2,'0')}:${String(mins).padStart(2,'0')}`;
             } catch { return '--:--'; }
         }
 
@@ -950,7 +520,7 @@
                 const diffMs = s - r;
                 const hrs = Math.floor(diffMs / 3600000);
                 const mins = Math.floor((diffMs % 3600000) / 60000);
-                return `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
+                return `${String(hrs).padStart(2,'0')}:${String(mins).padStart(2,'0')}`;
             } catch { return '--:--'; }
         }
 
@@ -983,19 +553,14 @@
             try {
                 const snap = await getDocs(collection(db, USERS_COLL));
                 allUsers = [];
-                snap.forEach(doc => {
-                    allUsers.push({ id: doc.id, ...doc.data() });
-                });
-            } catch (err) {
-                console.error('Error fetching users:', err);
-            }
+                snap.forEach(doc => { allUsers.push({ id: doc.id, ...doc.data() }); });
+            } catch (err) { console.error('Error fetching users:', err); }
         }
 
         // ============================================================
         // POPULATE DROPDOWNS
         // ============================================================
         function populateDropdowns() {
-            // Handed back to: all requesters
             const handedToSelect = document.getElementById('jobHandedTo');
             handedToSelect.innerHTML = '<option value="">-- Select --</option>';
             const requesters = allUsers.filter(u => u.role === 'requester');
@@ -1006,7 +571,6 @@
                 handedToSelect.appendChild(opt);
             });
 
-            // Technician Name: maintenance or admin
             const techSelect = document.getElementById('jobTechName');
             techSelect.innerHTML = '<option value="">-- Select --</option>';
             const techUsers = allUsers.filter(u => u.role === 'maintenance' || u.role === 'admin');
@@ -1018,9 +582,6 @@
             });
         }
 
-        // ============================================================
-        // POPULATE SUPERVISOR DROPDOWN
-        // ============================================================
         function populateSupervisorDropdown(department) {
             const certSelect = document.getElementById('jobCertName');
             certSelect.innerHTML = '<option value="">-- Select --</option>';
@@ -1149,7 +710,6 @@
         };
 
         function getSigData(pad) { return (pad && !pad.isEmpty()) ? pad.toData() : null; }
-
         function loadSigData(pad, data) { if (pad && data) pad.fromData(data); }
 
         // ============================================================
@@ -1158,28 +718,21 @@
         async function populateRequestDropdown() {
             const dropdown = document.getElementById('jobRequestNo');
             dropdown.innerHTML = '<option value="">-- Select Request --</option>';
-
             try {
                 const reqSnap = await getDocs(query(collection(db, REQUESTS_COLL), orderBy('createdAt', 'desc')));
                 allRequests = [];
-                reqSnap.forEach(doc => {
-                    const data = doc.data();
+                reqSnap.forEach(doc => { const data = doc.data();
                     data.id = doc.id;
-                    allRequests.push(data);
-                });
+                    allRequests.push(data); });
 
                 const jobSnap = await getDocs(collection(db, JOBCARDS_COLL));
                 allJobCards = [];
-                jobSnap.forEach(doc => {
-                    const data = doc.data();
+                jobSnap.forEach(doc => { const data = doc.data();
                     data.id = doc.id;
-                    allJobCards.push(data);
-                });
+                    allJobCards.push(data); });
 
                 const jobMap = new Map();
-                allJobCards.forEach(j => {
-                    if (j.requestNo) jobMap.set(j.requestNo, j.status);
-                });
+                allJobCards.forEach(j => { if (j.requestNo) jobMap.set(j.requestNo, j.status); });
 
                 const availableRequests = allRequests.filter(r => {
                     const jobStatus = jobMap.get(r.requestNo);
@@ -1198,20 +751,15 @@
                 const reqParam = urlParams.get('request');
                 if (reqParam) {
                     for (let opt of dropdown.options) {
-                        if (opt.value === reqParam) {
-                            dropdown.value = reqParam;
-                            break;
-                        }
+                        if (opt.value === reqParam) { dropdown.value = reqParam; break; }
                     }
                     loadRequestData();
                 }
-            } catch (err) {
-                console.error(err);
-            }
+            } catch (err) { console.error(err); }
         }
 
         // ============================================================
-        // LOAD REQUEST DATA
+        // LOAD REQUEST DATA – stores requesterId
         // ============================================================
         window.loadRequestData = async function() {
             const requestNo = document.getElementById('jobRequestNo').value;
@@ -1221,9 +769,9 @@
                 document.getElementById('jobReportingDateTime').value = '';
                 document.getElementById('jobReceivedFrom').value = '';
                 document.getElementById('jobCertName').innerHTML = '<option value="">-- Select --</option>';
+                document.getElementById('jobRequesterId').value = '';
                 return;
             }
-
             try {
                 const q = query(collection(db, REQUESTS_COLL), where('requestNo', '==', requestNo));
                 const snap = await getDocs(q);
@@ -1240,11 +788,12 @@
                 document.getElementById('jobComplaint').value = r.complaint || '';
                 document.getElementById('jobReportingDateTime').value = r.dateTime || '';
                 document.getElementById('jobReceivedFrom').value = r.requesterName || '';
+                // Store requesterId for history
+                document.getElementById('jobRequesterId').value = r.requesterId || '';
 
                 if (!document.getElementById('jobReceivedDateTime').value) {
                     document.getElementById('jobReceivedDateTime').value = r.dateTime || '';
                 }
-
                 populateSupervisorDropdown(r.unit);
                 showToast('✅ Request data loaded.');
             } catch (err) {
@@ -1296,7 +845,7 @@
         document.getElementById('jobReportingDateTime').addEventListener('change', updateJobTimeFields);
 
         // ============================================================
-        // SAVE JOB CARD
+        // SAVE JOB CARD – includes requesterId & techId
         // ============================================================
         window.saveJobCard = async function() {
             const btn = document.querySelector('.btn-success');
@@ -1308,7 +857,7 @@
                 const requestNo = document.getElementById('jobRequestNo').value;
                 if (!requestNo) { showToast('Please select a request.', true);
                     btn.disabled = false;
-                    btn.innerHTML = '<i class="fas fa-save"></i> Save Job Card'; return; }
+                    btn.innerHTML = '💾 Save Job Card'; return; }
 
                 const handedToId = document.getElementById('jobHandedTo').value;
                 const handedToName = handedToId ? allUsers.find(u => u.id === handedToId)?.name || '' : '';
@@ -1319,11 +868,13 @@
 
                 const receivedBy = currentUser?.name || '';
                 const handedBy = currentUser?.name || '';
+                const requesterId = document.getElementById('jobRequesterId').value;
 
                 const data = {
                     jobNo: jobNo || await generateJobNumber(),
                     requestNo: requestNo,
                     requester: document.getElementById('jobRequester').value,
+                    requesterId: requesterId,
                     unit: document.getElementById('jobUnit').value,
                     reportingDateTime: document.getElementById('jobReportingDateTime').value,
                     equipName: document.getElementById('jobEquipName').value,
@@ -1387,14 +938,9 @@
                         const reqQuery = query(collection(db, REQUESTS_COLL), where('requestNo', '==', requestNo));
                         const reqSnap = await getDocs(reqQuery);
                         reqSnap.forEach(async (doc) => {
-                            await updateDoc(doc.ref, {
-                                jobStatus: data.status,
-                                jobNo: data.jobNo
-                            });
+                            await updateDoc(doc.ref, { jobStatus: data.status, jobNo: data.jobNo });
                         });
-                    } catch (err) {
-                        console.warn('Could not update request status:', err);
-                    }
+                    } catch (err) { console.warn('Could not update request status:', err); }
                 }
 
                 document.getElementById('jobNo').value = data.jobNo;
@@ -1404,7 +950,7 @@
                 showToast('❌ Error: ' + err.message, true);
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-save"></i> Save Job Card';
+                btn.innerHTML = '💾 Save Job Card';
             }
         };
 
@@ -1459,15 +1005,14 @@
                     techName: j.techName || '',
                     techDate: j.techDate || '',
                     certName: j.certName || '',
-                    certDate: j.certDate || ''
+                    certDate: j.certDate || '',
+                    requesterId: j.requesterId || '',
                 };
                 for (const [key, val] of Object.entries(fields)) {
                     const el = document.getElementById('job' + key.charAt(0).toUpperCase() + key.slice(1));
                     if (el) {
                         if (el.type === 'checkbox') el.checked = val;
-                        else if (el.tagName !== 'SELECT') {
-                            el.value = val || '';
-                        }
+                        else if (el.tagName === 'SELECT') { /* handled later */ } else el.value = val || '';
                     }
                 }
 
@@ -1484,10 +1029,7 @@
 
                 const dropdown = document.getElementById('jobRequestNo');
                 for (let opt of dropdown.options) {
-                    if (opt.value === j.requestNo) {
-                        dropdown.value = j.requestNo;
-                        break;
-                    }
+                    if (opt.value === j.requestNo) { dropdown.value = j.requestNo; break; }
                 }
                 await loadRequestData();
 
@@ -1508,7 +1050,8 @@
             if (!confirm('Reset the form? Unsaved data will be lost.')) return;
             document.querySelectorAll('#jobcardForm input, #jobcardForm textarea, #jobcardForm select').forEach(el => {
                 if (el.id !== 'jobReceivedBy' && el.id !== 'jobHandedBy' && el.id !== 'jobTechName' &&
-                    el.id !== 'jobCertName' && el.id !== 'jobRequestNo' && el.id !== 'jobHandedTo') {
+                    el.id !== 'jobCertName' && el.id !== 'jobRequestNo' && el.id !== 'jobHandedTo' &&
+                    el.id !== 'jobRequesterId') {
                     if (el.type === 'checkbox') el.checked = (el.id === 'jobFunctionOk' || el.id === 'jobSafetyOk');
                     else if (el.tagName !== 'SELECT') el.value = '';
                 }
@@ -1518,6 +1061,7 @@
             document.getElementById('jobCertName').value = '';
             document.getElementById('jobRequestNo').value = '';
             document.getElementById('jobStatus').value = 'Pending';
+            document.getElementById('jobRequesterId').value = '';
             techSigPad && techSigPad.clear();
             certSigPad && certSigPad.clear();
             document.getElementById('jobStatusBadge').textContent = '● PENDING';
@@ -1538,7 +1082,6 @@
         async function initPage() {
             document.getElementById('jobReceivedBy').value = currentUser?.name || '';
             document.getElementById('jobHandedBy').value = currentUser?.name || '';
-
             await fetchUsers();
             populateDropdowns();
             await populateRequestDropdown();
@@ -1559,14 +1102,11 @@
 
             const urlParams = new URLSearchParams(window.location.search);
             const viewParam = urlParams.get('view');
-            if (viewParam) {
-                await window.loadJobCard(viewParam);
-            }
+            if (viewParam) await window.loadJobCard(viewParam);
 
             console.log('🚀 Job Card system ready.');
         }
 
-        // Expose functions to global
         window.saveJobCard = saveJobCard;
         window.toggleStatusFields = toggleStatusFields;
         window.loadJobCard = loadJobCard;
