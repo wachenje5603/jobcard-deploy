@@ -96,6 +96,7 @@
         .status-badge.writtenoff { background:#fee2e2; color:#b91c1c; }
         .status-badge.postponed { background:#fef3c7; color:#b45309; }
         .status-badge.open { background:#dbeafe; color:#1d4ed8; }
+        .status-badge.received { background:#d1fae5; color:#065f46; } /* Added for received status */
         .table-actions { display:flex; flex-wrap:wrap; gap:6px; }
 
         /* ===== MODALS ===== */
@@ -320,7 +321,7 @@
                         <option value="PHYSIOTHERAPY">PHYSIOTHERAPY</option>
                         <option value="OCCUPATIONAL THERAPY">OCCUPATIONAL THERAPY</option>
                         <option value="MCH">MCH</option>
-                        <option value="PURPLE HEALTH">PURPLE HEALTH</option>
+                        <option value="PUBLIC HEALTH">PUBLIC HEALTH</option>
                         <option value="NCT">NCT</option>
                         <option value="LAB SERVICE">LAB SERVICE</option>
                         <option value="XRAY SERVICE">XRAY SERVICE</option>
@@ -378,7 +379,7 @@
                         <option value="PHYSIOTHERAPY">PHYSIOTHERAPY</option>
                         <option value="OCCUPATIONAL THERAPY">OCCUPATIONAL THERAPY</option>
                         <option value="MCH">MCH</option>
-                        <option value="PURPLE HEALTH">PURPLE HEALTH</option>
+                        <option value="PUBLIC HEALTH">PUBLIC HEALTH</option>
                         <option value="NCT">NCT</option>
                         <option value="LAB SERVICE">LAB SERVICE</option>
                         <option value="XRAY SERVICE">XRAY SERVICE</option>
@@ -565,6 +566,7 @@
         if (s === 'pending' || s === 'postponed') return 'pending';
         if (s === 'completed') return 'completed';
         if (s === 'written off') return 'writtenoff';
+        if (s === 'received') return 'received';
         return 'open';
     }
 
@@ -613,6 +615,8 @@
             reqSnap.forEach(doc => {
                 const data = doc.data();
                 data.id = doc.id;
+                // Ensure received field exists
+                if (data.received === undefined) data.received = false;
                 allRequests.push(data);
             });
             console.log(`✅ Fetched ${allRequests.length} total requests.`);
@@ -815,7 +819,7 @@
     };
 
     // ================================================================
-    // BUILD FILTER BAR
+    // BUILD FILTER BAR – added received and pending-receiving options
     // ================================================================
     function buildFilterBar() {
         const isAdmin = userRole === 'admin';
@@ -829,6 +833,8 @@
                         <option value="all">All Statuses</option>
                         <option value="new">New (No Job)</option>
                         <option value="pending">Pending</option>
+                        <option value="received">Received</option>
+                        <option value="pending-receiving">Pending Receiving</option>
                         <option value="completed">Completed</option>
                         <option value="postponed">Postponed</option>
                         <option value="writtenoff">Written Off</option>
@@ -882,15 +888,19 @@
             requestsForCharts = allRequests;
         }
 
-        const statusCounts = { 'Pending':0, 'Completed':0, 'Written Off':0, 'Postponed':0, 'No Job':0 };
+        const statusCounts = { 'Pending':0, 'Completed':0, 'Written Off':0, 'Postponed':0, 'No Job':0, 'Received':0 };
         requestsForCharts.forEach(r => {
-            const s = r.jobStatus || 'No Job';
+            let s = r.jobStatus || 'No Job';
+            // If received and no job, treat as "Received" for chart
+            if (r.received === true && (s === 'No Job' || s === 'Pending')) {
+                s = 'Received';
+            }
             if (statusCounts.hasOwnProperty(s)) statusCounts[s]++;
             else statusCounts[s] = 1;
         });
         const labels = Object.keys(statusCounts);
         const data = Object.values(statusCounts);
-        const colors = ['#f59e0b', '#22c55e', '#ef4444', '#f59e0b', '#6b7280'];
+        const colors = ['#f59e0b', '#22c55e', '#ef4444', '#f59e0b', '#6b7280', '#10b981'];
 
         const ctx1 = document.getElementById('statusChart').getContext('2d');
         if (statusChartInstance) statusChartInstance.destroy();
@@ -918,7 +928,7 @@
     }
 
     // ================================================================
-    // APPLY FILTERS
+    // APPLY FILTERS – added received and pending-receiving
     // ================================================================
     window.applyFilter = function(status) {
         const select = document.getElementById('statusFilter');
@@ -943,7 +953,11 @@
         if (statusFilter !== 'all') {
             if (isRequests) {
                 if (statusFilter === 'new') {
-                    data = data.filter(item => item.jobStatus === 'No Job');
+                    data = data.filter(item => item.jobStatus === 'No Job' && item.received !== true);
+                } else if (statusFilter === 'received') {
+                    data = data.filter(item => item.received === true);
+                } else if (statusFilter === 'pending-receiving') {
+                    data = data.filter(item => (item.received !== true) && (item.jobStatus === 'No Job' || item.jobStatus === 'Pending'));
                 } else {
                     data = data.filter(item => item.jobStatus && item.jobStatus.toLowerCase() === statusFilter);
                 }
@@ -985,7 +999,7 @@
     }
 
     // ================================================================
-    // RENDER REQUESTS TABLE
+    // RENDER REQUESTS TABLE – added Receiving column and Mark Received button
     // ================================================================
     function renderRequestsTable(requests) {
         let html = `
@@ -997,6 +1011,7 @@
                         <th>Unit/Ward</th>
                         <th>Equipment</th>
                         <th>Status</th>
+                        <th>Receiving Status</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -1005,10 +1020,18 @@
         requests.forEach(r => {
             const status = r.jobStatus || 'No Job';
             const statusClass = getStatusClass(status);
+            const isReceived = r.received === true;
+            const receiveBadge = isReceived 
+                ? '<span class="status-badge received">✅ Received</span>' 
+                : '<span class="status-badge pending">⏳ Pending Receiving</span>';
+            
+            const canReceive = (userRole === 'admin' || userRole === 'maintenance') && !isReceived && (status === 'No Job' || status === 'Pending');
+            
             const actions = `
                 <div class="table-actions">
                     <button class="btn btn-info btn-sm" onclick="downloadRequestPDF('${r.id}')" title="Download PDF"><i class="fas fa-file-pdf"></i></button>
-                    ${(userRole === 'maintenance' || userRole === 'admin') && status === 'No Job' ? `<button class="btn btn-success btn-sm" onclick="createJob('${r.requestNo}')"><i class="fas fa-tools"></i> Create Job</button>` : ''}
+                    ${canReceive ? `<button class="btn btn-success btn-sm receive-btn" data-id="${r.id}" title="Mark as Received"><i class="fas fa-check-double"></i> Mark Received</button>` : ''}
+                    ${(userRole === 'maintenance' || userRole === 'admin') && status === 'No Job' ? `<button class="btn btn-warning btn-sm" onclick="createJob('${r.requestNo}')"><i class="fas fa-tools"></i> Create Job</button>` : ''}
                 </div>
             `;
             html += `
@@ -1018,12 +1041,43 @@
                     <td>${r.unit || 'N/A'}</td>
                     <td>${r.equipName || 'N/A'}</td>
                     <td><span class="status-badge ${statusClass}">${status}</span></td>
+                    <td>${receiveBadge}</td>
                     <td>${actions}</td>
                 </tr>
             `;
         });
         html += '</tbody></table>';
         tableBody.innerHTML = html;
+
+        // Attach receive event listeners
+        document.querySelectorAll('.receive-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const id = this.dataset.id;
+                if (id) markAsReceived(id);
+            });
+        });
+    }
+
+    // ================================================================
+    // MARK AS RECEIVED FUNCTION
+    // ================================================================
+    async function markAsReceived(requestId) {
+        if (!requestId) return;
+        try {
+            await updateDoc(doc(db, REQUESTS_COLL, requestId), {
+                received: true,
+                receivedAt: serverTimestamp(),
+                receivedBy: currentUser?.id || null,
+                receivedByName: currentUser?.name || 'Unknown'
+            });
+            showToast('✅ Request marked as Received.');
+            // Refresh data and re-render
+            await fetchData();
+            applyFilters();
+        } catch (err) {
+            console.error('Error marking as received:', err);
+            showToast('Error: ' + err.message, true);
+        }
     }
 
     // ================================================================
