@@ -603,13 +603,43 @@
     // ================================================================
     // FETCH DATA
     // ================================================================
-    async function fetchData() {
-        console.log('🔍 fetchData() called.');
-        try {
-            const isAdmin = userRole === 'admin';
-            const isMaintenance = userRole === 'maintenance';
+  async function fetchData() {
+    console.log('🔍 fetchData() called.');
+    try {
+        const isAdmin = userRole === 'admin';
+        const isMaintenance = userRole === 'maintenance';
+        const isRequester = userRole === 'requester';
 
-            const reqQuery = query(collection(db, REQUESTS_COLL), orderBy('createdAt', 'desc'));
+        let reqQuery = null;
+        let jobQuery = null;
+
+        if (isAdmin) {
+            reqQuery = query(collection(db, REQUESTS_COLL), orderBy('createdAt', 'desc'));
+            jobQuery = query(collection(db, JOBCARDS_COLL), orderBy('updatedAt', 'desc'));
+        } else if (isMaintenance) {
+            const depts = currentUser?.departments || [];
+            if (depts.length > 0) {
+                // Only fetch requests for departments assigned to this engineer
+                reqQuery = query(collection(db, REQUESTS_COLL), where('unit', 'in', depts), orderBy('createdAt', 'desc'));
+                jobQuery = query(collection(db, JOBCARDS_COLL), where('unit', 'in', depts), orderBy('updatedAt', 'desc'));
+            } else {
+                // No departments assigned – show nothing
+                allRequests = [];
+                allJobCards = [];
+                // Still need to fetch users for management
+            }
+        } else if (isRequester) {
+            reqQuery = query(collection(db, REQUESTS_COLL), where('requesterId', '==', currentUser.id), orderBy('createdAt', 'desc'));
+            const dept = currentUser?.department;
+            if (dept) {
+                jobQuery = query(collection(db, JOBCARDS_COLL), where('unit', '==', dept), orderBy('updatedAt', 'desc'));
+            } else {
+                jobQuery = query(collection(db, JOBCARDS_COLL), orderBy('updatedAt', 'desc'));
+            }
+        }
+
+        // Execute request query
+        if (reqQuery) {
             const reqSnap = await getDocs(reqQuery);
             allRequests = [];
             reqSnap.forEach(doc => {
@@ -619,9 +649,14 @@
                 if (data.received === undefined) data.received = false;
                 allRequests.push(data);
             });
-            console.log(`✅ Fetched ${allRequests.length} total requests.`);
+            console.log(`✅ Fetched ${allRequests.length} requests.`);
+        } else {
+            allRequests = [];
+        }
 
-            const jobSnap = await getDocs(query(collection(db, JOBCARDS_COLL), orderBy('updatedAt', 'desc')));
+        // Execute jobcard query
+        if (jobQuery) {
+            const jobSnap = await getDocs(jobQuery);
             allJobCards = [];
             jobSnap.forEach(doc => {
                 const data = doc.data();
@@ -629,41 +664,47 @@
                 allJobCards.push(data);
             });
             console.log(`✅ Fetched ${allJobCards.length} jobcards.`);
-
-            const jobMap = new Map();
-            allJobCards.forEach(j => {
-                if (j.requestNo) jobMap.set(j.requestNo, j);
-            });
-            allRequests.forEach(r => {
-                const job = jobMap.get(r.requestNo);
-                if (job) {
-                    r.jobStatus = job.status || 'Pending';
-                    r.jobNo = job.jobNo;
-                    r.jobId = job.id;
-                } else {
-                    r.jobStatus = 'No Job';
-                    r.jobNo = null;
-                    r.jobId = null;
-                }
-            });
-
-            if (isAdmin || isMaintenance) {
-                const userSnap = await getDocs(collection(db, USERS_COLL));
-                allUsers = [];
-                userSnap.forEach(doc => {
-                    allUsers.push({ id: doc.id, ...doc.data() });
-                });
-                pendingApprovalCount = allUsers.filter(u => u.approved !== true).length;
-                console.log(`✅ Fetched ${allUsers.length} users, ${pendingApprovalCount} pending.`);
-            } else {
-                allUsers = [];
-                pendingApprovalCount = 0;
-            }
-        } catch (err) {
-            console.error('❌ fetchData error:', err);
-            showToast('Error loading data: ' + err.message, true);
+        } else {
+            allJobCards = [];
         }
+
+        // Map job status to requests (only for the requests we fetched)
+        const jobMap = new Map();
+        allJobCards.forEach(j => {
+            if (j.requestNo) jobMap.set(j.requestNo, j);
+        });
+        allRequests.forEach(r => {
+            const job = jobMap.get(r.requestNo);
+            if (job) {
+                r.jobStatus = job.status || 'Pending';
+                r.jobNo = job.jobNo;
+                r.jobId = job.id;
+            } else {
+                r.jobStatus = 'No Job';
+                r.jobNo = null;
+                r.jobId = null;
+            }
+        });
+
+        // Fetch users (only admin/maintenance need this)
+        if (isAdmin || isMaintenance) {
+            const userSnap = await getDocs(collection(db, USERS_COLL));
+            allUsers = [];
+            userSnap.forEach(doc => {
+                allUsers.push({ id: doc.id, ...doc.data() });
+            });
+            pendingApprovalCount = allUsers.filter(u => u.approved !== true).length;
+            console.log(`✅ Fetched ${allUsers.length} users, ${pendingApprovalCount} pending.`);
+        } else {
+            allUsers = [];
+            pendingApprovalCount = 0;
+        }
+    } catch (err) {
+        console.error('❌ fetchData error:', err);
+        showToast('Error loading data: ' + err.message, true);
     }
+}
+       
 
     function getMyRequests() {
         if (!currentUser || !currentUser.id) return [];
