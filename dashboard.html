@@ -293,6 +293,12 @@
                 </select>
             </div>
 
+            <!-- ===== ADMIN PASSWORD FIELD (Option A) ===== -->
+            <div class="form-group" id="adminPasswordField">
+                <label>Your Admin Password (to re-authenticate)</label>
+                <input type="password" id="adminPassword" placeholder="Enter your admin password" />
+            </div>
+
             <!-- ===== SINGLE DEPARTMENT – ORGANOGRAM ===== -->
             <div class="form-group" id="deptFieldContainer" style="display:block;">
                 <label id="deptLabel">Department (for requester)</label>
@@ -348,6 +354,8 @@
                         <option value="ENT CLINIC">ENT CLINIC</option>
                         <option value="DERMATOLOGY CLINIC">DERMATOLOGY CLINIC</option>
                         <option value="EYE CENTER">EYE CENTER</option>
+                        <!-- ===== NEW DEPARTMENT ADDED ===== -->
+                        <option value="ONCOLOGY/CANCER CENTER">ONCOLOGY/CANCER CENTER</option>
                     </optgroup>
                 </select>
             </div>
@@ -406,6 +414,8 @@
                         <option value="ENT CLINIC">ENT CLINIC</option>
                         <option value="DERMATOLOGY CLINIC">DERMATOLOGY CLINIC</option>
                         <option value="EYE CENTER">EYE CENTER</option>
+                        <!-- ===== NEW DEPARTMENT ADDED ===== -->
+                        <option value="ONCOLOGY/CANCER CENTER">ONCOLOGY/CANCER CENTER</option>
                     </optgroup>
                 </select>
                 <small style="color:#6c757d;">Hold Ctrl (Windows) or Cmd (Mac) to select multiple.</small>
@@ -448,7 +458,7 @@
                 </div>
             </div>
 
-            <button class="btn btn-success" id="saveUserBtn" onclick="saveUser()"><i class="fas fa-save"></i> Save User</button>
+            <button class="btn btn-success" id="saveUserBtn"><i class="fas fa-save"></i> Save User</button>
             <div id="userModalError" class="error-text"></div>
             <div id="userModalSuccess" class="success-text"></div>
         </div>
@@ -496,7 +506,7 @@
     };
 
     import { initializeApp } from 'firebase/app';
-    import { getAuth, signOut, onAuthStateChanged, createUserWithEmailAndPassword } from 'firebase/auth';
+    import { getAuth, signOut, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
     import {
         getFirestore,
         collection,
@@ -540,6 +550,7 @@
     const tableBody = document.getElementById('tableBody');
     const toast = document.getElementById('toast');
     const logoutBtn = document.getElementById('logoutBtn');
+    const saveUserBtn = document.getElementById('saveUserBtn');
 
     let statusChartInstance = null;
     let trendChartInstance = null;
@@ -579,6 +590,7 @@
         const whatsappContainer = document.getElementById('whatsappFieldContainer');
         const deptLabel = document.getElementById('deptLabel');
         const passwordField = document.getElementById('passwordField');
+        const adminPasswordField = document.getElementById('adminPasswordField');
 
         deptContainer.style.display = 'none';
         multiDeptContainer.style.display = 'none';
@@ -586,6 +598,8 @@
 
         const isEdit = document.getElementById('editUserId').value !== '';
         passwordField.style.display = isEdit ? 'none' : 'block';
+        // Show admin password only when adding a new user
+        adminPasswordField.style.display = isEdit ? 'none' : 'block';
 
         if (role === 'requester') {
             deptContainer.style.display = 'block';
@@ -642,7 +656,6 @@
             let jobcards = [];
 
             if (isAdmin) {
-                // 🔥 FIX: Fetch all jobcards without orderBy to avoid index issues
                 const snap = await getDocs(collection(db, JOBCARDS_COLL));
                 console.log('🔍 Admin jobcards snapshot size:', snap.size);
                 if (snap.size > 0) {
@@ -1579,7 +1592,7 @@
     };
 
     // ================================================================
-    // USER MANAGEMENT (unchanged)
+    // USER MANAGEMENT - UPDATED with Option A (Admin Password)
     // ================================================================
     window.openUserModal = function() {
         console.log('🔓 Opening user modal');
@@ -1590,6 +1603,8 @@
         document.getElementById('newUserPassword').value = '';
         document.getElementById('newUserPassword').required = true;
         document.getElementById('passwordField').style.display = 'block';
+        document.getElementById('adminPasswordField').style.display = 'block';
+        document.getElementById('adminPassword').value = '';
         document.getElementById('newUserName').value = '';
         document.getElementById('newUserEmail').value = '';
         document.getElementById('newUserDept').value = '';
@@ -1623,6 +1638,9 @@
             document.getElementById('newUserEmail').value = userData.email || '';
             document.getElementById('newUserRole').value = userData.role || 'requester';
             document.getElementById('newUserWhatsApp').value = userData.whatsapp || '';
+            // Hide admin password field when editing
+            document.getElementById('adminPasswordField').style.display = 'none';
+            document.getElementById('adminPassword').value = '';
             if (userData.role === 'requester') {
                 document.getElementById('newUserDept').value = userData.department || '';
             } else if (userData.role === 'maintenance') {
@@ -1654,7 +1672,6 @@
     };
 
     window.saveUser = async function() {
-        // (same as before – unchanged)
         const editId = document.getElementById('editUserId').value;
         const email = document.getElementById('newUserEmail').value.trim();
         const name = document.getElementById('newUserName').value.trim();
@@ -1665,6 +1682,10 @@
         const deptSingle = document.getElementById('newUserDept').value;
         const deptSelect = document.getElementById('newUserDepts');
         const selectedDepts = Array.from(deptSelect.selectedOptions).map(opt => opt.value);
+        
+        // Admin re-authentication details
+        const adminEmail = currentUser?.email;
+        const adminPassword = document.getElementById('adminPassword').value.trim();
 
         const errorDiv = document.getElementById('userModalError');
         const successDiv = document.getElementById('userModalSuccess');
@@ -1678,6 +1699,12 @@
         }
         if (!editId && password.length < 6) {
             errorDiv.textContent = 'Password must be at least 6 characters.';
+            errorDiv.style.display = 'block';
+            return;
+        }
+        // Check admin password only when adding a new user
+        if (!editId && !adminPassword) {
+            errorDiv.textContent = 'Please enter your admin password to re-authenticate.';
             errorDiv.style.display = 'block';
             return;
         }
@@ -1700,10 +1727,15 @@
         }
 
         showToast(editId ? 'Updating user...' : 'Creating user...');
+        saveUserBtn.disabled = true;
+        saveUserBtn.innerHTML = '<span class="loading-spinner"></span> Saving...';
 
         try {
             let userId = editId;
+            
+            // CREATE NEW USER (only if not editing)
             if (!editId) {
+                // Create the user in Firebase Auth
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 userId = userCredential.user.uid;
             }
@@ -1729,23 +1761,40 @@
                 userData.departments = null;
             }
 
+            // Save to Firestore
             if (!editId) {
                 userData.approved = true;
                 userData.createdAt = serverTimestamp();
                 await setDoc(doc(db, USERS_COLL, userId), userData);
-                successDiv.textContent = `✅ User ${name} created successfully!`;
             } else {
                 await updateDoc(doc(db, USERS_COLL, userId), userData);
-                successDiv.textContent = `✅ User ${name} updated successfully!`;
             }
 
+            // ============================================================
+            // OPTION A: Re-authenticate as admin (only for new users)
+            // ============================================================
+            if (!editId) {
+                // Sign out (we are currently signed in as the new user)
+                await signOut(auth);
+                // Sign back in as the admin
+                await signInWithEmailAndPassword(auth, adminEmail, adminPassword);
+                // Refresh the user list and dashboard
+                await fetchData();
+                renderUserList();
+                renderDashboard();
+                showToast(`✅ User ${name} created successfully! You are now re-authenticated as admin.`);
+            } else {
+                // For edits, just refresh the list
+                await fetchData();
+                renderUserList();
+                renderDashboard();
+                showToast(`✅ User ${name} updated successfully!`);
+            }
+
+            successDiv.textContent = `✅ User ${name} ${editId ? 'updated' : 'created'} successfully!`;
             successDiv.style.display = 'block';
 
-            await fetchData();
-            renderUserList();
-            renderDashboard();
-            showToast(successDiv.textContent);
-
+            // Clear form if new user
             if (!editId) {
                 document.getElementById('newUserEmail').value = '';
                 document.getElementById('newUserName').value = '';
@@ -1753,10 +1802,12 @@
                 document.getElementById('newUserWhatsApp').value = '';
                 document.getElementById('newUserDept').value = '';
                 document.getElementById('newUserDepts').selectedIndex = -1;
+                document.getElementById('adminPassword').value = '';
                 toggleRoleFields();
             } else {
                 closeUserModal();
             }
+
         } catch (err) {
             console.error(err);
             let msg = 'Error: ' + err.message;
@@ -1766,10 +1817,17 @@
                 msg = 'Password is too weak. Use at least 6 characters.';
             } else if (err.code === 'auth/operation-not-allowed') {
                 msg = 'Email/password accounts are not enabled. Enable them in Firebase Console > Authentication > Sign-in methods.';
+            } else if (err.code === 'auth/wrong-password') {
+                msg = 'Incorrect admin password. Please enter the correct password for your admin account.';
+            } else if (err.code === 'auth/user-not-found') {
+                msg = 'Admin account not found. Please contact support.';
             }
             errorDiv.textContent = msg;
             errorDiv.style.display = 'block';
             showToast(msg, true);
+        } finally {
+            saveUserBtn.disabled = false;
+            saveUserBtn.innerHTML = '<i class="fas fa-save"></i> Save User';
         }
     };
 
@@ -1923,6 +1981,7 @@
         try {
             const userDoc = await getDoc(doc(db, USERS_COLL, user.uid));
             if (!userDoc.exists()) {
+                // If admin document is missing, sign out
                 await signOut(auth);
                 window.location.href = 'login.html';
                 return;
