@@ -1479,7 +1479,7 @@
     };
 
     // ================================================================
-    // SAVE USER – CORRECTED
+    // SAVE USER – CORRECTED (with admin state restoration)
     // ================================================================
     window.saveUser = async function() {
         const editId = document.getElementById('editUserId').value;
@@ -1545,17 +1545,38 @@
         try {
             let userId = editId;
 
-            // 1. Create the user in Firebase Auth (this automatically signs them in)
+            // 1. Create the user in Firebase Auth (if new)
             if (!editId) {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 userId = userCredential.user.uid;
             }
 
-            // 2. IMMEDIATELY sign out of the new user
-            await auth.signOut();
+            // 2. Immediately sign out of the new user (if new) or remain as admin (if edit)
+            if (!editId) {
+                await auth.signOut();
+            }
 
-            // 3. Sign back in as the admin
-            await signInWithEmailAndPassword(auth, adminEmail, adminPassword);
+            // 3. Sign back in as the admin (if new) or stay as admin (if edit)
+            if (!editId) {
+                await signInWithEmailAndPassword(auth, adminEmail, adminPassword);
+            }
+
+            // ★★★ CRITICAL FIX: Ensure currentUser and userRole are updated ★★★
+            // After sign-in, fetch the admin's own document to set the global state.
+            const adminUser = auth.currentUser;
+            if (adminUser) {
+                const adminDoc = await getDoc(doc(db, USERS_COLL, adminUser.uid));
+                if (adminDoc.exists()) {
+                    const adminData = adminDoc.data();
+                    // Update global currentUser and userRole
+                    currentUser = { id: adminUser.uid, ...adminData };
+                    userRole = adminData.role || 'admin';
+                    // Also update the UI elements
+                    userNameDisplay.textContent = currentUser.name || 'User';
+                    userRoleDisplay.textContent = currentUser.email || '';
+                    roleTag.textContent = userRole;
+                }
+            }
 
             // 4. Build the user data
             const fullWhatsApp = role === 'maintenance' ? countryCode + whatsappNumber : '';
@@ -1581,7 +1602,6 @@
             if (!editId) {
                 userData.approved = true;
                 userData.createdAt = serverTimestamp();
-                // 5. Write the user document to Firestore (with admin privileges)
                 await setDoc(doc(db, USERS_COLL, userId), userData);
                 successDiv.textContent = `✅ User ${name} created successfully!`;
             } else {
@@ -1592,13 +1612,13 @@
             successDiv.style.display = 'block';
             showToast(successDiv.textContent);
 
-            // 6. Refresh the user list and dashboard
-            await fetchData();
+            // 5. Refresh data and UI
+            await fetchData();          // This now uses the updated currentUser/userRole
             renderUserList();
             renderDashboard();
             closeUserModal();
 
-            showToast('✅ User created and admin session restored.');
+            showToast('✅ Operation completed.');
 
         } catch (err) {
             console.error(err);
