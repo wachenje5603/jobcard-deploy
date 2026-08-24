@@ -448,13 +448,7 @@
                 </div>
             </div>
 
-            <!-- ===== ADMIN PASSWORD FIELD ===== -->
-            <div class="form-group" id="adminPasswordField">
-                <label>Your Admin Password (to re‑authenticate)</label>
-                <input type="password" id="adminPassword" placeholder="Enter your admin password" />
-                <small style="color:#6c757d;">We need this to re‑authenticate you after creating the new user.</small>
-            </div>
-
+            <!-- ===== SAVE BUTTON (no admin password) ===== -->
             <button class="btn btn-success" id="saveUserBtn" onclick="saveUser()"><i class="fas fa-save"></i> Save User</button>
             <div id="userModalError" class="error-text"></div>
             <div id="userModalSuccess" class="success-text"></div>
@@ -503,7 +497,7 @@
     };
 
     import { initializeApp } from 'firebase/app';
-    import { getAuth, signOut, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+    import { getAuth, signOut, onAuthStateChanged } from 'firebase/auth';
     import {
         getFirestore,
         collection,
@@ -1403,7 +1397,7 @@
     };
 
     // ================================================================
-    // USER MANAGEMENT – FIXED
+    // USER MANAGEMENT – UPDATED
     // ================================================================
     window.openUserModal = function() {
         console.log('🔓 Opening user modal');
@@ -1414,7 +1408,6 @@
         document.getElementById('newUserPassword').value = '';
         document.getElementById('newUserPassword').required = true;
         document.getElementById('passwordField').style.display = 'block';
-        document.getElementById('adminPassword').value = '';
         document.getElementById('newUserName').value = '';
         document.getElementById('newUserEmail').value = '';
         document.getElementById('newUserDept').value = '';
@@ -1479,7 +1472,7 @@
     };
 
     // ================================================================
-    // SAVE USER – CORRECTED (with admin state restoration)
+    // SAVE USER – NEW VERSION (calls backend for create, client for edit)
     // ================================================================
     window.saveUser = async function() {
         const editId = document.getElementById('editUserId').value;
@@ -1492,7 +1485,6 @@
         const deptSingle = document.getElementById('newUserDept').value;
         const deptSelect = document.getElementById('newUserDepts');
         const selectedDepts = Array.from(deptSelect.selectedOptions).map(opt => opt.value);
-        const adminPassword = document.getElementById('adminPassword').value.trim();
 
         const errorDiv = document.getElementById('userModalError');
         const successDiv = document.getElementById('userModalSuccess');
@@ -1527,116 +1519,72 @@
             errorDiv.style.display = 'block';
             return;
         }
-        if (!adminPassword) {
-            errorDiv.textContent = 'Please enter your admin password to re‑authenticate.';
-            errorDiv.style.display = 'block';
-            return;
-        }
-
-        const adminEmail = currentUser?.email;
-        if (!adminEmail) {
-            errorDiv.textContent = 'Could not determine your admin email. Please log out and in again.';
-            errorDiv.style.display = 'block';
-            return;
-        }
-
-        showToast(editId ? 'Updating user...' : 'Creating user...');
 
         try {
-            let userId = editId;
-
-            // 1. Create the user in Firebase Auth (if new)
             if (!editId) {
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                userId = userCredential.user.uid;
-            }
+                // --- CREATE NEW USER via backend ---
+                const payload = {
+                    email,
+                    password,
+                    name,
+                    role,
+                    whatsapp: role === 'maintenance' ? countryCode + whatsappNumber : '',
+                    department: role === 'requester' ? deptSingle : null,
+                    departments: role === 'maintenance' ? selectedDepts : null
+                };
 
-            // 2. Immediately sign out of the new user (if new) or remain as admin (if edit)
-            if (!editId) {
-                await auth.signOut();
-            }
+                const response = await fetch('/create-user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
 
-            // 3. Sign back in as the admin (if new) or stay as admin (if edit)
-            if (!editId) {
-                await signInWithEmailAndPassword(auth, adminEmail, adminPassword);
-            }
-
-            // ★★★ CRITICAL FIX: Ensure currentUser and userRole are updated ★★★
-            // After sign-in, fetch the admin's own document to set the global state.
-            const adminUser = auth.currentUser;
-            if (adminUser) {
-                const adminDoc = await getDoc(doc(db, USERS_COLL, adminUser.uid));
-                if (adminDoc.exists()) {
-                    const adminData = adminDoc.data();
-                    // Update global currentUser and userRole
-                    currentUser = { id: adminUser.uid, ...adminData };
-                    userRole = adminData.role || 'admin';
-                    // Also update the UI elements
-                    userNameDisplay.textContent = currentUser.name || 'User';
-                    userRoleDisplay.textContent = currentUser.email || '';
-                    roleTag.textContent = userRole;
+                const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(result.error || 'Unknown error');
                 }
-            }
-
-            // 4. Build the user data
-            const fullWhatsApp = role === 'maintenance' ? countryCode + whatsappNumber : '';
-            const userData = {
-                name: name,
-                email: email,
-                role: role,
-                whatsapp: fullWhatsApp,
-                updatedAt: serverTimestamp()
-            };
-
-            if (role === 'requester') {
-                userData.department = deptSingle;
-                userData.departments = null;
-            } else if (role === 'maintenance') {
-                userData.departments = selectedDepts;
-                userData.department = null;
+                successDiv.textContent = `✅ ${result.message}`;
+                successDiv.style.display = 'block';
+                showToast(successDiv.textContent);
+                // Refresh data and UI
+                await fetchData();
+                renderUserList();
+                renderDashboard();
+                closeUserModal();
+                showToast('✅ User created successfully.');
             } else {
-                userData.department = null;
-                userData.departments = null;
-            }
-
-            if (!editId) {
-                userData.approved = true;
-                userData.createdAt = serverTimestamp();
-                await setDoc(doc(db, USERS_COLL, userId), userData);
-                successDiv.textContent = `✅ User ${name} created successfully!`;
-            } else {
-                await updateDoc(doc(db, USERS_COLL, userId), userData);
+                // --- EDIT EXISTING USER (client‑side) ---
+                const userData = {
+                    name: name,
+                    role: role,
+                    whatsapp: role === 'maintenance' ? countryCode + whatsappNumber : '',
+                    updatedAt: serverTimestamp()
+                };
+                if (role === 'requester') {
+                    userData.department = deptSingle;
+                    userData.departments = null;
+                } else if (role === 'maintenance') {
+                    userData.departments = selectedDepts;
+                    userData.department = null;
+                } else {
+                    userData.department = null;
+                    userData.departments = null;
+                }
+                await updateDoc(doc(db, USERS_COLL, editId), userData);
                 successDiv.textContent = `✅ User ${name} updated successfully!`;
+                successDiv.style.display = 'block';
+                showToast(successDiv.textContent);
+                await fetchData();
+                renderUserList();
+                renderDashboard();
+                closeUserModal();
+                showToast('✅ Update completed.');
             }
-
-            successDiv.style.display = 'block';
-            showToast(successDiv.textContent);
-
-            // 5. Refresh data and UI
-            await fetchData();          // This now uses the updated currentUser/userRole
-            renderUserList();
-            renderDashboard();
-            closeUserModal();
-
-            showToast('✅ Operation completed.');
-
         } catch (err) {
             console.error(err);
-            let msg = 'Error: ' + err.message;
-            if (err.code === 'auth/email-already-in-use') {
-                msg = 'This email is already registered. Please use a different email.';
-            } else if (err.code === 'auth/weak-password') {
-                msg = 'Password is too weak. Use at least 6 characters.';
-            } else if (err.code === 'auth/operation-not-allowed') {
-                msg = 'Email/password accounts are not enabled. Enable them in Firebase Console > Authentication > Sign-in methods.';
-            } else if (err.code === 'auth/wrong-password') {
-                msg = 'Admin password is incorrect. Please try again.';
-            } else if (err.code === 'permission-denied') {
-                msg = 'Permission denied. Check your Firestore security rules and ensure your admin document has role: "admin".';
-            }
-            errorDiv.textContent = msg;
+            errorDiv.textContent = 'Error: ' + err.message;
             errorDiv.style.display = 'block';
-            showToast(msg, true);
+            showToast(err.message, true);
         }
     };
 
