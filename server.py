@@ -3,12 +3,10 @@ import os
 import json
 import http.server
 import firebase_admin
-from firebase_admin import credentials, auth
-from google.oauth2 import service_account
-from google.cloud import firestore
+from firebase_admin import credentials, auth, firestore
 
 # ============================================================
-# LOAD FIREBASE CREDENTIALS (from env var or file)
+# LOAD CREDENTIALS AND SET PROJECT ID
 # ============================================================
 cred_json = os.environ.get('FIREBASE_SERVICE_ACCOUNT_JSON')
 
@@ -16,12 +14,11 @@ if cred_json:
     try:
         cred_dict = json.loads(cred_json)
         project_id = cred_dict.get('project_id')
+        # Set environment variable for project ID
+        os.environ['GOOGLE_CLOUD_PROJECT'] = project_id
         print(f"🔑 Project ID: {project_id}")
         print(f"🔑 Client Email: {cred_dict.get('client_email')}")
-        # Create credentials for Admin SDK (Auth)
         cred = credentials.Certificate(cred_dict)
-        # Create credentials for Firestore standalone client
-        firestore_creds = service_account.Credentials.from_service_account_info(cred_dict)
     except json.JSONDecodeError as e:
         print(f"❌ Error: FIREBASE_SERVICE_ACCOUNT_JSON is not valid JSON: {e}")
         raise
@@ -29,37 +26,28 @@ if cred_json:
         print(f"❌ Error loading credentials from JSON: {e}")
         raise
 else:
-    # Fallback to local file (for development)
     try:
         with open("serviceAccountKey.json") as f:
             cred_dict = json.load(f)
             project_id = cred_dict.get('project_id')
+            os.environ['GOOGLE_CLOUD_PROJECT'] = project_id
             cred = credentials.Certificate(cred_dict)
-            firestore_creds = service_account.Credentials.from_service_account_info(cred_dict)
         print("✅ Loaded credentials from local file.")
     except FileNotFoundError:
         print("❌ Error: serviceAccountKey.json not found and FIREBASE_SERVICE_ACCOUNT_JSON is not set.")
         raise
 
 # ============================================================
-# INITIALIZE FIREBASE ADMIN SDK (for Auth only)
+# INITIALIZE FIREBASE ADMIN SDK
 # ============================================================
 try:
     app = firebase_admin.initialize_app(cred)
+    # Use Firestore client with explicit database_id = 'default' (no parentheses)
+    db = firestore.client(app, database_id='default')
     print("✅ Firebase Admin SDK initialized successfully.")
     print(f"✅ Project ID: {app.project_id}")
 except Exception as e:
     print(f"❌ Firebase initialization failed: {e}")
-    raise
-
-# ============================================================
-# INITIALIZE FIRESTORE CLIENT (standalone)
-# ============================================================
-try:
-    db = firestore.Client(project=project_id, credentials=firestore_creds)
-    print("✅ Firestore client initialized successfully.")
-except Exception as e:
-    print(f"❌ Firestore client initialization failed: {e}")
     raise
 
 # ============================================================
@@ -97,7 +85,7 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
             return
 
         try:
-            # Create user in Firebase Auth (using Admin SDK)
+            # Create user in Firebase Auth
             user = auth.create_user(
                 email=email,
                 password=password,
@@ -126,7 +114,7 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
                 user_data['department'] = None
                 user_data['departments'] = None
 
-            # Save to Firestore using standalone client
+            # Save to Firestore
             db.collection('users').document(uid).set(user_data)
 
             self.send_response(200)
