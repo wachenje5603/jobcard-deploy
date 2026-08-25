@@ -2,15 +2,30 @@
 import http.server
 import os
 import json
+import base64
 import firebase_admin
 from firebase_admin import credentials, auth, firestore
 
 # ============================================================
 # INIT FIREBASE ADMIN SDK
 # ============================================================
-cred = credentials.Certificate("serviceAccountKey.json")
+# Option 1: Use environment variable (base64 encoded JSON)
+SERVICE_ACCOUNT_B64 = os.environ.get('FIREBASE_SERVICE_ACCOUNT_B64')
+if SERVICE_ACCOUNT_B64:
+    # Decode from base64
+    service_account_json = base64.b64decode(SERVICE_ACCOUNT_B64).decode('utf-8')
+    cred = credentials.Certificate(json.loads(service_account_json))
+else:
+    # Fallback to file (for local testing)
+    try:
+        cred = credentials.Certificate("serviceAccountKey.json")
+    except FileNotFoundError:
+        print("ERROR: No service account credentials found. Set FIREBASE_SERVICE_ACCOUNT_B64 env var.")
+        raise
+
 firebase_admin.initialize_app(cred)
 db = firestore.client()
+print("✅ Firebase Admin SDK initialized.")
 
 # ============================================================
 # PORT
@@ -39,8 +54,8 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
         password = data.get('password')
         name = data.get('name')
         role = data.get('role', 'requester')
-        department = data.get('department')        # for requester
-        departments = data.get('departments')      # list for maintenance
+        department = data.get('department')
+        departments = data.get('departments')
         whatsapp = data.get('whatsapp', '')
 
         if not email or not password or not name:
@@ -93,6 +108,7 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
         except auth.EmailAlreadyExistsError:
             self.send_json_error(400, "Email already in use.")
         except Exception as e:
+            print("Error creating user:", str(e))
             self.send_json_error(500, f"Server error: {str(e)}")
 
     def send_json_error(self, code, message):
