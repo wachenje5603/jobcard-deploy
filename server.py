@@ -13,7 +13,6 @@ cred_json = os.environ.get('FIREBASE_SERVICE_ACCOUNT_JSON')
 if cred_json:
     try:
         cred_dict = json.loads(cred_json)
-        # Debug: print project ID and client email
         print(f"🔑 Project ID: {cred_dict.get('project_id')}")
         print(f"🔑 Client Email: {cred_dict.get('client_email')}")
         cred = credentials.Certificate(cred_dict)
@@ -35,8 +34,8 @@ else:
 # Initialize Firebase Admin SDK
 try:
     app = firebase_admin.initialize_app(cred)
-    # Explicitly use the default database
-    db = firestore.client(app, database_id='(default)')
+    # Use the default Firestore client (no database_id needed)
+    db = firestore.client()
     print("✅ Firebase Admin SDK initialized successfully.")
     print(f"✅ Project ID: {app.project_id}")
 except Exception as e:
@@ -122,7 +121,6 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
         except auth.EmailAlreadyExistsError:
             self.send_json_error(400, "Email already in use.")
         except Exception as e:
-            # Log the full error for debugging
             print(f"❌ Error creating user: {e}")
             self.send_json_error(500, f"Server error: {str(e)}")
 
