@@ -34,9 +34,11 @@ else:
 
 # Initialize Firebase Admin SDK
 try:
-    firebase_admin.initialize_app(cred)
-    db = firestore.client()
+    app = firebase_admin.initialize_app(cred)
+    # Explicitly use the default database
+    db = firestore.client(app, database_id='(default)')
     print("✅ Firebase Admin SDK initialized successfully.")
+    print(f"✅ Project ID: {app.project_id}")
 except Exception as e:
     print(f"❌ Firebase initialization failed: {e}")
     raise
@@ -131,7 +133,6 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
         self.wfile.write(json.dumps({'success': False, 'error': message}).encode())
 
     def do_GET(self):
-        # Health check
         if self.path == '/health':
             self.send_response(200)
             self.send_header('Content-type', 'text/plain')
@@ -139,7 +140,6 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
             self.wfile.write(b'OK')
             return
 
-        # Serve static files (HTML, CSS, JS)
         path = self.translate_path(self.path)
         if os.path.isdir(path):
             if self.path in ('/', '/index.html'):
