@@ -3,8 +3,7 @@ import os
 import json
 import http.server
 import firebase_admin
-from firebase_admin import credentials, auth
-from google.cloud import firestore  # Direct Firestore client
+from firebase_admin import credentials, auth, firestore
 
 # ============================================================
 # LOAD FIREBASE CREDENTIALS
@@ -14,8 +13,7 @@ cred_json = os.environ.get('FIREBASE_SERVICE_ACCOUNT_JSON')
 if cred_json:
     try:
         cred_dict = json.loads(cred_json)
-        project_id = cred_dict.get('project_id')
-        print(f"🔑 Project ID: {project_id}")
+        print(f"🔑 Project ID: {cred_dict.get('project_id')}")
         print(f"🔑 Client Email: {cred_dict.get('client_email')}")
         cred = credentials.Certificate(cred_dict)
     except json.JSONDecodeError as e:
@@ -29,29 +27,19 @@ else:
     try:
         cred = credentials.Certificate("serviceAccountKey.json")
         print("✅ Loaded credentials from local file.")
-        # Extract project_id from file for explicit use
-        with open("serviceAccountKey.json") as f:
-            cred_dict = json.load(f)
-            project_id = cred_dict.get('project_id')
     except FileNotFoundError:
         print("❌ Error: serviceAccountKey.json not found and FIREBASE_SERVICE_ACCOUNT_JSON is not set.")
         raise
 
-# Initialize Firebase Admin SDK (for Auth)
+# Initialize Firebase Admin SDK
 try:
     app = firebase_admin.initialize_app(cred)
+    # Use the Admin SDK's Firestore client (no database_id needed)
+    db = firestore.client()
     print("✅ Firebase Admin SDK initialized successfully.")
-    print(f"✅ Project ID: {project_id}")
+    print(f"✅ Project ID: {app.project_id}")
 except Exception as e:
     print(f"❌ Firebase initialization failed: {e}")
-    raise
-
-# Initialize Firestore client explicitly with project ID and credentials
-try:
-    db = firestore.Client(project=project_id, credentials=cred)
-    print("✅ Firestore client initialized successfully.")
-except Exception as e:
-    print(f"❌ Firestore client initialization failed: {e}")
     raise
 
 # ============================================================
@@ -118,7 +106,7 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
                 user_data['department'] = None
                 user_data['departments'] = None
 
-            # Save to Firestore using the direct client
+            # Save to Firestore using Admin SDK client
             db.collection('users').document(uid).set(user_data)
 
             self.send_response(200)
