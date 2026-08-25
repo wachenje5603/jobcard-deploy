@@ -13,20 +13,33 @@ cred_json = os.environ.get('FIREBASE_SERVICE_ACCOUNT_JSON')
 if cred_json:
     try:
         cred_dict = json.loads(cred_json)
+        # Debug: print project ID and client email
+        print(f"🔑 Project ID: {cred_dict.get('project_id')}")
+        print(f"🔑 Client Email: {cred_dict.get('client_email')}")
         cred = credentials.Certificate(cred_dict)
     except json.JSONDecodeError as e:
         print(f"❌ Error: FIREBASE_SERVICE_ACCOUNT_JSON is not valid JSON: {e}")
         raise
+    except Exception as e:
+        print(f"❌ Error loading credentials from JSON: {e}")
+        raise
 else:
+    # Fallback to local file (for development)
     try:
         cred = credentials.Certificate("serviceAccountKey.json")
+        print("✅ Loaded credentials from local file.")
     except FileNotFoundError:
         print("❌ Error: serviceAccountKey.json not found and FIREBASE_SERVICE_ACCOUNT_JSON is not set.")
         raise
 
-firebase_admin.initialize_app(cred)
-db = firestore.client()
-print("✅ Firebase Admin SDK initialized successfully.")
+# Initialize Firebase Admin SDK
+try:
+    firebase_admin.initialize_app(cred)
+    db = firestore.client()
+    print("✅ Firebase Admin SDK initialized successfully.")
+except Exception as e:
+    print(f"❌ Firebase initialization failed: {e}")
+    raise
 
 # ============================================================
 # HTTP SERVER
@@ -46,8 +59,8 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
         body = self.rfile.read(content_length)
         try:
             data = json.loads(body)
-        except:
-            self.send_json_error(400, "Invalid JSON")
+        except json.JSONDecodeError as e:
+            self.send_json_error(400, f"Invalid JSON: {str(e)}")
             return
 
         email = data.get('email')
@@ -63,6 +76,7 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
             return
 
         try:
+            # Create user in Firebase Auth
             user = auth.create_user(
                 email=email,
                 password=password,
@@ -70,6 +84,7 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
             )
             uid = user.uid
 
+            # Build Firestore user document
             user_data = {
                 'name': name,
                 'email': email,
@@ -90,6 +105,7 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
                 user_data['department'] = None
                 user_data['departments'] = None
 
+            # Save to Firestore
             db.collection('users').document(uid).set(user_data)
 
             self.send_response(200)
@@ -104,6 +120,8 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
         except auth.EmailAlreadyExistsError:
             self.send_json_error(400, "Email already in use.")
         except Exception as e:
+            # Log the full error for debugging
+            print(f"❌ Error creating user: {e}")
             self.send_json_error(500, f"Server error: {str(e)}")
 
     def send_json_error(self, code, message):
@@ -113,6 +131,7 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
         self.wfile.write(json.dumps({'success': False, 'error': message}).encode())
 
     def do_GET(self):
+        # Health check
         if self.path == '/health':
             self.send_response(200)
             self.send_header('Content-type', 'text/plain')
@@ -120,6 +139,7 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
             self.wfile.write(b'OK')
             return
 
+        # Serve static files (HTML, CSS, JS)
         path = self.translate_path(self.path)
         if os.path.isdir(path):
             if self.path in ('/', '/index.html'):
