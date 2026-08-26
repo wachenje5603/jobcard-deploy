@@ -6,44 +6,30 @@ import firebase_admin
 from firebase_admin import credentials, auth, firestore
 
 # ============================================================
-# LOAD CREDENTIALS AND SET PROJECT ID
+# LOAD CREDENTIALS FROM FILE (local or secret file on Render)
 # ============================================================
-cred_json = os.environ.get('FIREBASE_SERVICE_ACCOUNT_JSON')
-
-if cred_json:
-    try:
-        cred_dict = json.loads(cred_json)
+try:
+    with open("serviceAccountKey.json") as f:
+        cred_dict = json.load(f)
         project_id = cred_dict.get('project_id')
-        # Set environment variable for project ID
-        os.environ['GOOGLE_CLOUD_PROJECT'] = project_id
+        os.environ['GOOGLE_CLOUD_PROJECT'] = project_id   # helps the SDK
         print(f"🔑 Project ID: {project_id}")
         print(f"🔑 Client Email: {cred_dict.get('client_email')}")
         cred = credentials.Certificate(cred_dict)
-    except json.JSONDecodeError as e:
-        print(f"❌ Error: FIREBASE_SERVICE_ACCOUNT_JSON is not valid JSON: {e}")
-        raise
-    except Exception as e:
-        print(f"❌ Error loading credentials from JSON: {e}")
-        raise
-else:
-    try:
-        with open("serviceAccountKey.json") as f:
-            cred_dict = json.load(f)
-            project_id = cred_dict.get('project_id')
-            os.environ['GOOGLE_CLOUD_PROJECT'] = project_id
-            cred = credentials.Certificate(cred_dict)
-        print("✅ Loaded credentials from local file.")
-    except FileNotFoundError:
-        print("❌ Error: serviceAccountKey.json not found and FIREBASE_SERVICE_ACCOUNT_JSON is not set.")
-        raise
+    print("✅ Loaded credentials from file.")
+except FileNotFoundError:
+    print("❌ Error: serviceAccountKey.json not found. Place it in the project root.")
+    raise
+except json.JSONDecodeError as e:
+    print(f"❌ Error: serviceAccountKey.json is not valid JSON: {e}")
+    raise
 
 # ============================================================
 # INITIALIZE FIREBASE ADMIN SDK
 # ============================================================
 try:
     app = firebase_admin.initialize_app(cred)
-    # Use Firestore client with explicit database_id = 'default' (no parentheses)
-    db = firestore.client(app, database_id='default')
+    db = firestore.client()   # uses the default database
     print("✅ Firebase Admin SDK initialized successfully.")
     print(f"✅ Project ID: {app.project_id}")
 except Exception as e:
@@ -68,8 +54,8 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
         body = self.rfile.read(content_length)
         try:
             data = json.loads(body)
-        except json.JSONDecodeError as e:
-            self.send_json_error(400, f"Invalid JSON: {str(e)}")
+        except json.JSONDecodeError:
+            self.send_json_error(400, "Invalid JSON")
             return
 
         email = data.get('email')
@@ -85,7 +71,6 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
             return
 
         try:
-            # Create user in Firebase Auth
             user = auth.create_user(
                 email=email,
                 password=password,
@@ -93,7 +78,6 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
             )
             uid = user.uid
 
-            # Build Firestore user document
             user_data = {
                 'name': name,
                 'email': email,
@@ -114,7 +98,6 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
                 user_data['department'] = None
                 user_data['departments'] = None
 
-            # Save to Firestore
             db.collection('users').document(uid).set(user_data)
 
             self.send_response(200)
