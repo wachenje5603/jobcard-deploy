@@ -17,271 +17,46 @@
     </script>
 
     <style>
-        /* ===== STYLES ===== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f4f6f9;
-            padding: 20px;
-            color: #1e2a3a;
-        }
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background: white;
-            padding: 25px 30px;
-            border-radius: 12px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-        }
-        .hospital-header {
-            border-bottom: 4px solid #C8102E;
-            padding-bottom: 12px;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        .logo-area {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .logo-area .logo-icon {
-            font-size: 36px;
-            background: #C8102E;
-            color: white;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-        }
-        .logo-area h1 {
-            font-size: 24px;
-            color: #C8102E;
-            letter-spacing: 1px;
-            font-weight: 700;
-        }
-        .logo-area .sub {
-            font-size: 13px;
-            color: #333;
-            font-weight: 500;
-        }
-        .hospital-header .badge {
-            background: #C8102E;
-            color: white;
-            padding: 6px 16px;
-            border-radius: 30px;
-            font-size: 14px;
-            font-weight: 600;
-        }
-        .card-title {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #f8f9fc;
-            padding: 8px 16px;
-            border-radius: 8px;
-            margin-bottom: 18px;
-        }
-        .card-title h2 {
-            font-size: 20px;
-            color: #1e2a3a;
-            font-weight: 600;
-        }
-        .card-title .status {
-            font-size: 13px;
-            padding: 4px 14px;
-            border-radius: 20px;
-            font-weight: 600;
-            background: #28a745;
-            color: white;
-        }
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 14px 24px;
-        }
-        .full-width {
-            grid-column: 1 / -1;
-        }
-        .field-group {
-            display: flex;
-            flex-direction: column;
-            margin-bottom: 4px;
-        }
-        .field-group label {
-            font-size: 12px;
-            font-weight: 600;
-            color: #495057;
-            margin-bottom: 3px;
-            text-transform: uppercase;
-            letter-spacing: 0.4px;
-        }
-        .field-group input,
-        .field-group select,
-        .field-group textarea {
-            padding: 8px 12px;
-            border: 1px solid #ced4da;
-            border-radius: 6px;
-            font-size: 14px;
-            background: white;
-            transition: 0.2s;
-            font-family: inherit;
-        }
-        .field-group input:focus,
-        .field-group select:focus,
-        .field-group textarea:focus {
-            border-color: #C8102E;
-            outline: 0;
-            box-shadow: 0 0 0 3px rgba(200, 16, 46, 0.15);
-        }
-        .field-group input[readonly] {
-            background: #e9ecef;
-            cursor: default;
-        }
-        textarea {
-            resize: vertical;
-            min-height: 50px;
-        }
-        .action-bar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin: 20px 0 12px 0;
-            padding: 16px 0;
-            border-top: 1px solid #e9ecef;
-            border-bottom: 1px solid #e9ecef;
-        }
-        .btn {
-            padding: 10px 24px;
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            transition: 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .btn-success {
-            background: #28a745;
-            color: white;
-        }
-        .btn-success:hover {
-            background: #1e7e34;
-        }
-        .btn-outline {
-            background: transparent;
-            border: 1.5px solid #6c757d;
-            color: #6c757d;
-        }
-        .btn-outline:hover {
-            background: #6c757d;
-            color: white;
-        }
-        .btn-danger {
-            background: #dc3545;
-            color: white;
-        }
-        .btn-danger:hover {
-            background: #b02a37;
-        }
-        .btn-info {
-            background: #17a2b8;
-            color: white;
-        }
-        .btn-info:hover {
-            background: #138496;
-        }
-        .btn-sm {
-            padding: 4px 12px;
-            font-size: 12px;
-            border-radius: 4px;
-        }
+        /* (styles unchanged – keep your existing CSS) */
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#f4f6f9; padding:20px; color:#1e2a3a; }
+        .container { max-width:1000px; margin:0 auto; background:white; padding:25px 30px; border-radius:12px; box-shadow:0 8px 30px rgba(0,0,0,0.12); }
+        .hospital-header { border-bottom:4px solid #C8102E; padding-bottom:12px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; }
+        .logo-area { display:flex; align-items:center; gap:15px; }
+        .logo-area .logo-icon { font-size:36px; background:#C8102E; color:white; width:60px; height:60px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; }
+        .logo-area h1 { font-size:24px; color:#C8102E; letter-spacing:1px; font-weight:700; }
+        .logo-area .sub { font-size:13px; color:#333; font-weight:500; }
+        .hospital-header .badge { background:#C8102E; color:white; padding:6px 16px; border-radius:30px; font-size:14px; font-weight:600; }
+        .card-title { display:flex; justify-content:space-between; align-items:center; background:#f8f9fc; padding:8px 16px; border-radius:8px; margin-bottom:18px; }
+        .card-title h2 { font-size:20px; color:#1e2a3a; font-weight:600; }
+        .card-title .status { font-size:13px; padding:4px 14px; border-radius:20px; font-weight:600; background:#28a745; color:white; }
+        .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:14px 24px; }
+        .full-width { grid-column:1 / -1; }
+        .field-group { display:flex; flex-direction:column; margin-bottom:4px; }
+        .field-group label { font-size:12px; font-weight:600; color:#495057; margin-bottom:3px; text-transform:uppercase; letter-spacing:0.4px; }
+        .field-group input, .field-group select, .field-group textarea { padding:8px 12px; border:1px solid #ced4da; border-radius:6px; font-size:14px; background:white; transition:0.2s; font-family:inherit; }
+        .field-group input:focus, .field-group select:focus, .field-group textarea:focus { border-color:#C8102E; outline:0; box-shadow:0 0 0 3px rgba(200,16,46,0.15); }
+        .field-group input[readonly] { background:#e9ecef; cursor:default; }
+        textarea { resize:vertical; min-height:50px; }
+        .action-bar { display:flex; flex-wrap:wrap; gap:12px; margin:20px 0 12px 0; padding:16px 0; border-top:1px solid #e9ecef; border-bottom:1px solid #e9ecef; }
+        .btn { padding:10px 24px; border:none; border-radius:6px; font-weight:600; font-size:14px; cursor:pointer; transition:0.2s; display:inline-flex; align-items:center; gap:8px; }
+        .btn-success { background:#28a745; color:white; }
+        .btn-success:hover { background:#1e7e34; }
+        .btn-outline { background:transparent; border:1.5px solid #6c757d; color:#6c757d; }
+        .btn-outline:hover { background:#6c757d; color:white; }
+        .btn-danger { background:#dc3545; color:white; }
+        .btn-danger:hover { background:#b02a37; }
+        .btn-info { background:#17a2b8; color:white; }
+        .btn-info:hover { background:#138496; }
+        .btn-sm { padding:4px 12px; font-size:12px; border-radius:4px; }
 
-        .toast {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #1e2a3a;
-            color: white;
-            padding: 14px 28px;
-            border-radius: 8px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-            font-weight: 500;
-            z-index: 999;
-            transform: translateY(-20px);
-            opacity: 0;
-            transition: 0.3s ease;
-            border-left: 6px solid #C8102E;
-        }
-        .toast.show {
-            transform: translateY(0);
-            opacity: 1;
-        }
-        .loading-spinner {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
+        .toast { position:fixed; top:20px; right:20px; background:#1e2a3a; color:white; padding:14px 28px; border-radius:8px; box-shadow:0 6px 20px rgba(0,0,0,0.25); font-weight:500; z-index:999; transform:translateY(-20px); opacity:0; transition:0.3s ease; border-left:6px solid #C8102E; }
+        .toast.show { transform:translateY(0); opacity:1; }
+        .loading-spinner { display:inline-block; width:16px; height:16px; border:3px solid rgba(255,255,255,0.3); border-radius:50%; border-top-color:#fff; animation:spin 0.8s linear infinite; }
+        @keyframes spin { to { transform:rotate(360deg); } }
 
-        @media print {
-            .action-bar,
-            .btn,
-            .no-print {
-                display: none !important;
-            }
-            .field-group input,
-            .field-group select,
-            .field-group textarea {
-                border: none;
-                background: transparent;
-                padding: 2px 0;
-                box-shadow: none;
-            }
-            .container {
-                box-shadow: none;
-                padding: 10px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .grid-2 {
-                grid-template-columns: 1fr;
-            }
-            .container {
-                padding: 15px;
-            }
-            .hospital-header {
-                flex-direction: column;
-                align-items: start;
-                gap: 6px;
-            }
-            .action-bar {
-                flex-direction: column;
-            }
-            .action-bar .btn {
-                justify-content: center;
-            }
-        }
+        @media print { .action-bar,.btn,.no-print { display:none !important; } .field-group input,.field-group select,.field-group textarea { border:none; background:transparent; padding:2px 0; box-shadow:none; } .container { box-shadow:none; padding:10px; } }
+        @media (max-width:768px) { .grid-2 { grid-template-columns:1fr; } .container { padding:15px; } .hospital-header { flex-direction:column; align-items:start; gap:6px; } .action-bar { flex-direction:column; } .action-bar .btn { justify-content:center; } }
     </style>
 </head>
 <body>
@@ -311,7 +86,6 @@
             <div class="grid-2">
                 <div class="field-group">
                     <label>Request No.</label>
-                    <!-- UPDATED: Placeholder until saved -->
                     <input type="text" id="reqNo" readonly placeholder="Will be assigned on save" />
                 </div>
                 <div class="field-group">
@@ -378,7 +152,7 @@
         </form>
 
         <footer style="margin-top:22px;font-size:12px;color:#6c757d;text-align:center;border-top:1px solid #e9ecef;padding-top:14px;">
-            🔥 Firestore‑powered · 📧 Email Notifications · MCRH Request Slip v8.0 (No WhatsApp, Fixed Numbering)
+            🔥 Firestore‑powered · 📧 Email Notifications · MCRH Request Slip v8.0
         </footer>
     </div>
 
@@ -399,20 +173,8 @@
         };
 
         import { initializeApp } from 'firebase/app';
-        import {
-            getAuth,
-            onAuthStateChanged,
-            signOut
-        } from 'firebase/auth';
-        import {
-            getFirestore,
-            collection,
-            addDoc,
-            getDoc,
-            doc,
-            runTransaction,
-            serverTimestamp
-        } from 'firebase/firestore';
+        import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
+        import { getFirestore, collection, addDoc, getDoc, doc, runTransaction, serverTimestamp } from 'firebase/firestore';
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -428,14 +190,13 @@
         let currentDocId = null;
 
         // ============================================================
-        // AUTHENTICATION & APPROVAL CHECK
+        // AUTH
         // ============================================================
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
                 window.location.href = 'login.html';
                 return;
             }
-
             try {
                 const userDoc = await getDoc(doc(db, USERS_COLL, user.uid));
                 if (!userDoc.exists()) {
@@ -450,15 +211,8 @@
                     window.location.href = 'login.html';
                     return;
                 }
-
                 currentUser = { id: user.uid, ...userData };
-                document.getElementById('reqRequester').value = currentUser.name || '';
-                if (currentUser.role === 'requester' && currentUser.department) {
-                    document.getElementById('reqUnit').value = currentUser.department;
-                }
-
-                await init();
-
+                init();
             } catch (err) {
                 console.error('Auth error:', err);
                 window.location.href = 'login.html';
@@ -469,9 +223,7 @@
         // LOGOUT
         // ============================================================
         window.logout = function() {
-            signOut(auth).then(() => {
-                window.location.href = 'login.html';
-            });
+            signOut(auth).then(() => window.location.href = 'login.html');
         };
 
         // ============================================================
@@ -496,19 +248,16 @@
                 const newNumber = await runTransaction(db, async (transaction) => {
                     const docSnap = await transaction.get(counterDocRef);
                     let currentCount;
-
                     if (docSnap.exists()) {
-                        currentCount = docSnap.data().count || 3;
+                        currentCount = docSnap.data().count || 0;
                     } else {
-                        currentCount = 3;
+                        currentCount = 0;
                         transaction.set(counterDocRef, { count: currentCount });
                     }
-
                     const next = currentCount + 1;
                     transaction.update(counterDocRef, { count: next });
                     return next;
                 });
-
                 return `REQ-${String(newNumber).padStart(3, '0')}`;
             } catch (error) {
                 console.error('Error generating request number:', error);
@@ -535,7 +284,7 @@
         document.getElementById('reqType').addEventListener('change', toggleEquipFields);
 
         // ============================================================
-        // SAVE REQUEST – NUMBER IS GENERATED ONLY HERE
+        // SAVE REQUEST
         // ============================================================
         window.saveRequest = async function() {
             const requester = document.getElementById('reqRequester').value.trim();
@@ -553,9 +302,8 @@
                 return;
             }
 
-            // ✅ GENERATE THE NUMBER ONLY NOW (on save)
             const reqNo = await getNextRequestNumber();
-            document.getElementById('reqNo').value = reqNo; // update the field
+            document.getElementById('reqNo').value = reqNo;
 
             const data = {
                 requestNo: reqNo,
@@ -578,19 +326,16 @@
             try {
                 await addDoc(collection(db, REQUESTS_COLL), data);
                 showToast(`✅ Request ${reqNo} saved successfully.`);
-                // Reset form to a clean state for the next request
                 resetRequestForm();
-                // The reset will set the placeholder back.
             } catch (err) {
                 console.error('❌ Save error:', err);
                 showToast('❌ Error: ' + err.message, true);
-                // Revert the number field to placeholder if save failed
                 document.getElementById('reqNo').value = 'Will be assigned on save';
             }
         };
 
         // ============================================================
-        // EMAIL NOTIFICATION (remains)
+        // EMAIL NOTIFICATION
         // ============================================================
         window.sendEmailNotification = function() {
             const reqNo = document.getElementById('reqNo').value || 'New Request';
@@ -616,7 +361,7 @@
         };
 
         // ============================================================
-        // RESET FORM – sets number to placeholder, does NOT increment counter
+        // RESET FORM – sets number to placeholder
         // ============================================================
         function resetRequestForm() {
             document.getElementById('reqDateTime').value = new Date().toISOString().slice(0, 16);
@@ -626,11 +371,9 @@
             document.getElementById('reqSerial').value = '';
             document.getElementById('reqModel').value = '';
             document.getElementById('reqComplaint').value = '';
-            // ✅ Reset number to placeholder – NO COUNTER INCREMENT
             document.getElementById('reqNo').value = 'Will be assigned on save';
             toggleEquipFields();
             currentDocId = null;
-            // Re-populate requester and unit
             if (currentUser) {
                 document.getElementById('reqRequester').value = currentUser.name || '';
                 if (currentUser.role === 'requester' && currentUser.department) {
@@ -678,11 +421,10 @@
         }
 
         // ============================================================
-        // INIT – NO NUMBER GENERATION ON LOAD
+        // INIT
         // ============================================================
         async function init() {
             document.getElementById('reqDateTime').value = new Date().toISOString().slice(0, 16);
-            // ✅ Set placeholder – absolutely NO counter call here
             document.getElementById('reqNo').value = 'Will be assigned on save';
             if (currentUser) {
                 document.getElementById('reqRequester').value = currentUser.name || '';
@@ -691,10 +433,7 @@
                 }
             }
             toggleEquipFields();
-
-            // If URL has ?view=id, load that request for viewing/printing
             await loadRequestFromUrl();
-
             console.log('✅ Request page ready. Numbering only on save.');
         }
 

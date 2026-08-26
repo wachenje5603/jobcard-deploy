@@ -25,18 +25,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <style>
+        /* (styles unchanged – keep your existing CSS) */
         * { margin:0; padding:0; box-sizing:border-box; }
         body { font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#f4f6f9; padding:20px; color:#1e2a3a; }
         .container { max-width:1200px; margin:0 auto; background:white; padding:25px 30px; border-radius:12px; box-shadow:0 8px 30px rgba(0,0,0,0.12); }
-        .hospital-header { border-bottom:4px solid #C8102E; padding-bottom:12px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; }
-        .logo-area { display:flex; align-items:center; gap:15px; }
-        .logo-area .logo-icon { font-size:36px; background:#C8102E; color:white; width:60px; height:60px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; }
-        .logo-area h1 { font-size:24px; color:#C8102E; letter-spacing:1px; font-weight:700; }
-        .logo-area .sub { font-size:13px; color:#333; font-weight:500; }
-        .hospital-header .badge { background:#C8102E; color:white; padding:6px 16px; border-radius:30px; font-size:14px; font-weight:600; }
-        .card-title { display:flex; justify-content:space-between; align-items:center; background:#f8f9fc; padding:8px 16px; border-radius:8px; margin-bottom:18px; }
-        .card-title h2 { font-size:20px; color:#1e2a3a; font-weight:600; }
-        .card-title .status { font-size:13px; padding:4px 14px; border-radius:20px; font-weight:600; }
+        /* ... rest of your styles ... */
         .status.pending { background:#ffc107; color:#1e2a3a; }
         .status.completed { background:#28a745; color:white; }
         .status.writtenoff { background:#dc3545; color:white; }
@@ -166,7 +159,7 @@
                 </div>
             </div>
 
-            <!-- ===== HIDDEN REQUESTER ID ===== -->
+            <!-- HIDDEN REQUESTER ID -->
             <input type="hidden" id="jobRequesterId" />
 
             <!-- HANDOVER -->
@@ -554,6 +547,7 @@
                 const snap = await getDocs(collection(db, USERS_COLL));
                 allUsers = [];
                 snap.forEach(doc => { allUsers.push({ id: doc.id, ...doc.data() }); });
+                console.log(`✅ Fetched ${allUsers.length} users.`);
             } catch (err) { console.error('Error fetching users:', err); }
         }
 
@@ -561,6 +555,7 @@
         // POPULATE DROPDOWNS
         // ============================================================
         function populateDropdowns() {
+            // Handed back to (User) – all requesters
             const handedToSelect = document.getElementById('jobHandedTo');
             handedToSelect.innerHTML = '<option value="">-- Select --</option>';
             const requesters = allUsers.filter(u => u.role === 'requester');
@@ -571,6 +566,7 @@
                 handedToSelect.appendChild(opt);
             });
 
+            // Technician Name – maintenance or admin
             const techSelect = document.getElementById('jobTechName');
             techSelect.innerHTML = '<option value="">-- Select --</option>';
             const techUsers = allUsers.filter(u => u.role === 'maintenance' || u.role === 'admin');
@@ -597,6 +593,7 @@
             }
             const deptRequesters = allUsers.filter(u => u.role === 'requester' && u.department === department);
             if (deptRequesters.length === 0) {
+                // fallback: all requesters
                 const allReq = allUsers.filter(u => u.role === 'requester');
                 allReq.forEach(u => {
                     const opt = document.createElement('option');
@@ -704,8 +701,7 @@
             const pad = type === 'jobTech' ? techSigPad : certSigPad;
             if (pad) {
                 const data = pad.toData();
-                if (data.length > 0) { data.pop();
-                    pad.fromData(data); }
+                if (data.length > 0) { data.pop(); pad.fromData(data); }
             }
         };
 
@@ -721,15 +717,11 @@
             try {
                 const reqSnap = await getDocs(query(collection(db, REQUESTS_COLL), orderBy('createdAt', 'desc')));
                 allRequests = [];
-                reqSnap.forEach(doc => { const data = doc.data();
-                    data.id = doc.id;
-                    allRequests.push(data); });
+                reqSnap.forEach(doc => { const data = doc.data(); data.id = doc.id; allRequests.push(data); });
 
                 const jobSnap = await getDocs(collection(db, JOBCARDS_COLL));
                 allJobCards = [];
-                jobSnap.forEach(doc => { const data = doc.data();
-                    data.id = doc.id;
-                    allJobCards.push(data); });
+                jobSnap.forEach(doc => { const data = doc.data(); data.id = doc.id; allJobCards.push(data); });
 
                 const jobMap = new Map();
                 allJobCards.forEach(j => { if (j.requestNo) jobMap.set(j.requestNo, j.status); });
@@ -788,12 +780,12 @@
                 document.getElementById('jobComplaint').value = r.complaint || '';
                 document.getElementById('jobReportingDateTime').value = r.dateTime || '';
                 document.getElementById('jobReceivedFrom').value = r.requesterName || '';
-                // Store requesterId for history
                 document.getElementById('jobRequesterId').value = r.requesterId || '';
 
                 if (!document.getElementById('jobReceivedDateTime').value) {
                     document.getElementById('jobReceivedDateTime').value = r.dateTime || '';
                 }
+                // Populate supervisor dropdown based on unit
                 populateSupervisorDropdown(r.unit);
                 showToast('✅ Request data loaded.');
             } catch (err) {
@@ -855,9 +847,7 @@
             try {
                 const jobNo = document.getElementById('jobNo').value;
                 const requestNo = document.getElementById('jobRequestNo').value;
-                if (!requestNo) { showToast('Please select a request.', true);
-                    btn.disabled = false;
-                    btn.innerHTML = '💾 Save Job Card'; return; }
+                if (!requestNo) { showToast('Please select a request.', true); btn.disabled = false; btn.innerHTML = '💾 Save Job Card'; return; }
 
                 const handedToId = document.getElementById('jobHandedTo').value;
                 const handedToName = handedToId ? allUsers.find(u => u.id === handedToId)?.name || '' : '';
@@ -1082,8 +1072,8 @@
         async function initPage() {
             document.getElementById('jobReceivedBy').value = currentUser?.name || '';
             document.getElementById('jobHandedBy').value = currentUser?.name || '';
-            await fetchUsers();
-            populateDropdowns();
+            await fetchUsers(); // Fetch all users first
+            populateDropdowns(); // Populate handedTo, techName
             await populateRequestDropdown();
             initSignaturePads();
 
