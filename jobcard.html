@@ -390,7 +390,7 @@
         </form>
 
         <footer style="margin-top:22px;font-size:12px;color:#6c757d;text-align:center;border-top:1px solid #e9ecef;padding-top:14px;">
-            🔥 Firestore‑powered · ✍️ Drawable Signatures · MCRH Job Card v8.1
+            🔥 Firestore‑powered · ✍️ Drawable Signatures · MCRH Job Card v8.2
         </footer>
     </div>
 
@@ -535,13 +535,12 @@
             try {
                 const newNumber = await runTransaction(db, async (transaction) => {
                     const docSnap = await transaction.get(counterDocRef);
-                    let currentCount;
-                    if (docSnap.exists()) {
-                        currentCount = docSnap.data().count || 0;
-                    } else {
-                        currentCount = 0;
-                        transaction.set(counterDocRef, { count: currentCount });
+                    if (!docSnap.exists()) {
+                        // Should not happen because we pre-created it, but fallback
+                        transaction.set(counterDocRef, { count: 0 });
+                        return 1;
                     }
+                    const currentCount = docSnap.data().count || 0;
                     const next = currentCount + 1;
                     transaction.update(counterDocRef, { count: next });
                     return next;
@@ -596,10 +595,14 @@
             });
         }
 
+        // ============================================================
+        // POPULATE SUPERVISOR DROPDOWN (based on department)
+        // ============================================================
         function populateSupervisorDropdown(department) {
             const certSelect = document.getElementById('jobCertName');
             certSelect.innerHTML = '<option value="">-- Select --</option>';
             if (!department) {
+                // No department: show all requesters
                 const requesters = allUsers.filter(u => u.role === 'requester');
                 requesters.forEach(u => {
                     const opt = document.createElement('option');
@@ -609,9 +612,10 @@
                 });
                 return;
             }
+            // Find requesters with the exact department
             const deptRequesters = allUsers.filter(u => u.role === 'requester' && u.department === department);
             if (deptRequesters.length === 0) {
-                // fallback: all requesters
+                // Fallback to all requesters
                 const allReq = allUsers.filter(u => u.role === 'requester');
                 allReq.forEach(u => {
                     const opt = document.createElement('option');
@@ -619,6 +623,7 @@
                     opt.textContent = u.name + ' (' + (u.department || '') + ')';
                     certSelect.appendChild(opt);
                 });
+                console.warn(`No requesters found for department "${department}", showing all.`);
             } else {
                 deptRequesters.forEach(u => {
                     const opt = document.createElement('option');
@@ -733,7 +738,6 @@
             const dropdown = document.getElementById('jobRequestNo');
             dropdown.innerHTML = '<option value="">-- Select Request --</option>';
             try {
-                // Build query based on user role
                 let requestsQuery;
                 const isAdmin = currentUser?.role === 'admin';
                 const isMaintenance = currentUser?.role === 'maintenance';
@@ -746,7 +750,6 @@
                         showToast('No departments assigned to you.', true);
                         return;
                     }
-                    // Firestore 'in' queries are limited to 10 values, but we can work with it.
                     requestsQuery = query(collection(db, REQUESTS_COLL), where('unit', 'in', depts), orderBy('createdAt', 'desc'));
                 } else {
                     return;
@@ -756,9 +759,7 @@
                 allRequests = [];
                 reqSnap.forEach(doc => { const data = doc.data(); data.id = doc.id; allRequests.push(data); });
 
-                // Fetch all jobcards to map which requests already have jobs
-                // We need to read jobcards, but rules allow if in department or assigned.
-                // For admin, all; for maintenance, only those in their departments.
+                // Fetch jobcards to filter out already completed/written off
                 let jobQuery;
                 if (isAdmin) {
                     jobQuery = collection(db, JOBCARDS_COLL);
@@ -783,7 +784,6 @@
                     if (j.requestNo) jobMap.set(j.requestNo, j.status);
                 });
 
-                // Filter out requests that already have a job (Completed or Written Off)
                 const availableRequests = allRequests.filter(r => {
                     const jobStatus = jobMap.get(r.requestNo);
                     return jobStatus !== 'Completed' && jobStatus !== 'Written Off';
@@ -813,11 +813,12 @@
         }
 
         // ============================================================
-        // LOAD REQUEST DATA
+        // LOAD REQUEST DATA – FIXED: now populates all fields, including supervisor dropdown
         // ============================================================
         window.loadRequestData = async function() {
             const requestNo = document.getElementById('jobRequestNo').value;
             if (!requestNo) {
+                // Clear fields
                 ['jobRequester', 'jobUnit', 'jobEquipName', 'jobInventory', 'jobSerial', 'jobModel', 'jobComplaint']
                 .forEach(id => document.getElementById(id).value = '');
                 document.getElementById('jobReportingDateTime').value = '';
@@ -826,13 +827,21 @@
                 document.getElementById('jobRequesterId').value = '';
                 return;
             }
+
             try {
                 const q = query(collection(db, REQUESTS_COLL), where('requestNo', '==', requestNo));
                 const snap = await getDocs(q);
+                if (snap.empty) {
+                    showToast('Request not found.', true);
+                    return;
+                }
                 let r = null;
                 snap.forEach(doc => { r = doc.data(); });
                 if (!r) return;
 
+                console.log('📄 Loaded request data:', r);
+
+                // Populate fields
                 document.getElementById('jobRequester').value = r.requesterName || '';
                 document.getElementById('jobUnit').value = r.unit || '';
                 document.getElementById('jobEquipName').value = r.equipName || '';
@@ -847,9 +856,13 @@
                 if (!document.getElementById('jobReceivedDateTime').value) {
                     document.getElementById('jobReceivedDateTime').value = r.dateTime || '';
                 }
+
+                // ★★★ Fix: populate supervisor dropdown based on unit
                 populateSupervisorDropdown(r.unit);
+
                 showToast('✅ Request data loaded.');
             } catch (err) {
+                console.error('Error loading request:', err);
                 showToast('Error loading request: ' + err.message, true);
             }
         };
