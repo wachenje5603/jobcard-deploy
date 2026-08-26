@@ -390,7 +390,7 @@
         </form>
 
         <footer style="margin-top:22px;font-size:12px;color:#6c757d;text-align:center;border-top:1px solid #e9ecef;padding-top:14px;">
-            🔥 Firestore‑powered · ✍️ Drawable Signatures · MCRH Job Card v8.3
+            🔥 Firestore‑powered · ✍️ Drawable Signatures · MCRH Job Card v8.4
         </footer>
     </div>
 
@@ -475,6 +475,10 @@
                     return;
                 }
                 currentUser = { id: user.uid, ...userData };
+
+                // DEBUG: log the user's departments
+                console.log('🔍 Current user departments:', currentUser.departments);
+
                 await initPage();
             } catch (err) {
                 console.error('Auth error:', err);
@@ -814,7 +818,7 @@
         }
 
         // ============================================================
-        // LOAD REQUEST DATA – FIXED: use direct getDoc with docId
+        // LOAD REQUEST DATA – with debug logs
         // ============================================================
         window.loadRequestData = async function() {
             const dropdown = document.getElementById('jobRequestNo');
@@ -834,14 +838,17 @@
             }
 
             try {
-                // Direct document read using the stored docId – bypasses query limitations
+                // Direct document read using the stored docId
                 const docSnap = await getDoc(doc(db, REQUESTS_COLL, docId));
                 if (!docSnap.exists()) {
                     showToast('Request not found.', true);
                     return;
                 }
                 const r = docSnap.data();
-                console.log('📄 Loaded request data:', r);
+
+                // DEBUG: log the request's unit and the user's departments
+                console.log('📄 Request unit:', r.unit);
+                console.log('🔧 User departments:', currentUser?.departments);
 
                 // Populate fields
                 document.getElementById('jobRequester').value = r.requesterName || '';
