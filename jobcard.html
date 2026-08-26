@@ -390,7 +390,7 @@
         </form>
 
         <footer style="margin-top:22px;font-size:12px;color:#6c757d;text-align:center;border-top:1px solid #e9ecef;padding-top:14px;">
-            🔥 Firestore‑powered · ✍️ Drawable Signatures · MCRH Job Card v8.2
+            🔥 Firestore‑powered · ✍️ Drawable Signatures · MCRH Job Card v8.3
         </footer>
     </div>
 
@@ -554,7 +554,7 @@
         }
 
         // ============================================================
-        // FETCH USERS (now allowed by rules)
+        // FETCH USERS
         // ============================================================
         async function fetchUsers() {
             try {
@@ -793,6 +793,7 @@
                     const opt = document.createElement('option');
                     opt.value = r.requestNo;
                     opt.textContent = `${r.requestNo} - ${r.requesterName} (${r.unit}) - ${r.equipName}`;
+                    // Store the document ID for direct fetch
                     opt.dataset.docId = r.id;
                     dropdown.appendChild(opt);
                 });
@@ -813,11 +814,15 @@
         }
 
         // ============================================================
-        // LOAD REQUEST DATA – FIXED: now populates all fields, including supervisor dropdown
+        // LOAD REQUEST DATA – FIXED: use direct getDoc with docId
         // ============================================================
         window.loadRequestData = async function() {
-            const requestNo = document.getElementById('jobRequestNo').value;
-            if (!requestNo) {
+            const dropdown = document.getElementById('jobRequestNo');
+            const selectedOption = dropdown.options[dropdown.selectedIndex];
+            const requestNo = selectedOption?.value;
+            const docId = selectedOption?.dataset?.docId;
+
+            if (!requestNo || !docId) {
                 // Clear fields
                 ['jobRequester', 'jobUnit', 'jobEquipName', 'jobInventory', 'jobSerial', 'jobModel', 'jobComplaint']
                 .forEach(id => document.getElementById(id).value = '');
@@ -829,16 +834,13 @@
             }
 
             try {
-                const q = query(collection(db, REQUESTS_COLL), where('requestNo', '==', requestNo));
-                const snap = await getDocs(q);
-                if (snap.empty) {
+                // Direct document read using the stored docId – bypasses query limitations
+                const docSnap = await getDoc(doc(db, REQUESTS_COLL, docId));
+                if (!docSnap.exists()) {
                     showToast('Request not found.', true);
                     return;
                 }
-                let r = null;
-                snap.forEach(doc => { r = doc.data(); });
-                if (!r) return;
-
+                const r = docSnap.data();
                 console.log('📄 Loaded request data:', r);
 
                 // Populate fields
@@ -857,7 +859,7 @@
                     document.getElementById('jobReceivedDateTime').value = r.dateTime || '';
                 }
 
-                // ★★★ Fix: populate supervisor dropdown based on unit
+                // Populate supervisor dropdown based on unit
                 populateSupervisorDropdown(r.unit);
 
                 showToast('✅ Request data loaded.');
