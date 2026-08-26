@@ -17,7 +17,6 @@
     </script>
 
     <style>
-        /* (styles unchanged – keep your existing CSS) */
         * { margin:0; padding:0; box-sizing:border-box; }
         body { font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#f4f6f9; padding:20px; color:#1e2a3a; }
         .container { max-width:1000px; margin:0 auto; background:white; padding:25px 30px; border-radius:12px; box-shadow:0 8px 30px rgba(0,0,0,0.12); }
@@ -113,10 +112,10 @@
                 </div>
             </div>
 
-            <div id="reqEquipDetails" class="grid-2" style="display: none;">
+            <div id="reqEquipDetails" class="grid-2" style="display: grid;">
                 <div class="field-group">
                     <label>Inventory / Asset No.</label>
-                    <input type="text" id="reqInventory" placeholder="e.g. INV-001" />
+                    <input type="text" id="reqInventory" placeholder="Coming Soon" readonly value="Coming Soon" />
                 </div>
                 <div class="field-group">
                     <label>Serial No.</label>
@@ -133,7 +132,7 @@
                 <textarea id="reqComplaint" rows="3" placeholder="Describe the issue..."></textarea>
             </div>
 
-            <!-- ===== EMAIL NOTIFICATION ONLY – WHATSAPP REMOVED ===== -->
+            <!-- Email Notification -->
             <div class="field-group full-width">
                 <label>📧 Send Email Notification</label>
                 <button type="button" class="btn btn-info" onclick="sendEmailNotification()">
@@ -239,7 +238,7 @@
         }
 
         // ============================================================
-        // SEQUENTIAL REQUEST NUMBER GENERATOR (Atomic Firestore Counter)
+        // SEQUENTIAL REQUEST NUMBER GENERATOR (starts from REQ-001)
         // ============================================================
         async function getNextRequestNumber() {
             const counterDocRef = doc(db, COUNTERS_COLL, 'requestCounter');
@@ -263,22 +262,26 @@
                 console.error('Error generating request number:', error);
                 const timestamp = Date.now().toString().slice(-6);
                 const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-                const fallback = `REQ-${timestamp}${random}`;
-                showToast('⚠️ Using fallback number due to counter error.', true);
-                return fallback;
+                return `REQ-${timestamp}${random}`;
             }
         }
 
         // ============================================================
-        // TOGGLE EQUIPMENT DETAILS
+        // TOGGLE EQUIPMENT DETAILS – Inventory is now readonly "Coming Soon"
         // ============================================================
         function toggleEquipFields() {
             const type = document.getElementById('reqType').value;
             const details = document.getElementById('reqEquipDetails');
+            const inventoryField = document.getElementById('reqInventory');
+
             if (type === 'Equipment') {
                 details.style.display = 'grid';
+                inventoryField.value = 'Coming Soon';
+                inventoryField.readOnly = true;
             } else {
                 details.style.display = 'none';
+                inventoryField.value = '';
+                inventoryField.readOnly = false; // optional, but hidden
             }
         }
         document.getElementById('reqType').addEventListener('change', toggleEquipFields);
@@ -361,18 +364,19 @@
         };
 
         // ============================================================
-        // RESET FORM – sets number to placeholder
+        // RESET FORM
         // ============================================================
         function resetRequestForm() {
             document.getElementById('reqDateTime').value = new Date().toISOString().slice(0, 16);
             document.getElementById('reqType').value = 'Equipment';
             document.getElementById('reqEquipName').value = '';
-            document.getElementById('reqInventory').value = '';
+            document.getElementById('reqInventory').value = 'Coming Soon';
+            document.getElementById('reqInventory').readOnly = true;
             document.getElementById('reqSerial').value = '';
             document.getElementById('reqModel').value = '';
             document.getElementById('reqComplaint').value = '';
             document.getElementById('reqNo').value = 'Will be assigned on save';
-            toggleEquipFields();
+            toggleEquipFields(); // ensures display state
             currentDocId = null;
             if (currentUser) {
                 document.getElementById('reqRequester').value = currentUser.name || '';
@@ -407,7 +411,8 @@
                 document.getElementById('reqUnit').value = r.unit || '';
                 document.getElementById('reqType').value = r.type || 'Equipment';
                 document.getElementById('reqEquipName').value = r.equipName || '';
-                document.getElementById('reqInventory').value = r.inventory || '';
+                document.getElementById('reqInventory').value = r.inventory || (r.type === 'Equipment' ? 'Coming Soon' : '');
+                document.getElementById('reqInventory').readOnly = (r.type === 'Equipment');
                 document.getElementById('reqSerial').value = r.serial || '';
                 document.getElementById('reqModel').value = r.modelMake || '';
                 document.getElementById('reqComplaint').value = r.complaint || '';
@@ -426,18 +431,20 @@
         async function init() {
             document.getElementById('reqDateTime').value = new Date().toISOString().slice(0, 16);
             document.getElementById('reqNo').value = 'Will be assigned on save';
+            document.getElementById('reqInventory').value = 'Coming Soon';
+            document.getElementById('reqInventory').readOnly = true;
             if (currentUser) {
                 document.getElementById('reqRequester').value = currentUser.name || '';
                 if (currentUser.role === 'requester' && currentUser.department) {
                     document.getElementById('reqUnit').value = currentUser.department;
                 }
             }
-            toggleEquipFields();
+            toggleEquipFields(); // ensures visibility
             await loadRequestFromUrl();
-            console.log('✅ Request page ready. Numbering only on save.');
+            console.log('✅ Request page ready.');
         }
 
-        console.log('🚀 Request page loaded (fixed numbering & no WhatsApp).');
+        console.log('🚀 Request page loaded.');
     </script>
 </body>
 </html>

@@ -25,11 +25,19 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <style>
-        /* (styles unchanged – keep your existing CSS) */
+        /* (styles unchanged – same as before) */
         * { margin:0; padding:0; box-sizing:border-box; }
         body { font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#f4f6f9; padding:20px; color:#1e2a3a; }
         .container { max-width:1200px; margin:0 auto; background:white; padding:25px 30px; border-radius:12px; box-shadow:0 8px 30px rgba(0,0,0,0.12); }
-        /* ... rest of your styles ... */
+        .hospital-header { border-bottom:4px solid #C8102E; padding-bottom:12px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; }
+        .logo-area { display:flex; align-items:center; gap:15px; }
+        .logo-area .logo-icon { font-size:36px; background:#C8102E; color:white; width:60px; height:60px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; }
+        .logo-area h1 { font-size:24px; color:#C8102E; letter-spacing:1px; font-weight:700; }
+        .logo-area .sub { font-size:13px; color:#333; font-weight:500; }
+        .hospital-header .badge { background:#C8102E; color:white; padding:6px 16px; border-radius:30px; font-size:14px; font-weight:600; }
+        .card-title { display:flex; justify-content:space-between; align-items:center; background:#f8f9fc; padding:8px 16px; border-radius:8px; margin-bottom:18px; }
+        .card-title h2 { font-size:20px; color:#1e2a3a; font-weight:600; }
+        .card-title .status { font-size:13px; padding:4px 14px; border-radius:20px; font-weight:600; }
         .status.pending { background:#ffc107; color:#1e2a3a; }
         .status.completed { background:#28a745; color:white; }
         .status.writtenoff { background:#dc3545; color:white; }
@@ -382,7 +390,7 @@
         </form>
 
         <footer style="margin-top:22px;font-size:12px;color:#6c757d;text-align:center;border-top:1px solid #e9ecef;padding-top:14px;">
-            🔥 Firestore‑powered · ✍️ Drawable Signatures · MCRH Job Card v7.0
+            🔥 Firestore‑powered · ✍️ Drawable Signatures · MCRH Job Card v8.0
         </footer>
     </div>
 
@@ -519,6 +527,7 @@
 
         async function generateJobNumber() {
             try {
+                // Query all jobcards to find the maximum numeric suffix
                 const q = query(collection(db, JOBCARDS_COLL));
                 const snap = await getDocs(q);
                 let max = 0;
@@ -533,8 +542,11 @@
                     }
                 });
                 const next = max + 1;
+                // Pad with zeros to 3 digits: MCRH001, MCRH002, ...
                 return `MCRH${String(next).padStart(3, '0')}`;
-            } catch {
+            } catch (err) {
+                console.error('Error generating job number:', err);
+                // Fallback to timestamp-based
                 return `MCRH${Date.now().toString().slice(-6)}`;
             }
         }
@@ -709,23 +721,49 @@
         function loadSigData(pad, data) { if (pad && data) pad.fromData(data); }
 
         // ============================================================
-        // REQUEST DROPDOWN
+        // REQUEST DROPDOWN – FIXED FOR PERMISSIONS
         // ============================================================
         async function populateRequestDropdown() {
             const dropdown = document.getElementById('jobRequestNo');
             dropdown.innerHTML = '<option value="">-- Select Request --</option>';
             try {
-                const reqSnap = await getDocs(query(collection(db, REQUESTS_COLL), orderBy('createdAt', 'desc')));
+                // Build query based on user role
+                let requestsQuery;
+                const isAdmin = currentUser?.role === 'admin';
+                const isMaintenance = currentUser?.role === 'maintenance';
+
+                if (isAdmin) {
+                    // Admin sees all requests
+                    requestsQuery = query(collection(db, REQUESTS_COLL), orderBy('createdAt', 'desc'));
+                } else if (isMaintenance) {
+                    // Maintenance sees only requests in their departments
+                    const depts = currentUser?.departments || [];
+                    if (depts.length === 0) {
+                        showToast('No departments assigned to you.', true);
+                        return;
+                    }
+                    requestsQuery = query(collection(db, REQUESTS_COLL), where('unit', 'in', depts), orderBy('createdAt', 'desc'));
+                } else {
+                    // Should not happen (access restricted)
+                    return;
+                }
+
+                const reqSnap = await getDocs(requestsQuery);
                 allRequests = [];
                 reqSnap.forEach(doc => { const data = doc.data(); data.id = doc.id; allRequests.push(data); });
 
+                // Fetch all jobcards to check which requests are already assigned
                 const jobSnap = await getDocs(collection(db, JOBCARDS_COLL));
                 allJobCards = [];
                 jobSnap.forEach(doc => { const data = doc.data(); data.id = doc.id; allJobCards.push(data); });
 
+                // Map requestNo to job status (if already has a job)
                 const jobMap = new Map();
-                allJobCards.forEach(j => { if (j.requestNo) jobMap.set(j.requestNo, j.status); });
+                allJobCards.forEach(j => {
+                    if (j.requestNo) jobMap.set(j.requestNo, j.status);
+                });
 
+                // Filter out requests that are already Completed or Written Off
                 const availableRequests = allRequests.filter(r => {
                     const jobStatus = jobMap.get(r.requestNo);
                     return jobStatus !== 'Completed' && jobStatus !== 'Written Off';
@@ -739,6 +777,7 @@
                     dropdown.appendChild(opt);
                 });
 
+                // If URL has ?request=XXX, auto-select
                 const urlParams = new URLSearchParams(window.location.search);
                 const reqParam = urlParams.get('request');
                 if (reqParam) {
@@ -747,7 +786,10 @@
                     }
                     loadRequestData();
                 }
-            } catch (err) { console.error(err); }
+            } catch (err) {
+                console.error('Error populating request dropdown:', err);
+                showToast('Error loading requests: ' + err.message, true);
+            }
         }
 
         // ============================================================
@@ -785,7 +827,6 @@
                 if (!document.getElementById('jobReceivedDateTime').value) {
                     document.getElementById('jobReceivedDateTime').value = r.dateTime || '';
                 }
-                // Populate supervisor dropdown based on unit
                 populateSupervisorDropdown(r.unit);
                 showToast('✅ Request data loaded.');
             } catch (err) {
@@ -1072,9 +1113,9 @@
         async function initPage() {
             document.getElementById('jobReceivedBy').value = currentUser?.name || '';
             document.getElementById('jobHandedBy').value = currentUser?.name || '';
-            await fetchUsers(); // Fetch all users first
-            populateDropdowns(); // Populate handedTo, techName
-            await populateRequestDropdown();
+            await fetchUsers();
+            populateDropdowns();
+            await populateRequestDropdown(); // Now fetches only allowed requests
             initSignaturePads();
 
             const now = new Date();
