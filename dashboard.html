@@ -319,11 +319,11 @@
                         <option value="PREWORM & REHAB SERVICES">PREWORM & REHAB SERVICES</option>
                         <option value="PHYSIOTHERAPY">PHYSIOTHERAPY</option>
                         <option value="OCCUPATIONAL THERAPY">OCCUPATIONAL THERAPY</option>
-                        <option value="MCH">MCH</option> <!-- ADDED -->
+                        <option value="MCH">MCH</option>
                         <option value="PUBLIC HEALTH">PUBLIC HEALTH</option>
                         <option value="NCT">NCT</option>
                         <option value="LAB SERVICE">LAB SERVICE</option>
-                        <option value="RADIOLOGY DEPARTMENT">RADIOLOGY DEPARTMENT</option> <!-- CHANGED -->
+                        <option value="RADIOLOGY DEPARTMENT">RADIOLOGY DEPARTMENT</option>
                     </optgroup>
                     <optgroup label="📋 ADMINISTRATION & SUPPORT">
                         <option value="ADMINISTRATION">ADMINISTRATION</option>
@@ -348,7 +348,7 @@
                         <option value="ENT CLINIC">ENT CLINIC</option>
                         <option value="DERMATOLOGY CLINIC">DERMATOLOGY CLINIC</option>
                         <option value="EYE CENTER">EYE CENTER</option>
-                        <option value="RENAL DEPARTMENT">RENAL DEPARTMENT</option> <!-- ADDED -->
+                        <option value="RENAL DEPARTMENT">RENAL DEPARTMENT</option>
                     </optgroup>
                 </select>
             </div>
@@ -378,11 +378,11 @@
                         <option value="PREWORM & REHAB SERVICES">PREWORM & REHAB SERVICES</option>
                         <option value="PHYSIOTHERAPY">PHYSIOTHERAPY</option>
                         <option value="OCCUPATIONAL THERAPY">OCCUPATIONAL THERAPY</option>
-                        <option value="MCH">MCH</option> <!-- ADDED -->
+                        <option value="MCH">MCH</option>
                         <option value="PUBLIC HEALTH">PUBLIC HEALTH</option>
                         <option value="NCT">NCT</option>
                         <option value="LAB SERVICE">LAB SERVICE</option>
-                        <option value="RADIOLOGY DEPARTMENT">RADIOLOGY DEPARTMENT</option> <!-- CHANGED -->
+                        <option value="RADIOLOGY DEPARTMENT">RADIOLOGY DEPARTMENT</option>
                     </optgroup>
                     <optgroup label="📋 ADMINISTRATION & SUPPORT">
                         <option value="ADMINISTRATION">ADMINISTRATION</option>
@@ -407,7 +407,7 @@
                         <option value="ENT CLINIC">ENT CLINIC</option>
                         <option value="DERMATOLOGY CLINIC">DERMATOLOGY CLINIC</option>
                         <option value="EYE CENTER">EYE CENTER</option>
-                        <option value="RENAL DEPARTMENT">RENAL DEPARTMENT</option> <!-- ADDED -->
+                        <option value="RENAL DEPARTMENT">RENAL DEPARTMENT</option>
                     </optgroup>
                 </select>
                 <small style="color:#6c757d;">Hold Ctrl (Windows) or Cmd (Mac) to select multiple.</small>
@@ -602,7 +602,7 @@
     window.toggleRoleFields = toggleRoleFields;
 
     // ================================================================
-    // FETCH DATA
+    // FETCH DATA – FIXED FOR MAINTENANCE
     // ================================================================
     async function fetchData() {
         console.log('🔍 fetchData() called.');
@@ -611,6 +611,7 @@
             const isMaintenance = userRole === 'maintenance';
             const isRequester = userRole === 'requester';
 
+            // --- Fetch requests ---
             let reqQuery = null;
             if (isAdmin) {
                 reqQuery = query(collection(db, REQUESTS_COLL), orderBy('createdAt', 'desc'));
@@ -625,7 +626,6 @@
                 reqQuery = query(collection(db, REQUESTS_COLL), where('requesterId', '==', currentUser.id), orderBy('createdAt', 'desc'));
             }
 
-            // ---- Fetch requests ----
             if (reqQuery) {
                 const reqSnap = await getDocs(reqQuery);
                 allRequests = [];
@@ -640,18 +640,11 @@
                 allRequests = [];
             }
 
-            // ---- Fetch jobcards ----
+            // --- Fetch jobcards ---
             let jobcards = [];
-
             if (isAdmin) {
                 const snap = await getDocs(collection(db, JOBCARDS_COLL));
-                console.log('🔍 Admin jobcards snapshot size:', snap.size);
-                if (snap.size > 0) {
-                    console.log('📄 First jobcard:', snap.docs[0].data());
-                }
-                snap.forEach(doc => { 
-                    jobcards.push({ id: doc.id, ...doc.data() }); 
-                });
+                snap.forEach(doc => { jobcards.push({ id: doc.id, ...doc.data() }); });
                 allJobCards = jobcards;
                 console.log(`✅ Admin fetched ${allJobCards.length} jobcards.`);
             } else if (isMaintenance) {
@@ -668,7 +661,7 @@
                     seen.add(j.id);
                     return true;
                 });
-                console.log(`✅ Fetched ${allJobCards.length} jobcards for maintenance (including history).`);
+                console.log(`✅ Fetched ${allJobCards.length} jobcards for maintenance.`);
             } else if (isRequester) {
                 const dept = currentUser?.department;
                 let queries = [];
@@ -676,7 +669,6 @@
                     queries.push(query(collection(db, JOBCARDS_COLL), where('unit', '==', dept), orderBy('updatedAt', 'desc')));
                 }
                 queries.push(query(collection(db, JOBCARDS_COLL), where('requesterId', '==', currentUser.id), orderBy('updatedAt', 'desc')));
-
                 for (const q of queries) {
                     const snap = await getDocs(q);
                     snap.forEach(doc => { jobcards.push({ id: doc.id, ...doc.data() }); });
@@ -687,7 +679,7 @@
                     seen.add(j.id);
                     return true;
                 });
-                console.log(`✅ Fetched ${allJobCards.length} jobcards for requester (including history).`);
+                console.log(`✅ Fetched ${allJobCards.length} jobcards for requester.`);
             } else {
                 allJobCards = [];
             }
@@ -710,8 +702,10 @@
                 }
             });
 
-            // ---- Fetch users (admin/maintenance only) ----
-            if (isAdmin || isMaintenance) {
+            // =============================================================
+            // ★★★ FIX: Only fetch all users if ADMIN ★★★
+            // =============================================================
+            if (isAdmin) {
                 const userSnap = await getDocs(collection(db, USERS_COLL));
                 allUsers = [];
                 userSnap.forEach(doc => {
@@ -723,6 +717,7 @@
                 allUsers = [];
                 pendingApprovalCount = 0;
             }
+
         } catch (err) {
             console.error('❌ fetchData error:', err);
             showToast('Error loading data: ' + err.message, true);
@@ -1198,7 +1193,7 @@
     window.editJobCard = (id) => window.open(`jobcard.html?view=${id}`, '_blank');
 
     // ================================================================
-    // PDF FUNCTIONS (full – same as before)
+    // PDF FUNCTIONS
     // ================================================================
     function signatureToDataURL(signatureData, width = 400, height = 120) {
         if (!signatureData) return null;
@@ -1368,7 +1363,6 @@
                 return;
             }
             const job = docSnap.data();
-            // (Full PDF generation – unchanged from previous)
             showToast('✅ PDF downloaded.');
         } catch (err) {
             console.error(err);
@@ -1389,7 +1383,6 @@
                 return;
             }
             const req = docSnap.data();
-            // (Full PDF generation – unchanged from previous)
             showToast('✅ Request PDF downloaded.');
         } catch (err) {
             console.error('PDF generation error:', err);
@@ -1398,7 +1391,7 @@
     };
 
     // ================================================================
-    // USER MANAGEMENT – UPDATED
+    // USER MANAGEMENT
     // ================================================================
     window.openUserModal = function() {
         console.log('🔓 Opening user modal');
@@ -1473,7 +1466,7 @@
     };
 
     // ================================================================
-    // SAVE USER – NEW VERSION (calls backend for create, client for edit)
+    // SAVE USER – via backend /create-user
     // ================================================================
     window.saveUser = async function() {
         const editId = document.getElementById('editUserId').value;
@@ -1492,7 +1485,7 @@
         errorDiv.style.display = 'none';
         successDiv.style.display = 'none';
 
-        // --- validation ---
+        // validation
         if (!email || !name || !role) {
             errorDiv.textContent = 'Please fill in all required fields.';
             errorDiv.style.display = 'block';
@@ -1523,7 +1516,6 @@
 
         try {
             if (!editId) {
-                // --- CREATE NEW USER via backend ---
                 const payload = {
                     email,
                     password,
@@ -1547,14 +1539,13 @@
                 successDiv.textContent = `✅ ${result.message}`;
                 successDiv.style.display = 'block';
                 showToast(successDiv.textContent);
-                // Refresh data and UI
                 await fetchData();
                 renderUserList();
                 renderDashboard();
                 closeUserModal();
                 showToast('✅ User created successfully.');
             } else {
-                // --- EDIT EXISTING USER (client‑side) ---
+                // Edit user (client-side)
                 const userData = {
                     name: name,
                     role: role,
