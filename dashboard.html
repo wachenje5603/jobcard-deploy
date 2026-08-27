@@ -23,7 +23,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
     <style>
-        /* (your existing styles – unchanged) */
+        /* ===== BASE ===== */
         * { margin:0; padding:0; box-sizing:border-box; }
         :root { --primary: #C8102E; --primary-gradient: linear-gradient(135deg, #C8102E, #e81a3f); --bg: #f4f6fb; --card-bg: #ffffff; --text: #1a1a2e; --text-muted: #6c7a8a; --shadow: 0 8px 32px rgba(0,0,0,0.06); --radius: 16px; --radius-sm: 10px; }
         body { font-family:'Inter', sans-serif; background:var(--bg); color:var(--text); padding:16px; }
@@ -218,7 +218,8 @@
                     <option value="admin">Admin</option>
                 </select>
             </div>
-            <!-- Department selects (unchanged, all departments included) -->
+
+            <!-- ===== SINGLE DEPARTMENT – ORGANOGRAM ===== -->
             <div class="form-group" id="deptFieldContainer" style="display:block;">
                 <label id="deptLabel">Department (for requester)</label>
                 <select id="newUserDept">
@@ -277,10 +278,11 @@
                     </optgroup>
                 </select>
             </div>
+
+            <!-- ===== MULTI-DEPARTMENT – ORGANOGRAM ===== -->
             <div class="form-group" id="multiDeptContainer" style="display:none;">
                 <label>Select departments the engineer will handle (hold Ctrl/Cmd to choose multiple)</label>
                 <select id="newUserDepts" multiple size="5">
-                    <!-- Same departments as above -->
                     <optgroup label="🏥 CURATIVE & CLINICAL WARDS">
                         <option value="ACCIDENTS AND EMERGENCY">ACCIDENTS AND EMERGENCY</option>
                         <option value="TRIAGE">TRIAGE</option>
@@ -336,6 +338,8 @@
                 </select>
                 <small style="color:#6c757d;">Hold Ctrl (Windows) or Cmd (Mac) to select multiple.</small>
             </div>
+
+            <!-- WhatsApp -->
             <div class="form-group" id="whatsappFieldContainer">
                 <label>WhatsApp Number (for maintenance)</label>
                 <div class="whatsapp-inline">
@@ -371,6 +375,7 @@
                     </div>
                 </div>
             </div>
+
             <button class="btn btn-success" id="saveUserBtn" onclick="saveUser()"><i class="fas fa-save"></i> Save User</button>
             <div id="userModalError" class="error-text"></div>
             <div id="userModalSuccess" class="success-text"></div>
@@ -491,7 +496,9 @@
         return 'open';
     }
 
-    // ===== TOGGLE ROLE FIELDS =====
+    // ================================================================
+    // TOGGLE FIELDS
+    // ================================================================
     function toggleRoleFields() {
         const role = document.getElementById('newUserRole').value;
         const deptContainer = document.getElementById('deptFieldContainer');
@@ -519,7 +526,9 @@
     }
     window.toggleRoleFields = toggleRoleFields;
 
-    // ===== FETCH DATA =====
+    // ================================================================
+    // FETCH DATA
+    // ================================================================
     async function fetchData() {
         console.log('🔍 fetchData() called.');
         try {
@@ -648,7 +657,9 @@
         return allJobCards.filter(j => j.unit === currentUser.department);
     }
 
-    // ===== RENDER DASHBOARD =====
+    // ================================================================
+    // RENDER DASHBOARD
+    // ================================================================
     function renderDashboard() {
         if (!currentUser) return;
         const isAdmin = userRole === 'admin';
@@ -720,7 +731,7 @@
                     <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
                 </div>
             `;
-        } else {
+        } else { // Requester
             statsHtml = `
                 <div class="stat-card myrequests" onclick="switchView('requests')">
                     <div class="stat-left"><div class="number">${myRequests.length}</div><div class="label">📋 My Requests</div></div>
@@ -778,6 +789,9 @@
         applyFilters();
     }
 
+    // ================================================================
+    // SWITCH VIEW
+    // ================================================================
     window.switchView = function(view) {
         currentView = view;
         buildFilterBar();
@@ -785,6 +799,9 @@
         applyFilters();
     };
 
+    // ================================================================
+    // BUILD FILTER BAR
+    // ================================================================
     function buildFilterBar() {
         const isAdmin = userRole === 'admin';
         const isMaintenance = userRole === 'maintenance';
@@ -825,6 +842,9 @@
         filterBar.innerHTML = filterHtml;
     }
 
+    // ================================================================
+    // UPDATE TABLE TITLE
+    // ================================================================
     function updateTableTitle() {
         const isAdmin = userRole === 'admin';
         const isMaintenance = userRole === 'maintenance';
@@ -841,6 +861,9 @@
         tableTitle.textContent = title;
     }
 
+    // ================================================================
+    // RENDER CHARTS
+    // ================================================================
     function renderCharts() {
         let requestsForCharts = [];
         if (userRole === 'requester') {
@@ -887,6 +910,9 @@
         });
     }
 
+    // ================================================================
+    // APPLY FILTERS
+    // ================================================================
     window.applyFilter = function(status) {
         const select = document.getElementById('statusFilter');
         if (select) { select.value = status; applyFilters(); }
@@ -940,6 +966,9 @@
         renderTable(data);
     };
 
+    // ================================================================
+    // RENDER TABLE
+    // ================================================================
     function renderTable(data) {
         if (!data || data.length === 0) {
             tableBody.innerHTML = '<p style="color:#9ca3af; padding:20px; text-align:center;">No records found.</p>';
@@ -952,6 +981,9 @@
         }
     }
 
+    // ================================================================
+    // RENDER REQUESTS TABLE
+    // ================================================================
     function renderRequestsTable(requests) {
         let html = `
             <table>
@@ -1008,6 +1040,9 @@
         });
     }
 
+    // ================================================================
+    // MARK AS RECEIVED
+    // ================================================================
     async function markAsReceived(requestId) {
         if (!requestId) return;
         try {
@@ -1026,6 +1061,9 @@
         }
     }
 
+    // ================================================================
+    // RENDER JOBCARDS TABLE
+    // ================================================================
     function renderJobcardsTable(jobcards) {
         let html = `
             <table>
@@ -1071,10 +1109,10 @@
     }
 
     // ================================================================
-    // PDF GENERATION – EXACT MATCH OF YOUR SAMPLES
+    // PDF GENERATION – CLEAN, STRUCTURED, MATCHING THE FIRST SAMPLE
     // ================================================================
 
-    // Helper: convert signature strokes to a PNG data URL
+    // Helper: convert signature strokes to PNG data URL
     function signatureToDataURL(signatureData, width = 300, height = 80) {
         if (!signatureData || !Array.isArray(signatureData) || signatureData.length === 0) {
             return null;
@@ -1240,18 +1278,17 @@
             }
             const job = docSnap.data();
 
-            // Convert signatures to images
+            // Convert signatures
             const techSigImg = signatureToDataURL(job.techSignature);
             const certSigImg = signatureToDataURL(job.certSignature);
 
-            // Build the HTML with table layout
-            let statusBadge = job.status || 'Pending';
+            // Status badge color
             let statusColor = '#C8102E';
-            if (statusBadge === 'Pending' || statusBadge === 'Postponed') statusColor = '#f59e0b';
-            else if (statusBadge === 'Completed') statusColor = '#22c55e';
-            else if (statusBadge === 'Written Off') statusColor = '#dc3545';
+            if (job.status === 'Pending' || job.status === 'Postponed') statusColor = '#f59e0b';
+            else if (job.status === 'Completed') statusColor = '#22c55e';
+            else if (job.status === 'Written Off') statusColor = '#dc3545';
 
-            // Build status-specific rows
+            // Build status-specific extra rows
             let statusRows = '';
             if (job.status === 'Postponed') {
                 statusRows = `
@@ -1280,12 +1317,16 @@
             tempDiv.innerHTML = `
                 ${getHeaderHTML()}
                 <h2 style="text-align:center; font-size:18px; color:#C8102E; margin:5px 0;">EQUIPMENT MAINTENANCE JOB CARD</h2>
-                <div style="text-align:center; font-size:16px; font-weight:bold; color:${statusColor}; margin-bottom:10px;">${statusBadge}</div>
+                <div style="text-align:center; font-size:16px; font-weight:bold; color:${statusColor}; margin-bottom:10px;">${job.status || 'Pending'}</div>
                 <table style="width:100%; font-size:14px; border-collapse:collapse; margin-top:5px;">
                     <tr><td style="padding:4px 0; font-weight:bold; width:200px;">JOB CARD NO.</td><td style="padding:4px 0;">${job.jobNo || 'N/A'}</td></tr>
+                    <tr><td style="padding:4px 0; font-weight:bold;">REQUEST NO.</td><td style="padding:4px 0;">${job.requestNo || 'N/A'}</td></tr>
                     <tr><td style="padding:4px 0; font-weight:bold;">REPORTING DATE/TIME</td><td style="padding:4px 0;">${formatDateForPDF(job.reportingDateTime)}</td></tr>
+                    <tr><td style="padding:4px 0; font-weight:bold;">UNIT/WARD</td><td style="padding:4px 0;">${job.unit || 'N/A'}</td></tr>
                     <tr><td style="padding:4px 0; font-weight:bold;">REQUESTER NAME</td><td style="padding:4px 0;">${job.requester || 'N/A'}</td></tr>
+                    <tr><td style="padding:4px 0; font-weight:bold;">EQUIPMENT NAME</td><td style="padding:4px 0;">${job.equipName || 'N/A'}</td></tr>
                     <tr><td style="padding:4px 0; font-weight:bold;">INVENTORY/ASSET NO.</td><td style="padding:4px 0;">${job.inventory || 'N/A'}</td></tr>
+                    <tr><td style="padding:4px 0; font-weight:bold;">SERIAL NO.</td><td style="padding:4px 0;">${job.serial || 'N/A'}</td></tr>
                     <tr><td style="padding:4px 0; font-weight:bold;">MODEL/MAKE</td><td style="padding:4px 0;">${job.modelMake || 'N/A'}</td></tr>
                     <tr><td style="padding:4px 0; font-weight:bold;">COMPLAINT</td><td style="padding:4px 0;">${job.complaint || 'N/A'}</td></tr>
                     <tr><td style="padding:4px 0; font-weight:bold;">DIAGNOSIS</td><td style="padding:4px 0;">${job.diagnosis || 'N/A'}</td></tr>
@@ -1328,7 +1369,7 @@
             const pdf = new jsPDF('p', 'mm', 'a4');
             const imgWidth = 210;
             const imgHeight = (canvas.height * imgWidth) / canvas.width;
-            // If the content is taller than one page, split into multiple pages
+            // Multi‑page handling
             let heightLeft = imgHeight;
             let position = 0;
             const pageHeight = 297;
@@ -1349,7 +1390,7 @@
     };
 
     // ================================================================
-    // USER MANAGEMENT (unchanged)
+    // USER MANAGEMENT (unchanged from previous working version)
     // ================================================================
     window.openUserModal = function() {
         console.log('🔓 Opening user modal');
