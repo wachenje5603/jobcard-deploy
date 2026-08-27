@@ -1082,11 +1082,11 @@
     }
 
     // ================================================================
-    // PDF GENERATION – MIMIC WEB FORM LAYOUT
+    // PDF GENERATION – COMPRESSED WITH SMALLER FONTS AND TIGHTER SPACING
     // ================================================================
 
     // Helper: convert signature strokes to PNG
-    function signatureToDataURL(signatureData, width = 300, height = 80) {
+    function signatureToDataURL(signatureData, width = 250, height = 70) {
         if (!signatureData || !Array.isArray(signatureData) || signatureData.length === 0) {
             return null;
         }
@@ -1097,7 +1097,7 @@
         ctx.fillStyle = 'white';
         ctx.fillRect(0, 0, width, height);
         ctx.strokeStyle = 'black';
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 1.8;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
 
@@ -1150,34 +1150,34 @@
         return canvas.toDataURL('image/png');
     }
 
-    // Helper: format date as in web form (locale string)
+    // Helper: format date compactly
     function formatDateForPDF(dateString) {
         if (!dateString) return 'N/A';
         try {
             const d = new Date(dateString);
             if (isNaN(d)) return dateString;
-            return d.toLocaleString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true });
+            return d.toLocaleString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true });
         } catch {
             return dateString;
         }
     }
 
-    // Helper: build hospital header (same as web forms)
+    // Helper: header with smaller fonts
     function getHeaderHTML() {
         return `
-            <div style="display:flex; align-items:center; gap:15px; border-bottom:4px solid #C8102E; padding-bottom:12px; margin-bottom:20px;">
-                <div style="background:#C8102E; color:white; width:60px; height:60px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:36px; font-weight:700;">M</div>
-                <div>
-                    <h1 style="font-size:24px; color:#C8102E; letter-spacing:1px; font-weight:700; margin:0;">MOI VOI COUNTY REFERRAL HOSPITAL</h1>
-                    <div style="font-size:13px; color:#333; font-weight:500;">P.O. BOX 18-80300 VOI | Email: biomedsmoivoi@gmail.com</div>
-                    <div style="font-size:14px; font-weight:600; color:#C8102E; margin-top:2px;">TAITA TAVETA COUNTY</div>
-                    <div style="font-size:12px; font-weight:600; color:#C8102E;">DEPARTMENT OF HEALTH SERVICES</div>
+            <div style="display:flex; align-items:center; gap:12px; border-bottom:3px solid #C8102E; padding-bottom:8px; margin-bottom:12px;">
+                <div style="background:#C8102E; color:white; width:48px; height:48px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:28px; font-weight:700; flex-shrink:0;">M</div>
+                <div style="flex:1;">
+                    <h1 style="font-size:18px; color:#C8102E; letter-spacing:0.5px; font-weight:700; margin:0; line-height:1.2;">MOI VOI COUNTY REFERRAL HOSPITAL</h1>
+                    <div style="font-size:10px; color:#333; font-weight:500;">P.O. BOX 18-80300 VOI | Email: biomedsmoivoi@gmail.com</div>
+                    <div style="font-size:11px; font-weight:700; color:#C8102E; margin-top:1px;">TAITA TAVETA COUNTY</div>
+                    <div style="font-size:9px; font-weight:600; color:#C8102E;">DEPARTMENT OF HEALTH SERVICES</div>
                 </div>
             </div>
         `;
     }
 
-    // ---- REQUEST SLIP PDF ----
+    // ---- REQUEST SLIP PDF (compressed) ----
     window.downloadRequestPDF = async function(requestId) {
         if (!requestId) {
             showToast('Invalid request ID.', true);
@@ -1197,26 +1197,27 @@
             tempDiv.style.left = '-9999px';
             tempDiv.style.top = '0';
             tempDiv.style.width = '800px';
-            tempDiv.style.padding = '25px 30px';
+            tempDiv.style.padding = '15px 20px';
             tempDiv.style.background = 'white';
             tempDiv.style.fontFamily = 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif';
             tempDiv.style.color = '#1e2a3a';
+            tempDiv.style.fontSize = '12px';
             tempDiv.innerHTML = `
                 ${getHeaderHTML()}
-                <div style="display:flex; justify-content:space-between; align-items:center; background:#f8f9fc; padding:8px 16px; border-radius:8px; margin-bottom:18px;">
-                    <h2 style="font-size:20px; font-weight:600; margin:0;">📋 SERVICE REQUEST FORM</h2>
-                    <span style="background:#28a745; color:white; padding:4px 14px; border-radius:20px; font-size:13px; font-weight:600;">● OPEN</span>
+                <div style="display:flex; justify-content:space-between; align-items:center; background:#f8f9fc; padding:4px 12px; border-radius:6px; margin-bottom:10px;">
+                    <h2 style="font-size:16px; font-weight:600; margin:0;">📋 SERVICE REQUEST FORM</h2>
+                    <span style="background:#28a745; color:white; padding:2px 10px; border-radius:20px; font-size:11px; font-weight:600;">● OPEN</span>
                 </div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px 24px;">
-                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Request No.</label><div style="font-weight:500;">${req.requestNo || 'N/A'}</div></div>
-                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Date</label><div>${formatDateForPDF(req.dateTime)}</div></div>
-                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Requester Name</label><div>${req.requesterName || 'N/A'}</div></div>
-                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Department / Unit / Ward</label><div>${req.unit || 'N/A'}</div></div>
-                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Equipment / Item Type</label><div>${req.type || 'N/A'}</div></div>
-                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Equipment Name / Description</label><div>${req.equipName || 'N/A'}</div></div>
-                    <div style="grid-column:1 / -1;"><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Description of Fault / Complaint</label><div>${req.complaint || 'N/A'}</div></div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px 12px;">
+                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Request No.</label><div style="font-weight:500; font-size:12px;">${req.requestNo || 'N/A'}</div></div>
+                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Date</label><div style="font-size:12px;">${formatDateForPDF(req.dateTime)}</div></div>
+                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Requester Name</label><div style="font-size:12px;">${req.requesterName || 'N/A'}</div></div>
+                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Department / Unit / Ward</label><div style="font-size:12px;">${req.unit || 'N/A'}</div></div>
+                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Equipment / Item Type</label><div style="font-size:12px;">${req.type || 'N/A'}</div></div>
+                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Equipment Name</label><div style="font-size:12px;">${req.equipName || 'N/A'}</div></div>
+                    <div style="grid-column:1 / -1;"><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Description of Fault / Complaint</label><div style="font-size:12px;">${req.complaint || 'N/A'}</div></div>
                 </div>
-                <div style="margin-top:20px; font-size:12px; color:#6c757d; text-align:center; border-top:1px solid #e9ecef; padding-top:14px;">
+                <div style="margin-top:10px; font-size:9px; color:#6c757d; text-align:center; border-top:1px solid #e9ecef; padding-top:8px;">
                     🔥 Firestore‑powered · MCRH Request Slip
                 </div>
             `;
@@ -1237,7 +1238,7 @@
         }
     };
 
-    // ---- JOBCARD PDF ----
+    // ---- JOBCARD PDF (compressed) ----
     window.downloadJobcardPDF = async function(jobcardId) {
         if (!jobcardId) {
             showToast('Invalid jobcard ID.', true);
@@ -1259,25 +1260,24 @@
             if (job.status === 'Completed') statusColor = '#28a745';
             else if (job.status === 'Written Off') statusColor = '#dc3545';
 
-            // Build status-specific fields
             let statusFields = '';
             if (job.status === 'Postponed') {
                 statusFields = `
-                    <div style="grid-column:1 / -1; display:grid; grid-template-columns:1fr 1fr; gap:14px 24px;">
-                        <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Reason for Postponement</label><div>${job.postponeReason || 'N/A'} ${job.postponeNote ? '- ' + job.postponeNote : ''}</div></div>
-                        <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Expected Completion Date</label><div>${formatDateForPDF(job.expectedDate)}</div></div>
+                    <div style="grid-column:1 / -1; display:grid; grid-template-columns:1fr 1fr; gap:6px 12px;">
+                        <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Reason for Postponement</label><div style="font-size:12px;">${job.postponeReason || 'N/A'} ${job.postponeNote ? '- ' + job.postponeNote : ''}</div></div>
+                        <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Expected Completion</label><div style="font-size:12px;">${formatDateForPDF(job.expectedDate)}</div></div>
                     </div>
                 `;
             } else if (job.status === 'Completed') {
                 statusFields = `
-                    <div style="grid-column:1 / -1; display:grid; grid-template-columns:1fr 1fr; gap:14px 24px;">
-                        <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Defects Found</label><div>${job.defects || 'N/A'}</div></div>
-                        <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Action Taken</label><div>${job.actionTaken || 'N/A'}</div></div>
+                    <div style="grid-column:1 / -1; display:grid; grid-template-columns:1fr 1fr; gap:6px 12px;">
+                        <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Defects Found</label><div style="font-size:12px;">${job.defects || 'N/A'}</div></div>
+                        <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Action Taken</label><div style="font-size:12px;">${job.actionTaken || 'N/A'}</div></div>
                     </div>
                 `;
             } else if (job.status === 'Written Off') {
                 statusFields = `
-                    <div style="grid-column:1 / -1;"><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Reason for Write‑Off</label><div>${job.writeOffReason || 'N/A'} ${job.writeOffNote ? '- ' + job.writeOffNote : ''}</div></div>
+                    <div style="grid-column:1 / -1;"><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Write‑Off Reason</label><div style="font-size:12px;">${job.writeOffReason || 'N/A'} ${job.writeOffNote ? '- ' + job.writeOffNote : ''}</div></div>
                 `;
             }
 
@@ -1286,80 +1286,86 @@
             tempDiv.style.left = '-9999px';
             tempDiv.style.top = '0';
             tempDiv.style.width = '800px';
-            tempDiv.style.padding = '25px 30px';
+            tempDiv.style.padding = '12px 18px';
             tempDiv.style.background = 'white';
             tempDiv.style.fontFamily = 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif';
             tempDiv.style.color = '#1e2a3a';
+            tempDiv.style.fontSize = '12px';
             tempDiv.innerHTML = `
                 ${getHeaderHTML()}
-                <div style="display:flex; justify-content:space-between; align-items:center; background:#f8f9fc; padding:8px 16px; border-radius:8px; margin-bottom:18px;">
-                    <h2 style="font-size:20px; font-weight:600; margin:0;">⚙️ EQUIPMENT MAINTENANCE JOB CARD</h2>
-                    <span style="background:${statusColor}; color:${job.status === 'Pending' ? '#1e2a3a' : 'white'}; padding:4px 14px; border-radius:20px; font-size:13px; font-weight:600;">● ${job.status || 'PENDING'}</span>
+                <div style="display:flex; justify-content:space-between; align-items:center; background:#f8f9fc; padding:4px 12px; border-radius:6px; margin-bottom:8px;">
+                    <h2 style="font-size:16px; font-weight:600; margin:0;">⚙️ EQUIPMENT MAINTENANCE JOB CARD</h2>
+                    <span style="background:${statusColor}; color:${job.status === 'Pending' ? '#1e2a3a' : 'white'}; padding:2px 10px; border-radius:20px; font-size:11px; font-weight:600;">● ${job.status || 'PENDING'}</span>
                 </div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px 24px;">
-                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Job Card No.</label><div>${job.jobNo || 'N/A'}</div></div>
-                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Request No.</label><div>${job.requestNo || 'N/A'}</div></div>
-                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Reporting Date / Time</label><div>${formatDateForPDF(job.reportingDateTime)}</div></div>
-                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Unit / Ward</label><div>${job.unit || 'N/A'}</div></div>
-                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Requester Name</label><div>${job.requester || 'N/A'}</div></div>
-                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Equipment Name</label><div>${job.equipName || 'N/A'}</div></div>
-                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Inventory / Asset No.</label><div>${job.inventory || 'N/A'}</div></div>
-                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Serial No.</label><div>${job.serial || 'N/A'}</div></div>
-                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Model / Make</label><div>${job.modelMake || 'N/A'}</div></div>
-                    <div style="grid-column:1 / -1;"><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Complaint by User</label><div>${job.complaint || 'N/A'}</div></div>
-                    <div style="grid-column:1 / -1;"><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Diagnosis by Maintenance Team</label><div>${job.diagnosis || 'N/A'}</div></div>
-                </div>
-
-                <div style="border-top:1px solid #e9ecef; margin:18px 0 12px 0;"></div>
-                <h3 style="font-size:16px; font-weight:600; color:#1e2a3a; border-left:4px solid #C8102E; padding-left:12px;">📌 Handover Details</h3>
-                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px 24px; margin-top:8px;">
-                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Received from (Requester)</label><div>${job.receivedFrom || 'N/A'}</div></div>
-                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Date / Time Received</label><div>${formatDateForPDF(job.receivedDateTime)}</div></div>
-                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Received by (Technician)</label><div>${job.receivedBy || 'N/A'}</div></div>
-                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Handed back to (User)</label><div>${job.handedTo || 'N/A'}</div></div>
-                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Date / Time Handed</label><div>${formatDateForPDF(job.handedDateTime)}</div></div>
-                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Handed by (Technician)</label><div>${job.handedBy || 'N/A'}</div></div>
+                <!-- Job Details (2 columns) -->
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px 12px;">
+                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Job Card No.</label><div style="font-size:12px;">${job.jobNo || 'N/A'}</div></div>
+                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Request No.</label><div style="font-size:12px;">${job.requestNo || 'N/A'}</div></div>
+                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Reporting Date/Time</label><div style="font-size:12px;">${formatDateForPDF(job.reportingDateTime)}</div></div>
+                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Unit / Ward</label><div style="font-size:12px;">${job.unit || 'N/A'}</div></div>
+                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Requester Name</label><div style="font-size:12px;">${job.requester || 'N/A'}</div></div>
+                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Equipment Name</label><div style="font-size:12px;">${job.equipName || 'N/A'}</div></div>
+                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Inventory / Asset No.</label><div style="font-size:12px;">${job.inventory || 'N/A'}</div></div>
+                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Serial No.</label><div style="font-size:12px;">${job.serial || 'N/A'}</div></div>
+                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Model / Make</label><div style="font-size:12px;">${job.modelMake || 'N/A'}</div></div>
+                    <div style="grid-column:1 / -1;"><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Complaint</label><div style="font-size:12px;">${job.complaint || 'N/A'}</div></div>
+                    <div style="grid-column:1 / -1;"><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Diagnosis</label><div style="font-size:12px;">${job.diagnosis || 'N/A'}</div></div>
                 </div>
 
-                <div style="border-top:1px solid #e9ecef; margin:18px 0 12px 0;"></div>
-                <h3 style="font-size:16px; font-weight:600; color:#1e2a3a; border-left:4px solid #C8102E; padding-left:12px;">🛠️ Service & Timeline</h3>
-                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px 24px; margin-top:8px;">
-                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Service Type</label><div>${job.serviceType || 'N/A'}</div></div>
-                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Job Started</label><div>${formatDateForPDF(job.startDateTime)}</div></div>
-                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Job Completed</label><div>${formatDateForPDF(job.endDateTime)}</div></div>
-                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Total Time</label><div>${job.totalTime || 'N/A'}</div></div>
-                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Response Time</label><div>${job.responseTime || 'N/A'}</div></div>
-                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Admin / Requisition Time</label><div>${job.adminTime || 'N/A'}</div></div>
+                <!-- Handover -->
+                <div style="border-top:1px solid #e9ecef; margin:8px 0 6px 0;"></div>
+                <h3 style="font-size:13px; font-weight:600; color:#1e2a3a; border-left:3px solid #C8102E; padding-left:8px; margin:4px 0;">📌 Handover</h3>
+                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:4px 12px;">
+                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Received From</label><div style="font-size:12px;">${job.receivedFrom || 'N/A'}</div></div>
+                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Date/Time Received</label><div style="font-size:12px;">${formatDateForPDF(job.receivedDateTime)}</div></div>
+                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Received By</label><div style="font-size:12px;">${job.receivedBy || 'N/A'}</div></div>
+                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Handed To</label><div style="font-size:12px;">${job.handedTo || 'N/A'}</div></div>
+                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Date/Time Handed</label><div style="font-size:12px;">${formatDateForPDF(job.handedDateTime)}</div></div>
+                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Handed By</label><div style="font-size:12px;">${job.handedBy || 'N/A'}</div></div>
                 </div>
 
-                ${statusFields ? `<div style="border-top:1px solid #e9ecef; margin:18px 0 12px 0;"></div><h3 style="font-size:16px; font-weight:600; color:#1e2a3a; border-left:4px solid #C8102E; padding-left:12px;">📌 Status Details</h3><div style="margin-top:8px;">${statusFields}</div>` : ''}
-
-                <div style="border-top:1px solid #e9ecef; margin:18px 0 12px 0;"></div>
-                <h3 style="font-size:16px; font-weight:600; color:#1e2a3a; border-left:4px solid #C8102E; padding-left:12px;">✅ Final Verification</h3>
-                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px 24px; margin-top:8px;">
-                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Function O.K.</label><div>${job.functionOk ? 'Yes' : 'No'}</div></div>
-                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Safety O.K.</label><div>${job.safetyOk ? 'Yes' : 'No'}</div></div>
-                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Comments</label><div>${job.comments || 'N/A'}</div></div>
+                <!-- Service & Timeline -->
+                <div style="border-top:1px solid #e9ecef; margin:8px 0 6px 0;"></div>
+                <h3 style="font-size:13px; font-weight:600; color:#1e2a3a; border-left:3px solid #C8102E; padding-left:8px; margin:4px 0;">⏱️ Service & Timeline</h3>
+                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:4px 12px;">
+                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Service Type</label><div style="font-size:12px;">${job.serviceType || 'N/A'}</div></div>
+                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Job Started</label><div style="font-size:12px;">${formatDateForPDF(job.startDateTime)}</div></div>
+                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Job Completed</label><div style="font-size:12px;">${formatDateForPDF(job.endDateTime)}</div></div>
+                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Total Time</label><div style="font-size:12px;">${job.totalTime || 'N/A'}</div></div>
+                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Response Time</label><div style="font-size:12px;">${job.responseTime || 'N/A'}</div></div>
+                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Admin Time</label><div style="font-size:12px;">${job.adminTime || 'N/A'}</div></div>
                 </div>
 
-                <div style="border-top:1px solid #e9ecef; margin:18px 0 12px 0;"></div>
-                <h3 style="font-size:16px; font-weight:600; color:#1e2a3a; border-left:4px solid #C8102E; padding-left:12px;">✍️ Signatures</h3>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:30px; margin-top:8px;">
-                    <div style="border:1px solid #e9ecef; border-radius:8px; padding:16px 18px; background:#f8f9fa;">
-                        <h4 style="font-size:14px; color:#C8102E; margin:0 0 8px 0;">👨‍🔧 Technician</h4>
-                        <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Name</label><div>${job.techName || 'N/A'}</div></div>
-                        <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Signature</label><div>${techSigImg ? `<img src="${techSigImg}" style="max-width:200px; max-height:80px; border:1px solid #ddd; background:white;" />` : 'Not signed'}</div></div>
-                        <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Date</label><div>${job.techDate || 'N/A'}</div></div>
+                ${statusFields ? `<div style="border-top:1px solid #e9ecef; margin:8px 0 6px 0;"></div><h3 style="font-size:13px; font-weight:600; color:#1e2a3a; border-left:3px solid #C8102E; padding-left:8px; margin:4px 0;">📌 Status Details</h3><div style="margin-top:4px;">${statusFields}</div>` : ''}
+
+                <!-- Final Verification -->
+                <div style="border-top:1px solid #e9ecef; margin:8px 0 6px 0;"></div>
+                <h3 style="font-size:13px; font-weight:600; color:#1e2a3a; border-left:3px solid #C8102E; padding-left:8px; margin:4px 0;">✅ Final Verification</h3>
+                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:4px 12px;">
+                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Function O.K.</label><div style="font-size:12px;">${job.functionOk ? 'Yes' : 'No'}</div></div>
+                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Safety O.K.</label><div style="font-size:12px;">${job.safetyOk ? 'Yes' : 'No'}</div></div>
+                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Comments</label><div style="font-size:12px;">${job.comments || 'N/A'}</div></div>
+                </div>
+
+                <!-- Signatures -->
+                <div style="border-top:1px solid #e9ecef; margin:8px 0 6px 0;"></div>
+                <h3 style="font-size:13px; font-weight:600; color:#1e2a3a; border-left:3px solid #C8102E; padding-left:8px; margin:4px 0;">✍️ Signatures</h3>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:4px;">
+                    <div style="border:1px solid #e9ecef; border-radius:6px; padding:8px 12px; background:#f8f9fa;">
+                        <h4 style="font-size:12px; color:#C8102E; margin:0 0 4px 0;">👨‍🔧 Technician</h4>
+                        <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Name</label><div style="font-size:12px;">${job.techName || 'N/A'}</div></div>
+                        <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Signature</label><div style="font-size:12px;">${techSigImg ? `<img src="${techSigImg}" style="max-width:180px; max-height:60px; border:1px solid #ddd; background:white;" />` : 'Not signed'}</div></div>
+                        <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Date</label><div style="font-size:12px;">${job.techDate || 'N/A'}</div></div>
                     </div>
-                    <div style="border:1px solid #e9ecef; border-radius:8px; padding:16px 18px; background:#f8f9fa;">
-                        <h4 style="font-size:14px; color:#C8102E; margin:0 0 8px 0;">✅ Supervisor</h4>
-                        <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Name</label><div>${job.certName || 'N/A'}</div></div>
-                        <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Signature</label><div>${certSigImg ? `<img src="${certSigImg}" style="max-width:200px; max-height:80px; border:1px solid #ddd; background:white;" />` : 'Not signed'}</div></div>
-                        <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Date</label><div>${job.certDate || 'N/A'}</div></div>
+                    <div style="border:1px solid #e9ecef; border-radius:6px; padding:8px 12px; background:#f8f9fa;">
+                        <h4 style="font-size:12px; color:#C8102E; margin:0 0 4px 0;">✅ Supervisor</h4>
+                        <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Name</label><div style="font-size:12px;">${job.certName || 'N/A'}</div></div>
+                        <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Signature</label><div style="font-size:12px;">${certSigImg ? `<img src="${certSigImg}" style="max-width:180px; max-height:60px; border:1px solid #ddd; background:white;" />` : 'Not signed'}</div></div>
+                        <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Date</label><div style="font-size:12px;">${job.certDate || 'N/A'}</div></div>
                     </div>
                 </div>
 
-                <div style="margin-top:20px; font-size:12px; color:#6c757d; text-align:center; border-top:1px solid #e9ecef; padding-top:14px;">
+                <div style="margin-top:8px; font-size:9px; color:#6c757d; text-align:center; border-top:1px solid #e9ecef; padding-top:6px;">
                     🔥 Firestore‑powered · ✍️ Drawable Signatures · MCRH Job Card
                 </div>
             `;
@@ -1371,7 +1377,7 @@
             const pdf = new jsPDF('p', 'mm', 'a4');
             const imgWidth = 210;
             const imgHeight = (canvas.height * imgWidth) / canvas.width;
-            // Multi‑page
+            // Multi‑page if needed
             let heightLeft = imgHeight;
             let position = 0;
             const pageHeight = 297;
