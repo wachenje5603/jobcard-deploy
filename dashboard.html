@@ -23,7 +23,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
     <style>
-        /* (your existing styles – unchanged, kept for brevity) */
+        /* (your existing styles – unchanged) */
         * { margin:0; padding:0; box-sizing:border-box; }
         :root { --primary: #C8102E; --primary-gradient: linear-gradient(135deg, #C8102E, #e81a3f); --bg: #f4f6fb; --card-bg: #ffffff; --text: #1a1a2e; --text-muted: #6c7a8a; --shadow: 0 8px 32px rgba(0,0,0,0.06); --radius: 16px; --radius-sm: 10px; }
         body { font-family:'Inter', sans-serif; background:var(--bg); color:var(--text); padding:16px; }
@@ -218,8 +218,7 @@
                     <option value="admin">Admin</option>
                 </select>
             </div>
-
-            <!-- Single Department -->
+            <!-- Department selects (unchanged, all departments included) -->
             <div class="form-group" id="deptFieldContainer" style="display:block;">
                 <label id="deptLabel">Department (for requester)</label>
                 <select id="newUserDept">
@@ -278,11 +277,10 @@
                     </optgroup>
                 </select>
             </div>
-
-            <!-- Multi Department -->
             <div class="form-group" id="multiDeptContainer" style="display:none;">
                 <label>Select departments the engineer will handle (hold Ctrl/Cmd to choose multiple)</label>
                 <select id="newUserDepts" multiple size="5">
+                    <!-- Same departments as above -->
                     <optgroup label="🏥 CURATIVE & CLINICAL WARDS">
                         <option value="ACCIDENTS AND EMERGENCY">ACCIDENTS AND EMERGENCY</option>
                         <option value="TRIAGE">TRIAGE</option>
@@ -338,8 +336,6 @@
                 </select>
                 <small style="color:#6c757d;">Hold Ctrl (Windows) or Cmd (Mac) to select multiple.</small>
             </div>
-
-            <!-- WhatsApp -->
             <div class="form-group" id="whatsappFieldContainer">
                 <label>WhatsApp Number (for maintenance)</label>
                 <div class="whatsapp-inline">
@@ -375,7 +371,6 @@
                     </div>
                 </div>
             </div>
-
             <button class="btn btn-success" id="saveUserBtn" onclick="saveUser()"><i class="fas fa-save"></i> Save User</button>
             <div id="userModalError" class="error-text"></div>
             <div id="userModalSuccess" class="success-text"></div>
@@ -1076,8 +1071,10 @@
     }
 
     // ================================================================
-    // SIGNATURE CONVERTER (helper)
+    // PDF GENERATION – EXACT MATCH OF YOUR SAMPLES
     // ================================================================
+
+    // Helper: convert signature strokes to a PNG data URL
     function signatureToDataURL(signatureData, width = 300, height = 80) {
         if (!signatureData || !Array.isArray(signatureData) || signatureData.length === 0) {
             return null;
@@ -1142,27 +1139,12 @@
         return canvas.toDataURL('image/png');
     }
 
-    // ================================================================
-    // ENHANCED PDF DOWNLOAD – EXACT MATCH OF USER'S SAMPLES
-    // ================================================================
-
-    function getHeaderHTML() {
-        return `
-            <div style="text-align: center; border-bottom: 2px solid #C8102E; padding-bottom: 8px; margin-bottom: 15px;">
-                <h1 style="font-size: 22px; color: #C8102E; margin: 0; font-weight: 700;">MOI VOI COUNTY REFERRAL HOSPITAL</h1>
-                <div style="font-size: 12px; color: #333; font-weight: 500;">P.O. BOX 18-80300 VOI | Email: biomedsmoivoi@gmail.com</div>
-                <div style="font-size: 13px; font-weight: 700; color: #C8102E; margin-top: 2px;">TAITA TAVETA COUNTY</div>
-                <div style="font-size: 12px; font-weight: 600; color: #C8102E;">DEPARTMENT OF HEALTH SERVICES</div>
-            </div>
-        `;
-    }
-
+    // Helper: format date like "8/7/2026,7:04:00 PM"
     function formatDateForPDF(dateString) {
         if (!dateString) return 'N/A';
         try {
             const d = new Date(dateString);
             if (isNaN(d)) return dateString;
-            // Format: M/D/YYYY, H:MM:SS AM/PM (no spaces after commas)
             const month = d.getMonth() + 1;
             const day = d.getDate();
             const year = d.getFullYear();
@@ -1177,6 +1159,19 @@
         }
     }
 
+    // Helper: build the header HTML for PDFs
+    function getHeaderHTML() {
+        return `
+            <div style="text-align: center; border-bottom: 2px solid #C8102E; padding-bottom: 10px; margin-bottom: 15px;">
+                <h1 style="font-size: 22px; color: #C8102E; margin: 0; font-weight: 700;">MOI VOI COUNTY REFERRAL HOSPITAL</h1>
+                <div style="font-size: 12px; color: #333; font-weight: 500;">P.O. BOX 18-80300 VOI | Email: biomedsmoivoi@gmail.com</div>
+                <div style="font-size: 13px; font-weight: 700; color: #C8102E; margin-top: 2px;">TAITA TAVETA COUNTY</div>
+                <div style="font-size: 12px; font-weight: 600; color: #C8102E;">DEPARTMENT OF HEALTH SERVICES</div>
+            </div>
+        `;
+    }
+
+    // ---- REQUEST SLIP PDF ----
     window.downloadRequestPDF = async function(requestId) {
         if (!requestId) {
             showToast('Invalid request ID.', true);
@@ -1230,6 +1225,7 @@
         }
     };
 
+    // ---- JOBCARD PDF ----
     window.downloadJobcardPDF = async function(jobcardId) {
         if (!jobcardId) {
             showToast('Invalid jobcard ID.', true);
@@ -1244,31 +1240,34 @@
             }
             const job = docSnap.data();
 
-            // Build the HTML
-            const statusBadge = job.status ? `<span style="font-weight:700; color:#C8102E;">${job.status}</span>` : '';
+            // Convert signatures to images
             const techSigImg = signatureToDataURL(job.techSignature);
             const certSigImg = signatureToDataURL(job.certSignature);
 
-            // Build status-specific fields
-            let statusFields = '';
+            // Build the HTML with table layout
+            let statusBadge = job.status || 'Pending';
+            let statusColor = '#C8102E';
+            if (statusBadge === 'Pending' || statusBadge === 'Postponed') statusColor = '#f59e0b';
+            else if (statusBadge === 'Completed') statusColor = '#22c55e';
+            else if (statusBadge === 'Written Off') statusColor = '#dc3545';
+
+            // Build status-specific rows
+            let statusRows = '';
             if (job.status === 'Postponed') {
-                statusFields = `
-                    <div><strong>REASON FOR POSTPONEMENT</strong> ${job.postponeReason || 'N/A'} ${job.postponeNote ? '- ' + job.postponeNote : ''}</div>
-                    <div><strong>EXPECTED COMPLETION</strong> ${job.expectedDate ? formatDateForPDF(job.expectedDate) : 'N/A'}</div>
+                statusRows = `
+                    <tr><td style="padding:4px 0; font-weight:bold;">REASON FOR POSTPONEMENT</td><td style="padding:4px 0;">${job.postponeReason || 'N/A'} ${job.postponeNote ? '- ' + job.postponeNote : ''}</td></tr>
+                    <tr><td style="padding:4px 0; font-weight:bold;">EXPECTED COMPLETION</td><td style="padding:4px 0;">${formatDateForPDF(job.expectedDate)}</td></tr>
                 `;
             } else if (job.status === 'Completed') {
-                statusFields = `
-                    <div><strong>DEFECTS FOUND</strong> ${job.defects || 'N/A'}</div>
-                    <div><strong>ACTION TAKEN</strong> ${job.actionTaken || 'N/A'}</div>
+                statusRows = `
+                    <tr><td style="padding:4px 0; font-weight:bold;">DEFECTS FOUND</td><td style="padding:4px 0;">${job.defects || 'N/A'}</td></tr>
+                    <tr><td style="padding:4px 0; font-weight:bold;">ACTION TAKEN</td><td style="padding:4px 0;">${job.actionTaken || 'N/A'}</td></tr>
                 `;
             } else if (job.status === 'Written Off') {
-                statusFields = `
-                    <div><strong>WRITE‑OFF REASON</strong> ${job.writeOffReason || 'N/A'} ${job.writeOffNote ? '- ' + job.writeOffNote : ''}</div>
+                statusRows = `
+                    <tr><td style="padding:4px 0; font-weight:bold;">WRITE‑OFF REASON</td><td style="padding:4px 0;">${job.writeOffReason || 'N/A'} ${job.writeOffNote ? '- ' + job.writeOffNote : ''}</td></tr>
                 `;
             }
-
-            const techSigHTML = techSigImg ? `<img src="${techSigImg}" style="max-width:200px; max-height:80px; border:1px solid #ddd; background:white;" />` : 'Not signed';
-            const certSigHTML = certSigImg ? `<img src="${certSigImg}" style="max-width:200px; max-height:80px; border:1px solid #ddd; background:white;" />` : 'Not signed';
 
             const tempDiv = document.createElement('div');
             tempDiv.style.position = 'fixed';
@@ -1280,48 +1279,46 @@
             tempDiv.style.fontFamily = 'Segoe UI, Arial, sans-serif';
             tempDiv.innerHTML = `
                 ${getHeaderHTML()}
-                <h2 style="text-align: center; font-size: 18px; color: #C8102E; margin: 10px 0; font-weight: 600;">EQUIPMENT MAINTENANCE JOB CARD</h2>
-                <div style="text-align:center; font-size:16px; font-weight:600; color:#C8102E; margin-bottom:10px;">${statusBadge}</div>
-                <div style="font-size: 14px; line-height: 2;">
-                    <div><strong>JOB CARD NO.</strong> ${job.jobNo || 'N/A'}</div>
-                    <div><strong>REPORTING DATE/TIME</strong> ${formatDateForPDF(job.reportingDateTime)}</div>
-                    <div><strong>REQUESTER NAME</strong> ${job.requester || 'N/A'}</div>
-                    <div><strong>INVENTORY/ASSET NO.</strong> ${job.inventory || 'N/A'}</div>
-                    <div><strong>MODEL/MAKE</strong> ${job.modelMake || 'N/A'}</div>
-                    <div><strong>COMPLAINT</strong> ${job.complaint || 'N/A'}</div>
-                    <div><strong>DIAGNOSIS</strong> ${job.diagnosis || 'N/A'}</div>
-                    <div><strong>RECEIVED FROM</strong> ${job.receivedFrom || 'N/A'}</div>
-                    <div><strong>HANDED BACK TO</strong> ${job.handedTo || 'N/A'}</div>
-                    <div><strong>DATE/TIME RECEIVED</strong> ${formatDateForPDF(job.receivedDateTime)}</div>
-                    <div><strong>DATE/TIME HANDED</strong> ${formatDateForPDF(job.handedDateTime)}</div>
-                    <div><strong>RECEIVED BY</strong> ${job.receivedBy || 'N/A'}</div>
-                    <div><strong>HANDED BY</strong> ${job.handedBy || 'N/A'}</div>
-                    <hr style="border: 1px solid #ddd; margin: 8px 0;" />
-                    <h3 style="font-size: 16px; color: #C8102E; margin: 5px 0;">Service & Timeline</h3>
-                    <div><strong>SERVICE TYPE</strong> ${job.serviceType || 'N/A'}</div>
-                    <div><strong>TOTAL TIME</strong> ${job.totalTime || 'N/A'}</div>
-                    <div><strong>JOB STARTED</strong> ${formatDateForPDF(job.startDateTime)}</div>
-                    <div><strong>RESPONSE TIME</strong> ${job.responseTime || 'N/A'}</div>
-                    <div><strong>JOB COMPLETED</strong> ${formatDateForPDF(job.endDateTime)}</div>
-                    <div><strong>ADMIN/REQUISITION TIME</strong> ${job.adminTime || 'N/A'}</div>
-                    <hr style="border: 1px solid #ddd; margin: 8px 0;" />
-                    <h3 style="font-size: 16px; color: #C8102E; margin: 5px 0;">Final Verification</h3>
-                    <div><strong>Function O.K.</strong> ${job.functionOk ? 'Yes' : 'No'}</div>
-                    <div><strong>Safety O.K.</strong> ${job.safetyOk ? 'Yes' : 'No'}</div>
-                    <div><strong>COMMENTS</strong> ${job.comments || 'N/A'}</div>
-                    ${statusFields}
-                    <hr style="border: 1px solid #ddd; margin: 8px 0;" />
-                    <h3 style="font-size: 16px; color: #C8102E; margin: 5px 0;">Technician</h3>
-                    <div><strong>NAME</strong> ${job.techName || 'N/A'}</div>
-                    <div><strong>Signature</strong></div>
-                    <div style="margin-left:20px;">${techSigHTML}</div>
-                    <div><strong>DATE</strong> ${job.techDate || 'N/A'}</div>
-                    <div style="margin-top: 10px;"><strong>Supervisor NAME</strong> ${job.certName || 'N/A'}</div>
-                    <div><strong>Signature</strong></div>
-                    <div style="margin-left:20px;">${certSigHTML}</div>
-                    <div><strong>DATE</strong> ${job.certDate || 'N/A'}</div>
-                </div>
-                <div style="text-align: center; margin-top: 30px; font-size: 12px; color: #888;">Generated on ${new Date().toLocaleString()}</div>
+                <h2 style="text-align:center; font-size:18px; color:#C8102E; margin:5px 0;">EQUIPMENT MAINTENANCE JOB CARD</h2>
+                <div style="text-align:center; font-size:16px; font-weight:bold; color:${statusColor}; margin-bottom:10px;">${statusBadge}</div>
+                <table style="width:100%; font-size:14px; border-collapse:collapse; margin-top:5px;">
+                    <tr><td style="padding:4px 0; font-weight:bold; width:200px;">JOB CARD NO.</td><td style="padding:4px 0;">${job.jobNo || 'N/A'}</td></tr>
+                    <tr><td style="padding:4px 0; font-weight:bold;">REPORTING DATE/TIME</td><td style="padding:4px 0;">${formatDateForPDF(job.reportingDateTime)}</td></tr>
+                    <tr><td style="padding:4px 0; font-weight:bold;">REQUESTER NAME</td><td style="padding:4px 0;">${job.requester || 'N/A'}</td></tr>
+                    <tr><td style="padding:4px 0; font-weight:bold;">INVENTORY/ASSET NO.</td><td style="padding:4px 0;">${job.inventory || 'N/A'}</td></tr>
+                    <tr><td style="padding:4px 0; font-weight:bold;">MODEL/MAKE</td><td style="padding:4px 0;">${job.modelMake || 'N/A'}</td></tr>
+                    <tr><td style="padding:4px 0; font-weight:bold;">COMPLAINT</td><td style="padding:4px 0;">${job.complaint || 'N/A'}</td></tr>
+                    <tr><td style="padding:4px 0; font-weight:bold;">DIAGNOSIS</td><td style="padding:4px 0;">${job.diagnosis || 'N/A'}</td></tr>
+                    <tr><td style="padding:4px 0; font-weight:bold;">RECEIVED FROM</td><td style="padding:4px 0;">${job.receivedFrom || 'N/A'}</td></tr>
+                    <tr><td style="padding:4px 0; font-weight:bold;">HANDED BACK TO</td><td style="padding:4px 0;">${job.handedTo || 'N/A'}</td></tr>
+                    <tr><td style="padding:4px 0; font-weight:bold;">DATE/TIME RECEIVED</td><td style="padding:4px 0;">${formatDateForPDF(job.receivedDateTime)}</td></tr>
+                    <tr><td style="padding:4px 0; font-weight:bold;">DATE/TIME HANDED</td><td style="padding:4px 0;">${formatDateForPDF(job.handedDateTime)}</td></tr>
+                    <tr><td style="padding:4px 0; font-weight:bold;">RECEIVED BY</td><td style="padding:4px 0;">${job.receivedBy || 'N/A'}</td></tr>
+                    <tr><td style="padding:4px 0; font-weight:bold;">HANDED BY</td><td style="padding:4px 0;">${job.handedBy || 'N/A'}</td></tr>
+                    <tr><td colspan="2" style="padding:10px 0; border-bottom:1px solid #ddd;"></td></tr>
+                    <tr><td colspan="2" style="padding:8px 0; font-weight:bold; font-size:16px; color:#C8102E;">Service &amp; Timeline</td></tr>
+                    <tr><td style="padding:4px 0; font-weight:bold;">SERVICE TYPE</td><td style="padding:4px 0;">${job.serviceType || 'N/A'}</td></tr>
+                    <tr><td style="padding:4px 0; font-weight:bold;">TOTAL TIME</td><td style="padding:4px 0;">${job.totalTime || 'N/A'}</td></tr>
+                    <tr><td style="padding:4px 0; font-weight:bold;">JOB STARTED</td><td style="padding:4px 0;">${formatDateForPDF(job.startDateTime)}</td></tr>
+                    <tr><td style="padding:4px 0; font-weight:bold;">RESPONSE TIME</td><td style="padding:4px 0;">${job.responseTime || 'N/A'}</td></tr>
+                    <tr><td style="padding:4px 0; font-weight:bold;">JOB COMPLETED</td><td style="padding:4px 0;">${formatDateForPDF(job.endDateTime)}</td></tr>
+                    <tr><td style="padding:4px 0; font-weight:bold;">ADMIN/REQUISITION TIME</td><td style="padding:4px 0;">${job.adminTime || 'N/A'}</td></tr>
+                    <tr><td colspan="2" style="padding:10px 0; border-bottom:1px solid #ddd;"></td></tr>
+                    <tr><td colspan="2" style="padding:8px 0; font-weight:bold; font-size:16px; color:#C8102E;">Final Verification</td></tr>
+                    <tr><td style="padding:4px 0; font-weight:bold;">Function O.K.</td><td style="padding:4px 0;">${job.functionOk ? 'Yes' : 'No'}</td></tr>
+                    <tr><td style="padding:4px 0; font-weight:bold;">Safety O.K.</td><td style="padding:4px 0;">${job.safetyOk ? 'Yes' : 'No'}</td></tr>
+                    <tr><td style="padding:4px 0; font-weight:bold;">COMMENTS</td><td style="padding:4px 0;">${job.comments || 'N/A'}</td></tr>
+                    ${statusRows}
+                    <tr><td colspan="2" style="padding:10px 0; border-bottom:1px solid #ddd;"></td></tr>
+                    <tr><td colspan="2" style="padding:8px 0; font-weight:bold; font-size:16px; color:#C8102E;">Technician</td></tr>
+                    <tr><td style="padding:4px 0; font-weight:bold;">NAME</td><td style="padding:4px 0;">${job.techName || 'N/A'}</td></tr>
+                    <tr><td style="padding:4px 0; font-weight:bold;">Signature</td><td style="padding:4px 0;">${techSigImg ? `<img src="${techSigImg}" style="max-width:200px; max-height:80px; border:1px solid #ddd; background:white;" />` : 'Not signed'}</td></tr>
+                    <tr><td style="padding:4px 0; font-weight:bold;">DATE</td><td style="padding:4px 0;">${job.techDate || 'N/A'}</td></tr>
+                    <tr><td style="padding:4px 0; font-weight:bold; padding-top:10px;">Supervisor NAME</td><td style="padding:4px 0; padding-top:10px;">${job.certName || 'N/A'}</td></tr>
+                    <tr><td style="padding:4px 0; font-weight:bold;">Signature</td><td style="padding:4px 0;">${certSigImg ? `<img src="${certSigImg}" style="max-width:200px; max-height:80px; border:1px solid #ddd; background:white;" />` : 'Not signed'}</td></tr>
+                    <tr><td style="padding:4px 0; font-weight:bold;">DATE</td><td style="padding:4px 0;">${job.certDate || 'N/A'}</td></tr>
+                </table>
+                <div style="text-align:center; margin-top:30px; font-size:12px; color:#888;">Generated on ${new Date().toLocaleString()}</div>
             `;
             document.body.appendChild(tempDiv);
             const canvas = await html2canvas(tempDiv, { scale: 2, useCORS: true });
@@ -1331,6 +1328,7 @@
             const pdf = new jsPDF('p', 'mm', 'a4');
             const imgWidth = 210;
             const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            // If the content is taller than one page, split into multiple pages
             let heightLeft = imgHeight;
             let position = 0;
             const pageHeight = 297;
