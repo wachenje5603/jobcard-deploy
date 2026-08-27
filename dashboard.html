@@ -23,7 +23,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
     <style>
-        /* ===== BASE ===== */
+        /* (styles – same as before, unchanged) */
         * { margin:0; padding:0; box-sizing:border-box; }
         :root { --primary: #C8102E; --primary-gradient: linear-gradient(135deg, #C8102E, #e81a3f); --bg: #f4f6fb; --card-bg: #ffffff; --text: #1a1a2e; --text-muted: #6c7a8a; --shadow: 0 8px 32px rgba(0,0,0,0.06); --radius: 16px; --radius-sm: 10px; }
         body { font-family:'Inter', sans-serif; background:var(--bg); color:var(--text); padding:16px; }
@@ -602,7 +602,7 @@
     window.toggleRoleFields = toggleRoleFields;
 
     // ================================================================
-    // FETCH DATA – FIXED FOR MAINTENANCE
+    // FETCH DATA – FIXED for requester jobcards
     // ================================================================
     async function fetchData() {
         console.log('🔍 fetchData() called.');
@@ -666,19 +666,29 @@
                 const dept = currentUser?.department;
                 let queries = [];
                 if (dept) {
+                    // Fetch jobcards from the requester's department
                     queries.push(query(collection(db, JOBCARDS_COLL), where('unit', '==', dept), orderBy('updatedAt', 'desc')));
                 }
+                // Also fetch own jobcards (in case they are not in their own department)
                 queries.push(query(collection(db, JOBCARDS_COLL), where('requesterId', '==', currentUser.id), orderBy('updatedAt', 'desc')));
-                for (const q of queries) {
-                    const snap = await getDocs(q);
-                    snap.forEach(doc => { jobcards.push({ id: doc.id, ...doc.data() }); });
-                }
+                // Use a set to deduplicate
                 const seen = new Set();
-                allJobCards = jobcards.filter(j => {
-                    if (seen.has(j.id)) return false;
-                    seen.add(j.id);
-                    return true;
-                });
+                for (const q of queries) {
+                    try {
+                        const snap = await getDocs(q);
+                        snap.forEach(doc => {
+                            const data = doc.data();
+                            data.id = doc.id;
+                            if (!seen.has(doc.id)) {
+                                seen.add(doc.id);
+                                jobcards.push(data);
+                            }
+                        });
+                    } catch (err) {
+                        console.warn('Query failed:', err);
+                    }
+                }
+                allJobCards = jobcards;
                 console.log(`✅ Fetched ${allJobCards.length} jobcards for requester.`);
             } else {
                 allJobCards = [];
@@ -702,9 +712,7 @@
                 }
             });
 
-            // =============================================================
-            // ★★★ FIX: Only fetch all users if ADMIN ★★★
-            // =============================================================
+            // Fetch users (only for admin)
             if (isAdmin) {
                 const userSnap = await getDocs(collection(db, USERS_COLL));
                 allUsers = [];
@@ -808,14 +816,14 @@
                     <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
                 </div>
             `;
-        } else { // Requester – updated stats
+        } else { // Requester
             statsHtml = `
                 <div class="stat-card myrequests" onclick="switchView('requests')">
                     <div class="stat-left"><div class="number">${myRequests.length}</div><div class="label">📋 My Requests</div></div>
                     <div class="stat-icon"><i class="fas fa-file-alt"></i></div>
                 </div>
                 <div class="stat-card jobcards" onclick="switchView('jobcards')">
-                    <div class="stat-left"><div class="number">${totalJobcards}</div><div class="label">📋 My Jobcards</div></div>
+                    <div class="stat-left"><div class="number">${totalJobcards}</div><div class="label">📋 Dept. Jobcards</div></div>
                     <div class="stat-icon"><i class="fas fa-tools"></i></div>
                 </div>
                 <div class="stat-card pending" onclick="applyFilter('pending')">
@@ -855,7 +863,6 @@
         }
         actionButtons.innerHTML = actionsHtml;
 
-        // Attach event listeners
         document.getElementById('manageUsersBtn')?.addEventListener('click', openUserModal);
         document.getElementById('approveUsersBtn')?.addEventListener('click', showPendingUsers);
         document.getElementById('newRequestBtn')?.addEventListener('click', () => window.location.href='request.html');
@@ -933,7 +940,7 @@
             if (isRequester) title = '📋 My Requests';
             else title = '📋 All Requests';
         } else {
-            if (isRequester) title = '📋 My Jobcards';
+            if (isRequester) title = '📋 Dept. Jobcards';
             else title = '📋 All Jobcards';
         }
         tableTitle.textContent = title;
@@ -1187,174 +1194,68 @@
     }
 
     // ================================================================
-    // ACTIONS
+    // PDF DOWNLOAD – FIXED
     // ================================================================
-    window.createJob = (requestNo) => window.location.href = `jobcard.html?request=${requestNo}`;
-    window.editJobCard = (id) => window.open(`jobcard.html?view=${id}`, '_blank');
-
-    // ================================================================
-    // PDF FUNCTIONS
-    // ================================================================
-    function signatureToDataURL(signatureData, width = 400, height = 120) {
-        if (!signatureData) return null;
-        let strokes = signatureData;
-        if (!Array.isArray(strokes)) {
-            if (typeof strokes === 'object' && strokes.points) {
-                strokes = strokes.points;
-            } else if (typeof strokes === 'object' && strokes.data) {
-                strokes = strokes.data;
-            } else {
-                console.warn('Signature data is not an array:', strokes);
-                return null;
-            }
+    window.downloadRequestPDF = async function(requestId) {
+        if (!requestId) {
+            showToast('Invalid request ID.', true);
+            return;
         }
-        if (!Array.isArray(strokes) || strokes.length === 0) return null;
-
-        const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = 'white';
-        ctx.fillRect(0, 0, width, height);
-        ctx.strokeStyle = 'black';
-        ctx.lineWidth = 2;
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-
-        strokes.forEach(stroke => {
-            let points = stroke;
-            if (!Array.isArray(points)) {
-                if (points.points) points = points.points;
-                else if (points.data) points = points.data;
-                else {
-                    console.warn('Invalid stroke:', stroke);
-                    return;
-                }
-            }
-            if (!Array.isArray(points) || points.length === 0) return;
-            ctx.beginPath();
-            let first = true;
-            points.forEach(point => {
-                let x, y;
-                if (typeof point === 'object' && point !== null) {
-                    x = point.x;
-                    y = point.y;
-                    if (x === undefined && point[0] !== undefined) {
-                        x = point[0];
-                        y = point[1];
-                    }
-                } else if (Array.isArray(point) && point.length >= 2) {
-                    x = point[0];
-                    y = point[1];
-                } else {
-                    return;
-                }
-                if (x === undefined || y === undefined) return;
-                if (first) {
-                    ctx.moveTo(x, y);
-                    first = false;
-                } else {
-                    ctx.lineTo(x, y);
-                }
-            });
-            ctx.stroke();
-        });
-
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const data = imageData.data;
-        let hasNonWhite = false;
-        for (let i = 0; i < data.length; i += 4) {
-            if (data[i] < 255 || data[i+1] < 255 || data[i+2] < 255) {
-                hasNonWhite = true;
-                break;
-            }
-        }
-        if (!hasNonWhite) return null;
-
-        return canvas.toDataURL('image/png');
-    }
-
-    async function captureAndSavePDF(templateDiv, filename) {
-        templateDiv.style.position = 'fixed';
-        templateDiv.style.left = '0';
-        templateDiv.style.top = '0';
-        templateDiv.style.width = '800px';
-        templateDiv.style.height = 'auto';
-        templateDiv.style.overflow = 'visible';
-        templateDiv.style.opacity = '1';
-        templateDiv.style.pointerEvents = 'none';
-        templateDiv.style.zIndex = '9999';
-        templateDiv.style.background = 'white';
-        templateDiv.style.padding = '30px';
-
-        templateDiv.offsetHeight;
-        await new Promise(resolve => setTimeout(resolve, 600));
-
-        const canvas = await html2canvas(templateDiv, {
-            scale: 2,
-            useCORS: true,
-            logging: false,
-            backgroundColor: '#ffffff',
-            allowTaint: false,
-            width: 800,
-            height: templateDiv.scrollHeight,
-            windowWidth: 800,
-            windowHeight: templateDiv.scrollHeight,
-            scrollX: 0,
-            scrollY: 0,
-            onclone: (clonedDoc) => {
-                const clonedEl = clonedDoc.getElementById(templateDiv.id);
-                if (clonedEl) {
-                    clonedEl.style.height = 'auto';
-                    clonedEl.style.overflow = 'visible';
-                }
-            }
-        });
-
-        templateDiv.style.opacity = '0';
-        templateDiv.style.zIndex = '-1';
-        templateDiv.style.pointerEvents = 'none';
-
-        let imgData;
+        showToast('Generating PDF...');
         try {
-            imgData = canvas.toDataURL('image/png');
-            if (imgData.length < 1000) throw new Error('Empty PNG');
-        } catch (e) {
-            console.warn('PNG fallback to JPEG:', e);
-            imgData = canvas.toDataURL('image/jpeg', 0.95);
+            const docSnap = await getDoc(doc(db, REQUESTS_COLL, requestId));
+            if (!docSnap.exists()) {
+                showToast('Request not found.', true);
+                return;
+            }
+            const req = docSnap.data();
+            // Build a temporary div for PDF
+            const tempDiv = document.createElement('div');
+            tempDiv.style.position = 'fixed';
+            tempDiv.style.left = '-9999px';
+            tempDiv.style.top = '0';
+            tempDiv.style.width = '800px';
+            tempDiv.style.padding = '30px';
+            tempDiv.style.background = 'white';
+            tempDiv.style.fontFamily = 'Segoe UI, sans-serif';
+            tempDiv.innerHTML = `
+                <h1 style="color:#C8102E;">MOI VOI COUNTY REFERRAL HOSPITAL</h1>
+                <h2>Service Request Slip</h2>
+                <hr />
+                <p><strong>Request No.:</strong> ${req.requestNo}</p>
+                <p><strong>Date:</strong> ${req.dateTime}</p>
+                <p><strong>Requester:</strong> ${req.requesterName}</p>
+                <p><strong>Unit/Ward:</strong> ${req.unit}</p>
+                <p><strong>Equipment:</strong> ${req.equipName}</p>
+                <p><strong>Inventory:</strong> ${req.inventory || 'N/A'}</p>
+                <p><strong>Serial No.:</strong> ${req.serial || 'N/A'}</p>
+                <p><strong>Model:</strong> ${req.modelMake || 'N/A'}</p>
+                <p><strong>Complaint:</strong> ${req.complaint}</p>
+                <hr />
+                <p style="font-size:12px;">Generated on ${new Date().toLocaleString()}</p>
+            `;
+            document.body.appendChild(tempDiv);
+            const canvas = await html2canvas(tempDiv, { scale: 2, useCORS: true });
+            document.body.removeChild(tempDiv);
+            const imgData = canvas.toDataURL('image/png');
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const imgWidth = 210;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+            pdf.save(`request_${req.requestNo}.pdf`);
+            showToast('✅ PDF downloaded.');
+        } catch (err) {
+            console.error('PDF generation error:', err);
+            showToast('Error generating PDF: ' + err.message, true);
         }
-
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const imgWidth = 210;
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-        let remainingHeight = canvas.height;
-        let yOffset = 0;
-        const pageHeightPx = (297 * canvas.width) / 210;
-
-        while (remainingHeight > 0) {
-            const currentHeight = Math.min(remainingHeight, pageHeightPx);
-            const sliceCanvas = document.createElement('canvas');
-            sliceCanvas.width = canvas.width;
-            sliceCanvas.height = currentHeight;
-            const ctx = sliceCanvas.getContext('2d');
-            ctx.drawImage(canvas, 0, yOffset, canvas.width, currentHeight, 0, 0, canvas.width, currentHeight);
-            const sliceData = sliceCanvas.toDataURL('image/jpeg', 0.95);
-
-            if (yOffset > 0) pdf.addPage();
-            const sliceWidth = imgWidth;
-            const sliceHeight = (currentHeight * imgWidth) / canvas.width;
-            pdf.addImage(sliceData, 'JPEG', 0, 0, sliceWidth, sliceHeight);
-
-            yOffset += currentHeight;
-            remainingHeight -= currentHeight;
-        }
-
-        pdf.save(`${filename}.pdf`);
-    }
+    };
 
     window.downloadJobcardPDF = async function(jobcardId) {
+        if (!jobcardId) {
+            showToast('Invalid jobcard ID.', true);
+            return;
+        }
         showToast('Generating PDF...');
         try {
             const docSnap = await getDoc(doc(db, JOBCARDS_COLL, jobcardId));
@@ -1363,27 +1264,41 @@
                 return;
             }
             const job = docSnap.data();
+            const tempDiv = document.createElement('div');
+            tempDiv.style.position = 'fixed';
+            tempDiv.style.left = '-9999px';
+            tempDiv.style.top = '0';
+            tempDiv.style.width = '800px';
+            tempDiv.style.padding = '30px';
+            tempDiv.style.background = 'white';
+            tempDiv.style.fontFamily = 'Segoe UI, sans-serif';
+            tempDiv.innerHTML = `
+                <h1 style="color:#C8102E;">MOI VOI COUNTY REFERRAL HOSPITAL</h1>
+                <h2>Equipment Maintenance Job Card</h2>
+                <hr />
+                <p><strong>Job No.:</strong> ${job.jobNo}</p>
+                <p><strong>Request No.:</strong> ${job.requestNo}</p>
+                <p><strong>Equipment:</strong> ${job.equipName}</p>
+                <p><strong>Unit/Ward:</strong> ${job.unit}</p>
+                <p><strong>Status:</strong> ${job.status}</p>
+                <p><strong>Technician:</strong> ${job.techName || 'N/A'}</p>
+                <p><strong>Start Date:</strong> ${job.startDateTime || 'N/A'}</p>
+                <p><strong>End Date:</strong> ${job.endDateTime || 'N/A'}</p>
+                <p><strong>Total Time:</strong> ${job.totalTime || 'N/A'}</p>
+                <hr />
+                <p style="font-size:12px;">Generated on ${new Date().toLocaleString()}</p>
+            `;
+            document.body.appendChild(tempDiv);
+            const canvas = await html2canvas(tempDiv, { scale: 2, useCORS: true });
+            document.body.removeChild(tempDiv);
+            const imgData = canvas.toDataURL('image/png');
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const imgWidth = 210;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+            pdf.save(`jobcard_${job.jobNo}.pdf`);
             showToast('✅ PDF downloaded.');
-        } catch (err) {
-            console.error(err);
-            showToast('Error generating PDF: ' + err.message, true);
-        }
-    };
-
-    window.downloadRequestPDF = async function(requestId) {
-        if (!requestId) {
-            showToast('Invalid request ID.', true);
-            return;
-        }
-        showToast('Generating request PDF...');
-        try {
-            const docSnap = await getDoc(doc(db, REQUESTS_COLL, requestId));
-            if (!docSnap.exists()) {
-                showToast('Request not found.', true);
-                return;
-            }
-            const req = docSnap.data();
-            showToast('✅ Request PDF downloaded.');
         } catch (err) {
             console.error('PDF generation error:', err);
             showToast('Error generating PDF: ' + err.message, true);
@@ -1391,7 +1306,7 @@
     };
 
     // ================================================================
-    // USER MANAGEMENT
+    // USER MANAGEMENT (unchanged from previous working version)
     // ================================================================
     window.openUserModal = function() {
         console.log('🔓 Opening user modal');
@@ -1466,7 +1381,7 @@
     };
 
     // ================================================================
-    // SAVE USER – via backend /create-user
+    // SAVE USER – with backend call
     // ================================================================
     window.saveUser = async function() {
         const editId = document.getElementById('editUserId').value;
@@ -1485,7 +1400,6 @@
         errorDiv.style.display = 'none';
         successDiv.style.display = 'none';
 
-        // validation
         if (!email || !name || !role) {
             errorDiv.textContent = 'Please fill in all required fields.';
             errorDiv.style.display = 'block';
@@ -1545,7 +1459,6 @@
                 closeUserModal();
                 showToast('✅ User created successfully.');
             } else {
-                // Edit user (client-side)
                 const userData = {
                     name: name,
                     role: role,
