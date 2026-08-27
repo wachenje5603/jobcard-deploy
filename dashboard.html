@@ -23,7 +23,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
     <style>
-        /* ===== BASE ===== */
+        /* (your existing styles – unchanged) */
         * { margin:0; padding:0; box-sizing:border-box; }
         :root { --primary: #C8102E; --primary-gradient: linear-gradient(135deg, #C8102E, #e81a3f); --bg: #f4f6fb; --card-bg: #ffffff; --text: #1a1a2e; --text-muted: #6c7a8a; --shadow: 0 8px 32px rgba(0,0,0,0.06); --radius: 16px; --radius-sm: 10px; }
         body { font-family:'Inter', sans-serif; background:var(--bg); color:var(--text); padding:16px; }
@@ -219,7 +219,7 @@
                 </select>
             </div>
 
-            <!-- ===== SINGLE DEPARTMENT – ORGANOGRAM ===== -->
+            <!-- Single Department -->
             <div class="form-group" id="deptFieldContainer" style="display:block;">
                 <label id="deptLabel">Department (for requester)</label>
                 <select id="newUserDept">
@@ -279,7 +279,7 @@
                 </select>
             </div>
 
-            <!-- ===== MULTI-DEPARTMENT – ORGANOGRAM ===== -->
+            <!-- Multi Department -->
             <div class="form-group" id="multiDeptContainer" style="display:none;">
                 <label>Select departments the engineer will handle (hold Ctrl/Cmd to choose multiple)</label>
                 <select id="newUserDepts" multiple size="5">
@@ -527,7 +527,7 @@
     window.toggleRoleFields = toggleRoleFields;
 
     // ================================================================
-    // FETCH DATA
+    // FETCH DATA (unchanged)
     // ================================================================
     async function fetchData() {
         console.log('🔍 fetchData() called.');
@@ -658,7 +658,7 @@
     }
 
     // ================================================================
-    // RENDER DASHBOARD
+    // RENDER DASHBOARD (unchanged)
     // ================================================================
     function renderDashboard() {
         if (!currentUser) return;
@@ -789,9 +789,6 @@
         applyFilters();
     }
 
-    // ================================================================
-    // SWITCH VIEW
-    // ================================================================
     window.switchView = function(view) {
         currentView = view;
         buildFilterBar();
@@ -799,9 +796,6 @@
         applyFilters();
     };
 
-    // ================================================================
-    // BUILD FILTER BAR
-    // ================================================================
     function buildFilterBar() {
         const isAdmin = userRole === 'admin';
         const isMaintenance = userRole === 'maintenance';
@@ -842,9 +836,6 @@
         filterBar.innerHTML = filterHtml;
     }
 
-    // ================================================================
-    // UPDATE TABLE TITLE
-    // ================================================================
     function updateTableTitle() {
         const isAdmin = userRole === 'admin';
         const isMaintenance = userRole === 'maintenance';
@@ -861,9 +852,6 @@
         tableTitle.textContent = title;
     }
 
-    // ================================================================
-    // RENDER CHARTS
-    // ================================================================
     function renderCharts() {
         let requestsForCharts = [];
         if (userRole === 'requester') {
@@ -910,9 +898,6 @@
         });
     }
 
-    // ================================================================
-    // APPLY FILTERS
-    // ================================================================
     window.applyFilter = function(status) {
         const select = document.getElementById('statusFilter');
         if (select) { select.value = status; applyFilters(); }
@@ -966,9 +951,6 @@
         renderTable(data);
     };
 
-    // ================================================================
-    // RENDER TABLE
-    // ================================================================
     function renderTable(data) {
         if (!data || data.length === 0) {
             tableBody.innerHTML = '<p style="color:#9ca3af; padding:20px; text-align:center;">No records found.</p>';
@@ -981,9 +963,6 @@
         }
     }
 
-    // ================================================================
-    // RENDER REQUESTS TABLE
-    // ================================================================
     function renderRequestsTable(requests) {
         let html = `
             <table>
@@ -1040,9 +1019,6 @@
         });
     }
 
-    // ================================================================
-    // MARK AS RECEIVED
-    // ================================================================
     async function markAsReceived(requestId) {
         if (!requestId) return;
         try {
@@ -1061,9 +1037,6 @@
         }
     }
 
-    // ================================================================
-    // RENDER JOBCARDS TABLE
-    // ================================================================
     function renderJobcardsTable(jobcards) {
         let html = `
             <table>
@@ -1109,10 +1082,10 @@
     }
 
     // ================================================================
-    // PDF GENERATION – CLEAN, STRUCTURED, MATCHING THE FIRST SAMPLE
+    // PDF GENERATION – MIMIC WEB FORM LAYOUT
     // ================================================================
 
-    // Helper: convert signature strokes to PNG data URL
+    // Helper: convert signature strokes to PNG
     function signatureToDataURL(signatureData, width = 300, height = 80) {
         if (!signatureData || !Array.isArray(signatureData) || signatureData.length === 0) {
             return null;
@@ -1177,34 +1150,29 @@
         return canvas.toDataURL('image/png');
     }
 
-    // Helper: format date like "8/7/2026,7:04:00 PM"
+    // Helper: format date as in web form (locale string)
     function formatDateForPDF(dateString) {
         if (!dateString) return 'N/A';
         try {
             const d = new Date(dateString);
             if (isNaN(d)) return dateString;
-            const month = d.getMonth() + 1;
-            const day = d.getDate();
-            const year = d.getFullYear();
-            let hours = d.getHours();
-            const minutes = String(d.getMinutes()).padStart(2, '0');
-            const seconds = String(d.getSeconds()).padStart(2, '0');
-            const ampm = hours >= 12 ? 'PM' : 'AM';
-            hours = hours % 12 || 12;
-            return `${month}/${day}/${year},${hours}:${minutes}:${seconds} ${ampm}`;
+            return d.toLocaleString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true });
         } catch {
             return dateString;
         }
     }
 
-    // Helper: build the header HTML for PDFs
+    // Helper: build hospital header (same as web forms)
     function getHeaderHTML() {
         return `
-            <div style="text-align: center; border-bottom: 2px solid #C8102E; padding-bottom: 10px; margin-bottom: 15px;">
-                <h1 style="font-size: 22px; color: #C8102E; margin: 0; font-weight: 700;">MOI VOI COUNTY REFERRAL HOSPITAL</h1>
-                <div style="font-size: 12px; color: #333; font-weight: 500;">P.O. BOX 18-80300 VOI | Email: biomedsmoivoi@gmail.com</div>
-                <div style="font-size: 13px; font-weight: 700; color: #C8102E; margin-top: 2px;">TAITA TAVETA COUNTY</div>
-                <div style="font-size: 12px; font-weight: 600; color: #C8102E;">DEPARTMENT OF HEALTH SERVICES</div>
+            <div style="display:flex; align-items:center; gap:15px; border-bottom:4px solid #C8102E; padding-bottom:12px; margin-bottom:20px;">
+                <div style="background:#C8102E; color:white; width:60px; height:60px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:36px; font-weight:700;">M</div>
+                <div>
+                    <h1 style="font-size:24px; color:#C8102E; letter-spacing:1px; font-weight:700; margin:0;">MOI VOI COUNTY REFERRAL HOSPITAL</h1>
+                    <div style="font-size:13px; color:#333; font-weight:500;">P.O. BOX 18-80300 VOI | Email: biomedsmoivoi@gmail.com</div>
+                    <div style="font-size:14px; font-weight:600; color:#C8102E; margin-top:2px;">TAITA TAVETA COUNTY</div>
+                    <div style="font-size:12px; font-weight:600; color:#C8102E;">DEPARTMENT OF HEALTH SERVICES</div>
+                </div>
             </div>
         `;
     }
@@ -1229,22 +1197,28 @@
             tempDiv.style.left = '-9999px';
             tempDiv.style.top = '0';
             tempDiv.style.width = '800px';
-            tempDiv.style.padding = '30px';
+            tempDiv.style.padding = '25px 30px';
             tempDiv.style.background = 'white';
-            tempDiv.style.fontFamily = 'Segoe UI, Arial, sans-serif';
+            tempDiv.style.fontFamily = 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif';
+            tempDiv.style.color = '#1e2a3a';
             tempDiv.innerHTML = `
                 ${getHeaderHTML()}
-                <h2 style="text-align: center; font-size: 18px; color: #C8102E; margin: 10px 0; font-weight: 600;">SERVICE REQUEST SLIP</h2>
-                <div style="font-size: 14px; line-height: 2;">
-                    <div><strong>REQUEST NO.</strong> ${req.requestNo || 'N/A'}</div>
-                    <div><strong>REQUESTER</strong> ${req.requesterName || 'N/A'}</div>
-                    <div><strong>EQUIPMENT TYPE</strong> ${req.type || 'N/A'}</div>
-                    <div><strong>COMPLAINT</strong> ${req.complaint || 'N/A'}</div>
-                    <div><strong>DATE</strong> ${formatDateForPDF(req.dateTime)}</div>
-                    <div><strong>UNIT / WARD</strong> ${req.unit || 'N/A'}</div>
-                    <div><strong>EQUIPMENT NAME</strong> ${req.equipName || 'N/A'}</div>
+                <div style="display:flex; justify-content:space-between; align-items:center; background:#f8f9fc; padding:8px 16px; border-radius:8px; margin-bottom:18px;">
+                    <h2 style="font-size:20px; font-weight:600; margin:0;">📋 SERVICE REQUEST FORM</h2>
+                    <span style="background:#28a745; color:white; padding:4px 14px; border-radius:20px; font-size:13px; font-weight:600;">● OPEN</span>
                 </div>
-                <div style="text-align: center; margin-top: 30px; font-size: 12px; color: #888;">Generated on ${new Date().toLocaleString()}</div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px 24px;">
+                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Request No.</label><div style="font-weight:500;">${req.requestNo || 'N/A'}</div></div>
+                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Date</label><div>${formatDateForPDF(req.dateTime)}</div></div>
+                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Requester Name</label><div>${req.requesterName || 'N/A'}</div></div>
+                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Department / Unit / Ward</label><div>${req.unit || 'N/A'}</div></div>
+                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Equipment / Item Type</label><div>${req.type || 'N/A'}</div></div>
+                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Equipment Name / Description</label><div>${req.equipName || 'N/A'}</div></div>
+                    <div style="grid-column:1 / -1;"><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Description of Fault / Complaint</label><div>${req.complaint || 'N/A'}</div></div>
+                </div>
+                <div style="margin-top:20px; font-size:12px; color:#6c757d; text-align:center; border-top:1px solid #e9ecef; padding-top:14px;">
+                    🔥 Firestore‑powered · MCRH Request Slip
+                </div>
             `;
             document.body.appendChild(tempDiv);
             const canvas = await html2canvas(tempDiv, { scale: 2, useCORS: true });
@@ -1278,31 +1252,32 @@
             }
             const job = docSnap.data();
 
-            // Convert signatures
             const techSigImg = signatureToDataURL(job.techSignature);
             const certSigImg = signatureToDataURL(job.certSignature);
 
-            // Status badge color
-            let statusColor = '#C8102E';
-            if (job.status === 'Pending' || job.status === 'Postponed') statusColor = '#f59e0b';
-            else if (job.status === 'Completed') statusColor = '#22c55e';
+            let statusColor = '#ffc107';
+            if (job.status === 'Completed') statusColor = '#28a745';
             else if (job.status === 'Written Off') statusColor = '#dc3545';
 
-            // Build status-specific extra rows
-            let statusRows = '';
+            // Build status-specific fields
+            let statusFields = '';
             if (job.status === 'Postponed') {
-                statusRows = `
-                    <tr><td style="padding:4px 0; font-weight:bold;">REASON FOR POSTPONEMENT</td><td style="padding:4px 0;">${job.postponeReason || 'N/A'} ${job.postponeNote ? '- ' + job.postponeNote : ''}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:bold;">EXPECTED COMPLETION</td><td style="padding:4px 0;">${formatDateForPDF(job.expectedDate)}</td></tr>
+                statusFields = `
+                    <div style="grid-column:1 / -1; display:grid; grid-template-columns:1fr 1fr; gap:14px 24px;">
+                        <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Reason for Postponement</label><div>${job.postponeReason || 'N/A'} ${job.postponeNote ? '- ' + job.postponeNote : ''}</div></div>
+                        <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Expected Completion Date</label><div>${formatDateForPDF(job.expectedDate)}</div></div>
+                    </div>
                 `;
             } else if (job.status === 'Completed') {
-                statusRows = `
-                    <tr><td style="padding:4px 0; font-weight:bold;">DEFECTS FOUND</td><td style="padding:4px 0;">${job.defects || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:bold;">ACTION TAKEN</td><td style="padding:4px 0;">${job.actionTaken || 'N/A'}</td></tr>
+                statusFields = `
+                    <div style="grid-column:1 / -1; display:grid; grid-template-columns:1fr 1fr; gap:14px 24px;">
+                        <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Defects Found</label><div>${job.defects || 'N/A'}</div></div>
+                        <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Action Taken</label><div>${job.actionTaken || 'N/A'}</div></div>
+                    </div>
                 `;
             } else if (job.status === 'Written Off') {
-                statusRows = `
-                    <tr><td style="padding:4px 0; font-weight:bold;">WRITE‑OFF REASON</td><td style="padding:4px 0;">${job.writeOffReason || 'N/A'} ${job.writeOffNote ? '- ' + job.writeOffNote : ''}</td></tr>
+                statusFields = `
+                    <div style="grid-column:1 / -1;"><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Reason for Write‑Off</label><div>${job.writeOffReason || 'N/A'} ${job.writeOffNote ? '- ' + job.writeOffNote : ''}</div></div>
                 `;
             }
 
@@ -1311,55 +1286,82 @@
             tempDiv.style.left = '-9999px';
             tempDiv.style.top = '0';
             tempDiv.style.width = '800px';
-            tempDiv.style.padding = '30px';
+            tempDiv.style.padding = '25px 30px';
             tempDiv.style.background = 'white';
-            tempDiv.style.fontFamily = 'Segoe UI, Arial, sans-serif';
+            tempDiv.style.fontFamily = 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif';
+            tempDiv.style.color = '#1e2a3a';
             tempDiv.innerHTML = `
                 ${getHeaderHTML()}
-                <h2 style="text-align:center; font-size:18px; color:#C8102E; margin:5px 0;">EQUIPMENT MAINTENANCE JOB CARD</h2>
-                <div style="text-align:center; font-size:16px; font-weight:bold; color:${statusColor}; margin-bottom:10px;">${job.status || 'Pending'}</div>
-                <table style="width:100%; font-size:14px; border-collapse:collapse; margin-top:5px;">
-                    <tr><td style="padding:4px 0; font-weight:bold; width:200px;">JOB CARD NO.</td><td style="padding:4px 0;">${job.jobNo || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:bold;">REQUEST NO.</td><td style="padding:4px 0;">${job.requestNo || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:bold;">REPORTING DATE/TIME</td><td style="padding:4px 0;">${formatDateForPDF(job.reportingDateTime)}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:bold;">UNIT/WARD</td><td style="padding:4px 0;">${job.unit || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:bold;">REQUESTER NAME</td><td style="padding:4px 0;">${job.requester || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:bold;">EQUIPMENT NAME</td><td style="padding:4px 0;">${job.equipName || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:bold;">INVENTORY/ASSET NO.</td><td style="padding:4px 0;">${job.inventory || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:bold;">SERIAL NO.</td><td style="padding:4px 0;">${job.serial || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:bold;">MODEL/MAKE</td><td style="padding:4px 0;">${job.modelMake || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:bold;">COMPLAINT</td><td style="padding:4px 0;">${job.complaint || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:bold;">DIAGNOSIS</td><td style="padding:4px 0;">${job.diagnosis || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:bold;">RECEIVED FROM</td><td style="padding:4px 0;">${job.receivedFrom || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:bold;">HANDED BACK TO</td><td style="padding:4px 0;">${job.handedTo || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:bold;">DATE/TIME RECEIVED</td><td style="padding:4px 0;">${formatDateForPDF(job.receivedDateTime)}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:bold;">DATE/TIME HANDED</td><td style="padding:4px 0;">${formatDateForPDF(job.handedDateTime)}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:bold;">RECEIVED BY</td><td style="padding:4px 0;">${job.receivedBy || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:bold;">HANDED BY</td><td style="padding:4px 0;">${job.handedBy || 'N/A'}</td></tr>
-                    <tr><td colspan="2" style="padding:10px 0; border-bottom:1px solid #ddd;"></td></tr>
-                    <tr><td colspan="2" style="padding:8px 0; font-weight:bold; font-size:16px; color:#C8102E;">Service &amp; Timeline</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:bold;">SERVICE TYPE</td><td style="padding:4px 0;">${job.serviceType || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:bold;">TOTAL TIME</td><td style="padding:4px 0;">${job.totalTime || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:bold;">JOB STARTED</td><td style="padding:4px 0;">${formatDateForPDF(job.startDateTime)}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:bold;">RESPONSE TIME</td><td style="padding:4px 0;">${job.responseTime || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:bold;">JOB COMPLETED</td><td style="padding:4px 0;">${formatDateForPDF(job.endDateTime)}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:bold;">ADMIN/REQUISITION TIME</td><td style="padding:4px 0;">${job.adminTime || 'N/A'}</td></tr>
-                    <tr><td colspan="2" style="padding:10px 0; border-bottom:1px solid #ddd;"></td></tr>
-                    <tr><td colspan="2" style="padding:8px 0; font-weight:bold; font-size:16px; color:#C8102E;">Final Verification</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:bold;">Function O.K.</td><td style="padding:4px 0;">${job.functionOk ? 'Yes' : 'No'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:bold;">Safety O.K.</td><td style="padding:4px 0;">${job.safetyOk ? 'Yes' : 'No'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:bold;">COMMENTS</td><td style="padding:4px 0;">${job.comments || 'N/A'}</td></tr>
-                    ${statusRows}
-                    <tr><td colspan="2" style="padding:10px 0; border-bottom:1px solid #ddd;"></td></tr>
-                    <tr><td colspan="2" style="padding:8px 0; font-weight:bold; font-size:16px; color:#C8102E;">Technician</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:bold;">NAME</td><td style="padding:4px 0;">${job.techName || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:bold;">Signature</td><td style="padding:4px 0;">${techSigImg ? `<img src="${techSigImg}" style="max-width:200px; max-height:80px; border:1px solid #ddd; background:white;" />` : 'Not signed'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:bold;">DATE</td><td style="padding:4px 0;">${job.techDate || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:bold; padding-top:10px;">Supervisor NAME</td><td style="padding:4px 0; padding-top:10px;">${job.certName || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:bold;">Signature</td><td style="padding:4px 0;">${certSigImg ? `<img src="${certSigImg}" style="max-width:200px; max-height:80px; border:1px solid #ddd; background:white;" />` : 'Not signed'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:bold;">DATE</td><td style="padding:4px 0;">${job.certDate || 'N/A'}</td></tr>
-                </table>
-                <div style="text-align:center; margin-top:30px; font-size:12px; color:#888;">Generated on ${new Date().toLocaleString()}</div>
+                <div style="display:flex; justify-content:space-between; align-items:center; background:#f8f9fc; padding:8px 16px; border-radius:8px; margin-bottom:18px;">
+                    <h2 style="font-size:20px; font-weight:600; margin:0;">⚙️ EQUIPMENT MAINTENANCE JOB CARD</h2>
+                    <span style="background:${statusColor}; color:${job.status === 'Pending' ? '#1e2a3a' : 'white'}; padding:4px 14px; border-radius:20px; font-size:13px; font-weight:600;">● ${job.status || 'PENDING'}</span>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px 24px;">
+                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Job Card No.</label><div>${job.jobNo || 'N/A'}</div></div>
+                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Request No.</label><div>${job.requestNo || 'N/A'}</div></div>
+                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Reporting Date / Time</label><div>${formatDateForPDF(job.reportingDateTime)}</div></div>
+                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Unit / Ward</label><div>${job.unit || 'N/A'}</div></div>
+                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Requester Name</label><div>${job.requester || 'N/A'}</div></div>
+                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Equipment Name</label><div>${job.equipName || 'N/A'}</div></div>
+                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Inventory / Asset No.</label><div>${job.inventory || 'N/A'}</div></div>
+                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Serial No.</label><div>${job.serial || 'N/A'}</div></div>
+                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Model / Make</label><div>${job.modelMake || 'N/A'}</div></div>
+                    <div style="grid-column:1 / -1;"><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Complaint by User</label><div>${job.complaint || 'N/A'}</div></div>
+                    <div style="grid-column:1 / -1;"><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Diagnosis by Maintenance Team</label><div>${job.diagnosis || 'N/A'}</div></div>
+                </div>
+
+                <div style="border-top:1px solid #e9ecef; margin:18px 0 12px 0;"></div>
+                <h3 style="font-size:16px; font-weight:600; color:#1e2a3a; border-left:4px solid #C8102E; padding-left:12px;">📌 Handover Details</h3>
+                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px 24px; margin-top:8px;">
+                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Received from (Requester)</label><div>${job.receivedFrom || 'N/A'}</div></div>
+                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Date / Time Received</label><div>${formatDateForPDF(job.receivedDateTime)}</div></div>
+                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Received by (Technician)</label><div>${job.receivedBy || 'N/A'}</div></div>
+                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Handed back to (User)</label><div>${job.handedTo || 'N/A'}</div></div>
+                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Date / Time Handed</label><div>${formatDateForPDF(job.handedDateTime)}</div></div>
+                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Handed by (Technician)</label><div>${job.handedBy || 'N/A'}</div></div>
+                </div>
+
+                <div style="border-top:1px solid #e9ecef; margin:18px 0 12px 0;"></div>
+                <h3 style="font-size:16px; font-weight:600; color:#1e2a3a; border-left:4px solid #C8102E; padding-left:12px;">🛠️ Service & Timeline</h3>
+                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px 24px; margin-top:8px;">
+                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Service Type</label><div>${job.serviceType || 'N/A'}</div></div>
+                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Job Started</label><div>${formatDateForPDF(job.startDateTime)}</div></div>
+                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Job Completed</label><div>${formatDateForPDF(job.endDateTime)}</div></div>
+                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Total Time</label><div>${job.totalTime || 'N/A'}</div></div>
+                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Response Time</label><div>${job.responseTime || 'N/A'}</div></div>
+                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Admin / Requisition Time</label><div>${job.adminTime || 'N/A'}</div></div>
+                </div>
+
+                ${statusFields ? `<div style="border-top:1px solid #e9ecef; margin:18px 0 12px 0;"></div><h3 style="font-size:16px; font-weight:600; color:#1e2a3a; border-left:4px solid #C8102E; padding-left:12px;">📌 Status Details</h3><div style="margin-top:8px;">${statusFields}</div>` : ''}
+
+                <div style="border-top:1px solid #e9ecef; margin:18px 0 12px 0;"></div>
+                <h3 style="font-size:16px; font-weight:600; color:#1e2a3a; border-left:4px solid #C8102E; padding-left:12px;">✅ Final Verification</h3>
+                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px 24px; margin-top:8px;">
+                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Function O.K.</label><div>${job.functionOk ? 'Yes' : 'No'}</div></div>
+                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Safety O.K.</label><div>${job.safetyOk ? 'Yes' : 'No'}</div></div>
+                    <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Comments</label><div>${job.comments || 'N/A'}</div></div>
+                </div>
+
+                <div style="border-top:1px solid #e9ecef; margin:18px 0 12px 0;"></div>
+                <h3 style="font-size:16px; font-weight:600; color:#1e2a3a; border-left:4px solid #C8102E; padding-left:12px;">✍️ Signatures</h3>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:30px; margin-top:8px;">
+                    <div style="border:1px solid #e9ecef; border-radius:8px; padding:16px 18px; background:#f8f9fa;">
+                        <h4 style="font-size:14px; color:#C8102E; margin:0 0 8px 0;">👨‍🔧 Technician</h4>
+                        <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Name</label><div>${job.techName || 'N/A'}</div></div>
+                        <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Signature</label><div>${techSigImg ? `<img src="${techSigImg}" style="max-width:200px; max-height:80px; border:1px solid #ddd; background:white;" />` : 'Not signed'}</div></div>
+                        <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Date</label><div>${job.techDate || 'N/A'}</div></div>
+                    </div>
+                    <div style="border:1px solid #e9ecef; border-radius:8px; padding:16px 18px; background:#f8f9fa;">
+                        <h4 style="font-size:14px; color:#C8102E; margin:0 0 8px 0;">✅ Supervisor</h4>
+                        <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Name</label><div>${job.certName || 'N/A'}</div></div>
+                        <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Signature</label><div>${certSigImg ? `<img src="${certSigImg}" style="max-width:200px; max-height:80px; border:1px solid #ddd; background:white;" />` : 'Not signed'}</div></div>
+                        <div><label style="font-size:12px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.4px;">Date</label><div>${job.certDate || 'N/A'}</div></div>
+                    </div>
+                </div>
+
+                <div style="margin-top:20px; font-size:12px; color:#6c757d; text-align:center; border-top:1px solid #e9ecef; padding-top:14px;">
+                    🔥 Firestore‑powered · ✍️ Drawable Signatures · MCRH Job Card
+                </div>
             `;
             document.body.appendChild(tempDiv);
             const canvas = await html2canvas(tempDiv, { scale: 2, useCORS: true });
@@ -1369,7 +1371,7 @@
             const pdf = new jsPDF('p', 'mm', 'a4');
             const imgWidth = 210;
             const imgHeight = (canvas.height * imgWidth) / canvas.width;
-            // Multi‑page handling
+            // Multi‑page
             let heightLeft = imgHeight;
             let position = 0;
             const pageHeight = 297;
@@ -1390,7 +1392,7 @@
     };
 
     // ================================================================
-    // USER MANAGEMENT (unchanged from previous working version)
+    // USER MANAGEMENT (unchanged)
     // ================================================================
     window.openUserModal = function() {
         console.log('🔓 Opening user modal');
