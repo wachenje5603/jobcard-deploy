@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MCRH - Job Card</title>
 
-    <!-- Firebase v9 -->
     <script type="importmap">
         {
             "imports": {
@@ -16,11 +15,7 @@
         }
     </script>
 
-    <!-- Signature Pad -->
-    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js">
-    </script>
-
-    <!-- html2canvas & jsPDF for PDF Export -->
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
@@ -383,14 +378,14 @@
 
             <!-- ACTION BAR -->
             <div class="action-bar no-print">
-                <button class="btn btn-success" onclick="saveJobCard()">💾 Save Job Card</button>
-                <button class="btn btn-outline" onclick="window.print()">📄 Print Job Card</button>
-                <button class="btn btn-outline" onclick="resetJobCardForm()">🔄 Reset Form</button>
+                <button class="btn btn-success" onclick="saveJobCard()">💾 Save</button>
+                <button class="btn btn-outline" onclick="downloadJobcardPDF()">📄 PDF</button>
+                <button class="btn btn-outline" onclick="resetJobCardForm()">🔄 Reset</button>
             </div>
         </form>
 
         <footer style="margin-top:22px;font-size:12px;color:#6c757d;text-align:center;border-top:1px solid #e9ecef;padding-top:14px;">
-            🔥 Firestore‑powered · ✍️ Drawable Signatures · MCRH Job Card v8.4
+            🔥 Firestore‑powered · ✍️ Drawable Signatures · MCRH Job Card v9.0
         </footer>
     </div>
 
@@ -475,10 +470,7 @@
                     return;
                 }
                 currentUser = { id: user.uid, ...userData };
-
-                // DEBUG: log the user's departments
                 console.log('🔍 Current user departments:', currentUser.departments);
-
                 await initPage();
             } catch (err) {
                 console.error('Auth error:', err);
@@ -540,7 +532,6 @@
                 const newNumber = await runTransaction(db, async (transaction) => {
                     const docSnap = await transaction.get(counterDocRef);
                     if (!docSnap.exists()) {
-                        // Should not happen because we pre-created it, but fallback
                         transaction.set(counterDocRef, { count: 0 });
                         return 1;
                     }
@@ -552,7 +543,6 @@
                 return `MCRH${String(newNumber).padStart(3, '0')}`;
             } catch (error) {
                 console.error('Error generating job number:', error);
-                // Fallback to timestamp
                 return `MCRH${Date.now().toString().slice(-6)}`;
             }
         }
@@ -606,7 +596,6 @@
             const certSelect = document.getElementById('jobCertName');
             certSelect.innerHTML = '<option value="">-- Select --</option>';
             if (!department) {
-                // No department: show all requesters
                 const requesters = allUsers.filter(u => u.role === 'requester');
                 requesters.forEach(u => {
                     const opt = document.createElement('option');
@@ -616,10 +605,8 @@
                 });
                 return;
             }
-            // Find requesters with the exact department
             const deptRequesters = allUsers.filter(u => u.role === 'requester' && u.department === department);
             if (deptRequesters.length === 0) {
-                // Fallback to all requesters
                 const allReq = allUsers.filter(u => u.role === 'requester');
                 allReq.forEach(u => {
                     const opt = document.createElement('option');
@@ -763,7 +750,6 @@
                 allRequests = [];
                 reqSnap.forEach(doc => { const data = doc.data(); data.id = doc.id; allRequests.push(data); });
 
-                // Fetch jobcards to filter out already completed/written off
                 let jobQuery;
                 if (isAdmin) {
                     jobQuery = collection(db, JOBCARDS_COLL);
@@ -797,12 +783,10 @@
                     const opt = document.createElement('option');
                     opt.value = r.requestNo;
                     opt.textContent = `${r.requestNo} - ${r.requesterName} (${r.unit}) - ${r.equipName}`;
-                    // Store the document ID for direct fetch
                     opt.dataset.docId = r.id;
                     dropdown.appendChild(opt);
                 });
 
-                // Auto-select from URL parameter
                 const urlParams = new URLSearchParams(window.location.search);
                 const reqParam = urlParams.get('request');
                 if (reqParam) {
@@ -827,7 +811,6 @@
             const docId = selectedOption?.dataset?.docId;
 
             if (!requestNo || !docId) {
-                // Clear fields
                 ['jobRequester', 'jobUnit', 'jobEquipName', 'jobInventory', 'jobSerial', 'jobModel', 'jobComplaint']
                 .forEach(id => document.getElementById(id).value = '');
                 document.getElementById('jobReportingDateTime').value = '';
@@ -838,19 +821,15 @@
             }
 
             try {
-                // Direct document read using the stored docId
                 const docSnap = await getDoc(doc(db, REQUESTS_COLL, docId));
                 if (!docSnap.exists()) {
                     showToast('Request not found.', true);
                     return;
                 }
                 const r = docSnap.data();
-
-                // DEBUG: log the request's unit and the user's departments
                 console.log('📄 Request unit:', r.unit);
                 console.log('🔧 User departments:', currentUser?.departments);
 
-                // Populate fields
                 document.getElementById('jobRequester').value = r.requesterName || '';
                 document.getElementById('jobUnit').value = r.unit || '';
                 document.getElementById('jobEquipName').value = r.equipName || '';
@@ -866,9 +845,7 @@
                     document.getElementById('jobReceivedDateTime').value = r.dateTime || '';
                 }
 
-                // Populate supervisor dropdown based on unit
                 populateSupervisorDropdown(r.unit);
-
                 showToast('✅ Request data loaded.');
             } catch (err) {
                 console.error('Error loading request:', err);
@@ -930,7 +907,7 @@
             try {
                 const jobNo = document.getElementById('jobNo').value;
                 const requestNo = document.getElementById('jobRequestNo').value;
-                if (!requestNo) { showToast('Please select a request.', true); btn.disabled = false; btn.innerHTML = '💾 Save Job Card'; return; }
+                if (!requestNo) { showToast('Please select a request.', true); btn.disabled = false; btn.innerHTML = '💾 Save'; return; }
 
                 const handedToId = document.getElementById('jobHandedTo').value;
                 const handedToName = handedToId ? allUsers.find(u => u.id === handedToId)?.name || '' : '';
@@ -1005,7 +982,6 @@
                     showToast(`✅ Job card ${data.jobNo} saved.`);
                 }
 
-                // Update linked request status
                 if (requestNo) {
                     try {
                         const reqQuery = query(collection(db, REQUESTS_COLL), where('requestNo', '==', requestNo));
@@ -1023,9 +999,72 @@
                 showToast('❌ Error: ' + err.message, true);
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = '💾 Save Job Card';
+                btn.innerHTML = '💾 Save';
             }
         };
+
+        // ============================================================
+        // PDF DOWNLOAD
+        // ============================================================
+        window.downloadJobcardPDF = function() {
+            showToast('Generating PDF...');
+            const element = document.querySelector('.container');
+            html2canvas(element, { scale: 2 }).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const imgWidth = 210;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                let heightLeft = imgHeight;
+                let position = 0;
+                const pageHeight = 297;
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+                while (heightLeft > 0) {
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+                pdf.save('jobcard.pdf');
+                showToast('✅ PDF downloaded.');
+            }).catch(err => {
+                showToast('Error generating PDF: ' + err.message, true);
+            });
+        };
+
+        // ============================================================
+        // RESET FORM
+        // ============================================================
+        function resetJobCardForm() {
+            if (!confirm('Reset the form? Unsaved data will be lost.')) return;
+            document.querySelectorAll('#jobcardForm input, #jobcardForm textarea, #jobcardForm select').forEach(el => {
+                if (el.id !== 'jobReceivedBy' && el.id !== 'jobHandedBy' && el.id !== 'jobTechName' &&
+                    el.id !== 'jobCertName' && el.id !== 'jobRequestNo' && el.id !== 'jobHandedTo' &&
+                    el.id !== 'jobRequesterId') {
+                    if (el.type === 'checkbox') el.checked = (el.id === 'jobFunctionOk' || el.id === 'jobSafetyOk');
+                    else if (el.tagName !== 'SELECT') el.value = '';
+                }
+            });
+            document.getElementById('jobHandedTo').value = '';
+            document.getElementById('jobTechName').value = '';
+            document.getElementById('jobCertName').value = '';
+            document.getElementById('jobRequestNo').value = '';
+            document.getElementById('jobStatus').value = 'Pending';
+            document.getElementById('jobRequesterId').value = '';
+            techSigPad && techSigPad.clear();
+            certSigPad && certSigPad.clear();
+            document.getElementById('jobStatusBadge').textContent = '● PENDING';
+            document.getElementById('jobStatusBadge').className = 'status pending';
+            document.getElementById('jobNo').value = '';
+            currentJobCardId = null;
+            toggleStatusFields();
+            document.getElementById('jobCertName').innerHTML = '<option value="">-- Select --</option>';
+            populateRequestDropdown();
+            generateJobNumber().then(num => document.getElementById('jobNo').value = num);
+            showToast('🔄 Form reset.');
+        }
+        window.resetJobCardForm = resetJobCardForm;
 
         // ============================================================
         // LOAD JOB CARD FOR EDITING
@@ -1115,39 +1154,6 @@
                 showToast('Error loading: ' + err.message, true);
             }
         };
-
-        // ============================================================
-        // RESET FORM
-        // ============================================================
-        function resetJobCardForm() {
-            if (!confirm('Reset the form? Unsaved data will be lost.')) return;
-            document.querySelectorAll('#jobcardForm input, #jobcardForm textarea, #jobcardForm select').forEach(el => {
-                if (el.id !== 'jobReceivedBy' && el.id !== 'jobHandedBy' && el.id !== 'jobTechName' &&
-                    el.id !== 'jobCertName' && el.id !== 'jobRequestNo' && el.id !== 'jobHandedTo' &&
-                    el.id !== 'jobRequesterId') {
-                    if (el.type === 'checkbox') el.checked = (el.id === 'jobFunctionOk' || el.id === 'jobSafetyOk');
-                    else if (el.tagName !== 'SELECT') el.value = '';
-                }
-            });
-            document.getElementById('jobHandedTo').value = '';
-            document.getElementById('jobTechName').value = '';
-            document.getElementById('jobCertName').value = '';
-            document.getElementById('jobRequestNo').value = '';
-            document.getElementById('jobStatus').value = 'Pending';
-            document.getElementById('jobRequesterId').value = '';
-            techSigPad && techSigPad.clear();
-            certSigPad && certSigPad.clear();
-            document.getElementById('jobStatusBadge').textContent = '● PENDING';
-            document.getElementById('jobStatusBadge').className = 'status pending';
-            document.getElementById('jobNo').value = '';
-            currentJobCardId = null;
-            toggleStatusFields();
-            document.getElementById('jobCertName').innerHTML = '<option value="">-- Select --</option>';
-            populateRequestDropdown();
-            generateJobNumber().then(num => document.getElementById('jobNo').value = num);
-            showToast('🔄 Form reset.');
-        }
-        window.resetJobCardForm = resetJobCardForm;
 
         // ============================================================
         // INIT PAGE

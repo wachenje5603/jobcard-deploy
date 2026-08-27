@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MCRH - Request Slip</title>
 
-    <!-- Firebase v9 -->
     <script type="importmap">
         {
             "imports": {
@@ -16,7 +15,11 @@
         }
     </script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
     <style>
+        /* (styles unchanged – keep your existing CSS) */
         * { margin:0; padding:0; box-sizing:border-box; }
         body { font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#f4f6f9; padding:20px; color:#1e2a3a; }
         .container { max-width:1000px; margin:0 auto; background:white; padding:25px 30px; border-radius:12px; box-shadow:0 8px 30px rgba(0,0,0,0.12); }
@@ -145,13 +148,13 @@
 
             <div class="action-bar no-print">
                 <button type="button" class="btn btn-success" onclick="saveRequest()">💾 Save Request</button>
-                <button type="button" class="btn btn-outline" onclick="window.print()">📄 Print PDF</button>
-                <button type="button" class="btn btn-outline" onclick="resetRequestForm()">🔄 Reset Form</button>
+                <button type="button" class="btn btn-outline" onclick="downloadRequestPDF()">📄 PDF</button>
+                <button type="button" class="btn btn-outline" onclick="resetRequestForm()">🔄 Reset</button>
             </div>
         </form>
 
         <footer style="margin-top:22px;font-size:12px;color:#6c757d;text-align:center;border-top:1px solid #e9ecef;padding-top:14px;">
-            🔥 Firestore‑powered · 📧 Email Notifications · MCRH Request Slip v8.0
+            🔥 Firestore‑powered · 📧 Email Notifications · MCRH Request Slip v9.0
         </footer>
     </div>
 
@@ -238,11 +241,10 @@
         }
 
         // ============================================================
-        // SEQUENTIAL REQUEST NUMBER GENERATOR (starts from REQ-001)
+        // SEQUENTIAL REQUEST NUMBER GENERATOR (REQ-001, REQ-002, ...)
         // ============================================================
         async function getNextRequestNumber() {
             const counterDocRef = doc(db, COUNTERS_COLL, 'requestCounter');
-
             try {
                 const newNumber = await runTransaction(db, async (transaction) => {
                     const docSnap = await transaction.get(counterDocRef);
@@ -250,8 +252,9 @@
                     if (docSnap.exists()) {
                         currentCount = docSnap.data().count || 0;
                     } else {
+                        // Create with 0 if not exists
+                        transaction.set(counterDocRef, { count: 0 });
                         currentCount = 0;
-                        transaction.set(counterDocRef, { count: currentCount });
                     }
                     const next = currentCount + 1;
                     transaction.update(counterDocRef, { count: next });
@@ -260,6 +263,7 @@
                 return `REQ-${String(newNumber).padStart(3, '0')}`;
             } catch (error) {
                 console.error('Error generating request number:', error);
+                // Fallback to timestamp
                 const timestamp = Date.now().toString().slice(-6);
                 const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
                 return `REQ-${timestamp}${random}`;
@@ -267,13 +271,12 @@
         }
 
         // ============================================================
-        // TOGGLE EQUIPMENT DETAILS – Inventory is now readonly "Coming Soon"
+        // TOGGLE EQUIPMENT DETAILS
         // ============================================================
         function toggleEquipFields() {
             const type = document.getElementById('reqType').value;
             const details = document.getElementById('reqEquipDetails');
             const inventoryField = document.getElementById('reqInventory');
-
             if (type === 'Equipment') {
                 details.style.display = 'grid';
                 inventoryField.value = 'Coming Soon';
@@ -281,7 +284,7 @@
             } else {
                 details.style.display = 'none';
                 inventoryField.value = '';
-                inventoryField.readOnly = false; // optional, but hidden
+                inventoryField.readOnly = false;
             }
         }
         document.getElementById('reqType').addEventListener('change', toggleEquipFields);
@@ -364,6 +367,36 @@
         };
 
         // ============================================================
+        // PDF DOWNLOAD
+        // ============================================================
+        window.downloadRequestPDF = function() {
+            showToast('Generating PDF...');
+            const element = document.querySelector('.container');
+            html2canvas(element, { scale: 2 }).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const imgWidth = 210;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                let heightLeft = imgHeight;
+                let position = 0;
+                const pageHeight = 297;
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+                while (heightLeft > 0) {
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+                pdf.save('request_slip.pdf');
+                showToast('✅ PDF downloaded.');
+            }).catch(err => {
+                showToast('Error generating PDF: ' + err.message, true);
+            });
+        };
+
+        // ============================================================
         // RESET FORM
         // ============================================================
         function resetRequestForm() {
@@ -376,7 +409,7 @@
             document.getElementById('reqModel').value = '';
             document.getElementById('reqComplaint').value = '';
             document.getElementById('reqNo').value = 'Will be assigned on save';
-            toggleEquipFields(); // ensures display state
+            toggleEquipFields();
             currentDocId = null;
             if (currentUser) {
                 document.getElementById('reqRequester').value = currentUser.name || '';
@@ -384,12 +417,12 @@
                     document.getElementById('reqUnit').value = currentUser.department;
                 }
             }
-            showToast('🔄 Form reset. New number will be assigned on save.');
+            showToast('🔄 Form reset.');
         }
         window.resetRequestForm = resetRequestForm;
 
         // ============================================================
-        // LOAD REQUEST VIA URL PARAM (for viewing/printing only)
+        // LOAD REQUEST VIA URL PARAM (view)
         // ============================================================
         async function loadRequestFromUrl() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -439,7 +472,7 @@
                     document.getElementById('reqUnit').value = currentUser.department;
                 }
             }
-            toggleEquipFields(); // ensures visibility
+            toggleEquipFields();
             await loadRequestFromUrl();
             console.log('✅ Request page ready.');
         }
