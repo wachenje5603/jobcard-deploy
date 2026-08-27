@@ -23,7 +23,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
     <style>
-        /* (styles unchanged – keep your existing CSS) */
+        /* (your existing styles – unchanged) */
         * { margin:0; padding:0; box-sizing:border-box; }
         :root { --primary: #C8102E; --primary-gradient: linear-gradient(135deg, #C8102E, #e81a3f); --bg: #f4f6fb; --card-bg: #ffffff; --text: #1a1a2e; --text-muted: #6c7a8a; --shadow: 0 8px 32px rgba(0,0,0,0.06); --radius: 16px; --radius-sm: 10px; }
         body { font-family:'Inter', sans-serif; background:var(--bg); color:var(--text); padding:16px; }
@@ -148,7 +148,6 @@
 
 <div class="container">
 
-    <!-- ===== HERO ===== -->
     <div class="hero">
         <div class="hero-left">
             <h1>👋 Welcome, <span id="userNameDisplay">User</span></h1>
@@ -164,10 +163,8 @@
         </div>
     </div>
 
-    <!-- ===== STATS CARDS ===== -->
     <div class="stats-grid" id="statsContainer"></div>
 
-    <!-- ===== CHARTS ===== -->
     <div class="chart-row">
         <div class="chart-box">
             <h3>📊 Job Status Distribution</h3>
@@ -179,10 +176,8 @@
         </div>
     </div>
 
-    <!-- ===== ACTIONS ===== -->
     <div class="actions" id="actionButtons"></div>
 
-    <!-- ===== TABLE ===== -->
     <div class="table-wrap" id="tableContainer">
         <h3 id="tableTitle">📋 Requests</h3>
         <div class="filter-bar" id="filterBar"></div>
@@ -218,7 +213,7 @@
                     <option value="admin">Admin</option>
                 </select>
             </div>
-
+            <!-- Department selects (full list unchanged) -->
             <div class="form-group" id="deptFieldContainer" style="display:block;">
                 <label id="deptLabel">Department (for requester)</label>
                 <select id="newUserDept">
@@ -277,7 +272,6 @@
                     </optgroup>
                 </select>
             </div>
-
             <div class="form-group" id="multiDeptContainer" style="display:none;">
                 <label>Select departments the engineer will handle (hold Ctrl/Cmd to choose multiple)</label>
                 <select id="newUserDepts" multiple size="5">
@@ -336,7 +330,6 @@
                 </select>
                 <small style="color:#6c757d;">Hold Ctrl (Windows) or Cmd (Mac) to select multiple.</small>
             </div>
-
             <div class="form-group" id="whatsappFieldContainer">
                 <label>WhatsApp Number (for maintenance)</label>
                 <div class="whatsapp-inline">
@@ -372,7 +365,6 @@
                     </div>
                 </div>
             </div>
-
             <button class="btn btn-success" id="saveUserBtn" onclick="saveUser()"><i class="fas fa-save"></i> Save User</button>
             <div id="userModalError" class="error-text"></div>
             <div id="userModalSuccess" class="success-text"></div>
@@ -468,11 +460,13 @@
     let statusChartInstance = null;
     let trendChartInstance = null;
 
+    // ===== LOGOUT =====
     logoutBtn.addEventListener('click', () => {
         signOut(auth).then(() => window.location.href = 'login.html')
             .catch(err => showToast('Logout error: ' + err.message, true));
     });
 
+    // ===== TOAST =====
     function showToast(msg, isError = false) {
         toast.textContent = msg;
         toast.style.borderLeftColor = isError ? '#ef4444' : '#C8102E';
@@ -491,6 +485,7 @@
         return 'open';
     }
 
+    // ===== TOGGLE ROLE FIELDS =====
     function toggleRoleFields() {
         const role = document.getElementById('newUserRole').value;
         const deptContainer = document.getElementById('deptFieldContainer');
@@ -518,7 +513,7 @@
     }
     window.toggleRoleFields = toggleRoleFields;
 
-    // ===== FETCH DATA (same as previous working version) =====
+    // ===== FETCH DATA =====
     async function fetchData() {
         console.log('🔍 fetchData() called.');
         try {
@@ -647,6 +642,7 @@
         return allJobCards.filter(j => j.unit === currentUser.department);
     }
 
+    // ===== RENDER DASHBOARD =====
     function renderDashboard() {
         if (!currentUser) return;
         const isAdmin = userRole === 'admin';
@@ -718,7 +714,7 @@
                     <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
                 </div>
             `;
-        } else { // Requester
+        } else {
             statsHtml = `
                 <div class="stat-card myrequests" onclick="switchView('requests')">
                     <div class="stat-left"><div class="number">${myRequests.length}</div><div class="label">📋 My Requests</div></div>
@@ -776,6 +772,7 @@
         applyFilters();
     }
 
+    // ===== SWITCH VIEW =====
     window.switchView = function(view) {
         currentView = view;
         buildFilterBar();
@@ -839,6 +836,7 @@
         tableTitle.textContent = title;
     }
 
+    // ===== CHARTS =====
     function renderCharts() {
         let requestsForCharts = [];
         if (userRole === 'requester') {
@@ -885,6 +883,7 @@
         });
     }
 
+    // ===== FILTERS =====
     window.applyFilter = function(status) {
         const select = document.getElementById('statusFilter');
         if (select) { select.value = status; applyFilters(); }
@@ -938,6 +937,7 @@
         renderTable(data);
     };
 
+    // ===== RENDER TABLE =====
     function renderTable(data) {
         if (!data || data.length === 0) {
             tableBody.innerHTML = '<p style="color:#9ca3af; padding:20px; text-align:center;">No records found.</p>';
@@ -1069,21 +1069,22 @@
     }
 
     // ================================================================
-    // ENHANCED PDF DOWNLOAD FUNCTIONS
+    // ENHANCED PDF DOWNLOAD FUNCTIONS – EXACTLY MATCH THE SAMPLES
     // ================================================================
 
-    // --- Helper: create the official hospital header HTML ---
-    function createHeaderHTML() {
+    // --- Helper: official header ---
+    function getHeaderHTML() {
         return `
-            <div style="text-align:center; margin-bottom:20px; border-bottom:3px solid #C8102E; padding-bottom:10px;">
-                <h1 style="font-size:24px; color:#C8102E; margin:0; letter-spacing:1px;">MOI VOI COUNTY REFERRAL HOSPITAL</h1>
-                <div style="font-size:12px; color:#333; font-weight:500;">P.O. BOX 18-80300 VOI | Email: biomedsmoivoi@gmail.com</div>
-                <div style="font-size:14px; font-weight:700; color:#C8102E; margin-top:2px;">TAITA TAVETA COUNTY</div>
-                <div style="font-size:13px; font-weight:600; color:#C8102E;">DEPARTMENT OF HEALTH SERVICES</div>
+            <div style="text-align: center; border-bottom: 2px solid #C8102E; padding-bottom: 10px; margin-bottom: 15px;">
+                <h1 style="font-size: 24px; color: #C8102E; margin: 0; font-weight: 700;">MOI VOI COUNTY REFERRAL HOSPITAL</h1>
+                <div style="font-size: 12px; color: #333; font-weight: 500;">P.O. BOX 18-80300 VOI | Email: biomedsmoivoi@gmail.com</div>
+                <div style="font-size: 14px; font-weight: 700; color: #C8102E; margin-top: 2px;">TAITA TAVETA COUNTY</div>
+                <div style="font-size: 12px; font-weight: 600; color: #C8102E;">DEPARTMENT OF HEALTH SERVICES</div>
             </div>
         `;
     }
 
+    // --- Request Slip PDF ---
     window.downloadRequestPDF = async function(requestId) {
         if (!requestId) {
             showToast('Invalid request ID.', true);
@@ -1105,25 +1106,20 @@
             tempDiv.style.width = '800px';
             tempDiv.style.padding = '30px';
             tempDiv.style.background = 'white';
-            tempDiv.style.fontFamily = 'Segoe UI, sans-serif';
+            tempDiv.style.fontFamily = 'Segoe UI, Arial, sans-serif';
             tempDiv.innerHTML = `
-                ${createHeaderHTML()}
-                <h2 style="text-align:center; font-size:20px; color:#C8102E; margin:10px 0;">SERVICE REQUEST SLIP</h2>
-                <hr style="border:1px solid #eee;" />
-                <table style="width:100%; font-size:14px; border-collapse:collapse; margin-top:10px;">
-                    <tr><td style="padding:4px 0; font-weight:600; width:150px;">REQUEST NO.</td><td style="padding:4px 0;">${req.requestNo || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:600;">DATE</td><td style="padding:4px 0;">${req.dateTime ? new Date(req.dateTime).toLocaleString() : 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:600;">REQUESTER</td><td style="padding:4px 0;">${req.requesterName || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:600;">UNIT / WARD</td><td style="padding:4px 0;">${req.unit || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:600;">EQUIPMENT TYPE</td><td style="padding:4px 0;">${req.type || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:600;">EQUIPMENT NAME</td><td style="padding:4px 0;">${req.equipName || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:600;">INVENTORY / ASSET NO.</td><td style="padding:4px 0;">${req.inventory || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:600;">SERIAL NO.</td><td style="padding:4px 0;">${req.serial || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:600;">MODEL / MAKE</td><td style="padding:4px 0;">${req.modelMake || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:600;">COMPLAINT</td><td style="padding:4px 0;">${req.complaint || 'N/A'}</td></tr>
-                </table>
-                <hr style="border:1px solid #eee; margin-top:20px;" />
-                <div style="font-size:12px; text-align:center; color:#888; margin-top:20px;">Generated on ${new Date().toLocaleString()}</div>
+                ${getHeaderHTML()}
+                <h2 style="text-align: center; font-size: 18px; color: #C8102E; margin: 10px 0;">SERVICE REQUEST SLIP</h2>
+                <div style="font-size: 14px; line-height: 1.8;">
+                    <div><strong>REQUEST NO.</strong> ${req.requestNo || 'N/A'}</div>
+                    <div><strong>REQUESTER</strong> ${req.requesterName || 'N/A'}</div>
+                    <div><strong>EQUIPMENT TYPE</strong> ${req.type || 'N/A'}</div>
+                    <div><strong>COMPLAINT</strong> ${req.complaint || 'N/A'}</div>
+                    <div><strong>DATE</strong> ${req.dateTime ? new Date(req.dateTime).toLocaleString() : 'N/A'}</div>
+                    <div><strong>UNIT / WARD</strong> ${req.unit || 'N/A'}</div>
+                    <div><strong>EQUIPMENT NAME</strong> ${req.equipName || 'N/A'}</div>
+                </div>
+                <div style="text-align: center; margin-top: 30px; font-size: 12px; color: #888;">Generated on ${new Date().toLocaleString()}</div>
             `;
             document.body.appendChild(tempDiv);
             const canvas = await html2canvas(tempDiv, { scale: 2, useCORS: true });
@@ -1142,6 +1138,7 @@
         }
     };
 
+    // --- Job Card PDF ---
     window.downloadJobcardPDF = async function(jobcardId) {
         if (!jobcardId) {
             showToast('Invalid jobcard ID.', true);
@@ -1156,7 +1153,24 @@
             }
             const job = docSnap.data();
 
-            // Build the full jobcard content
+            // Build the job card content as per sample
+            let statusFields = '';
+            if (job.status === 'Postponed') {
+                statusFields = `
+                    <div><strong>REASON FOR POSTPONEMENT</strong> ${job.postponeReason || 'N/A'} ${job.postponeNote ? '- ' + job.postponeNote : ''}</div>
+                    <div><strong>EXPECTED COMPLETION</strong> ${job.expectedDate ? new Date(job.expectedDate).toLocaleString() : 'N/A'}</div>
+                `;
+            } else if (job.status === 'Completed') {
+                statusFields = `
+                    <div><strong>DEFECTS FOUND</strong> ${job.defects || 'N/A'}</div>
+                    <div><strong>ACTION TAKEN</strong> ${job.actionTaken || 'N/A'}</div>
+                `;
+            } else if (job.status === 'Written Off') {
+                statusFields = `
+                    <div><strong>WRITE‑OFF REASON</strong> ${job.writeOffReason || 'N/A'} ${job.writeOffNote ? '- ' + job.writeOffNote : ''}</div>
+                `;
+            }
+
             const tempDiv = document.createElement('div');
             tempDiv.style.position = 'fixed';
             tempDiv.style.left = '-9999px';
@@ -1164,54 +1178,48 @@
             tempDiv.style.width = '800px';
             tempDiv.style.padding = '30px';
             tempDiv.style.background = 'white';
-            tempDiv.style.fontFamily = 'Segoe UI, sans-serif';
+            tempDiv.style.fontFamily = 'Segoe UI, Arial, sans-serif';
             tempDiv.innerHTML = `
-                ${createHeaderHTML()}
-                <h2 style="text-align:center; font-size:20px; color:#C8102E; margin:10px 0;">EQUIPMENT MAINTENANCE JOB CARD</h2>
-                <hr style="border:1px solid #eee;" />
-
-                <table style="width:100%; font-size:13px; border-collapse:collapse; margin-top:10px;">
-                    <tr><td style="padding:4px 0; font-weight:600; width:180px;">JOB CARD NO.</td><td style="padding:4px 0;">${job.jobNo || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:600;">REQUEST NO.</td><td style="padding:4px 0;">${job.requestNo || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:600;">REPORTING DATE / TIME</td><td style="padding:4px 0;">${job.reportingDateTime ? new Date(job.reportingDateTime).toLocaleString() : 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:600;">REQUESTER NAME</td><td style="padding:4px 0;">${job.requester || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:600;">UNIT / WARD</td><td style="padding:4px 0;">${job.unit || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:600;">EQUIPMENT NAME</td><td style="padding:4px 0;">${job.equipName || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:600;">INVENTORY / ASSET NO.</td><td style="padding:4px 0;">${job.inventory || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:600;">SERIAL NO.</td><td style="padding:4px 0;">${job.serial || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:600;">MODEL / MAKE</td><td style="padding:4px 0;">${job.modelMake || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:600;">COMPLAINT</td><td style="padding:4px 0;">${job.complaint || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:600;">DIAGNOSIS</td><td style="padding:4px 0;">${job.diagnosis || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:600;">RECEIVED FROM</td><td style="padding:4px 0;">${job.receivedFrom || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:600;">DATE / TIME RECEIVED</td><td style="padding:4px 0;">${job.receivedDateTime ? new Date(job.receivedDateTime).toLocaleString() : 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:600;">RECEIVED BY</td><td style="padding:4px 0;">${job.receivedBy || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:600;">HANDED BACK TO</td><td style="padding:4px 0;">${job.handedTo || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:600;">DATE / TIME HANDED</td><td style="padding:4px 0;">${job.handedDateTime ? new Date(job.handedDateTime).toLocaleString() : 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:600;">HANDED BY</td><td style="padding:4px 0;">${job.handedBy || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:600;">SERVICE TYPE</td><td style="padding:4px 0;">${job.serviceType || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:600;">JOB STARTED</td><td style="padding:4px 0;">${job.startDateTime ? new Date(job.startDateTime).toLocaleString() : 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:600;">JOB COMPLETED</td><td style="padding:4px 0;">${job.endDateTime ? new Date(job.endDateTime).toLocaleString() : 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:600;">TOTAL TIME</td><td style="padding:4px 0;">${job.totalTime || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:600;">RESPONSE TIME</td><td style="padding:4px 0;">${job.responseTime || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:600;">ADMIN / REQUISITION TIME</td><td style="padding:4px 0;">${job.adminTime || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:600;">STATUS</td><td style="padding:4px 0;">${job.status || 'Pending'}</td></tr>
-                    ${job.status === 'Postponed' ? `<tr><td style="padding:4px 0; font-weight:600;">REASON FOR POSTPONEMENT</td><td style="padding:4px 0;">${job.postponeReason || 'N/A'} - ${job.postponeNote || ''}</td></tr>` : ''}
-                    ${job.status === 'Completed' ? `<tr><td style="padding:4px 0; font-weight:600;">DEFECTS FOUND</td><td style="padding:4px 0;">${job.defects || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:600;">ACTION TAKEN</td><td style="padding:4px 0;">${job.actionTaken || 'N/A'}</td></tr>` : ''}
-                    ${job.status === 'Written Off' ? `<tr><td style="padding:4px 0; font-weight:600;">WRITE‑OFF REASON</td><td style="padding:4px 0;">${job.writeOffReason || 'N/A'} - ${job.writeOffNote || ''}</td></tr>` : ''}
-                    <tr><td style="padding:4px 0; font-weight:600;">MEASUREMENTS</td><td style="padding:4px 0;">Current: ${job.measureCurrent || 'N/A'}, Voltage: ${job.measureVoltage || 'N/A'}, Insulation: ${job.measureInsulation || 'N/A'}, Pressure: ${job.measurePressure || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:600;">FUNCTION O.K.</td><td style="padding:4px 0;">${job.functionOk ? 'Yes' : 'No'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:600;">SAFETY O.K.</td><td style="padding:4px 0;">${job.safetyOk ? 'Yes' : 'No'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:600;">COMMENTS</td><td style="padding:4px 0;">${job.comments || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:600;">TECHNICIAN NAME</td><td style="padding:4px 0;">${job.techName || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:600;">TECHNICIAN SIGNATURE</td><td style="padding:4px 0;">${job.techSignature ? 'Signed' : 'Not signed'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:600;">TECHNICIAN DATE</td><td style="padding:4px 0;">${job.techDate || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:600;">SUPERVISOR NAME</td><td style="padding:4px 0;">${job.certName || 'N/A'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:600;">SUPERVISOR SIGNATURE</td><td style="padding:4px 0;">${job.certSignature ? 'Signed' : 'Not signed'}</td></tr>
-                    <tr><td style="padding:4px 0; font-weight:600;">SUPERVISOR DATE</td><td style="padding:4px 0;">${job.certDate || 'N/A'}</td></tr>
-                </table>
-                <hr style="border:1px solid #eee; margin-top:20px;" />
-                <div style="font-size:12px; text-align:center; color:#888; margin-top:20px;">Generated on ${new Date().toLocaleString()}</div>
+                ${getHeaderHTML()}
+                <h2 style="text-align: center; font-size: 18px; color: #C8102E; margin: 10px 0;">EQUIPMENT MAINTENANCE JOB CARD</h2>
+                <div style="font-size: 14px; line-height: 1.8;">
+                    <div><strong>JOB CARD NO.</strong> ${job.jobNo || 'N/A'}</div>
+                    <div><strong>REPORTING DATE / TIME</strong> ${job.reportingDateTime ? new Date(job.reportingDateTime).toLocaleString() : 'N/A'}</div>
+                    <div><strong>REQUESTER NAME</strong> ${job.requester || 'N/A'}</div>
+                    <div><strong>INVENTORY / ASSET NO.</strong> ${job.inventory || 'N/A'}</div>
+                    <div><strong>MODEL / MAKE</strong> ${job.modelMake || 'N/A'}</div>
+                    <div><strong>COMPLAINT</strong> ${job.complaint || 'N/A'}</div>
+                    <div><strong>DIAGNOSIS</strong> ${job.diagnosis || 'N/A'}</div>
+                    <div><strong>RECEIVED FROM</strong> ${job.receivedFrom || 'N/A'}</div>
+                    <div><strong>HANDED BACK TO</strong> ${job.handedTo || 'N/A'}</div>
+                    <div><strong>DATE / TIME RECEIVED</strong> ${job.receivedDateTime ? new Date(job.receivedDateTime).toLocaleString() : 'N/A'}</div>
+                    <div><strong>DATE / TIME HANDED</strong> ${job.handedDateTime ? new Date(job.handedDateTime).toLocaleString() : 'N/A'}</div>
+                    <div><strong>RECEIVED BY</strong> ${job.receivedBy || 'N/A'}</div>
+                    <div><strong>HANDED BY</strong> ${job.handedBy || 'N/A'}</div>
+                    <hr style="border: 1px solid #ddd; margin: 8px 0;" />
+                    <h3 style="font-size: 16px; color: #C8102E; margin: 5px 0;">Service & Timeline</h3>
+                    <div><strong>SERVICE TYPE</strong> ${job.serviceType || 'N/A'}</div>
+                    <div><strong>TOTAL TIME</strong> ${job.totalTime || 'N/A'}</div>
+                    <div><strong>JOB STARTED</strong> ${job.startDateTime ? new Date(job.startDateTime).toLocaleString() : 'N/A'}</div>
+                    <div><strong>RESPONSE TIME</strong> ${job.responseTime || 'N/A'}</div>
+                    <div><strong>JOB COMPLETED</strong> ${job.endDateTime ? new Date(job.endDateTime).toLocaleString() : 'N/A'}</div>
+                    <div><strong>ADMIN/REQUISITION TIME</strong> ${job.adminTime || 'N/A'}</div>
+                    <hr style="border: 1px solid #ddd; margin: 8px 0;" />
+                    <h3 style="font-size: 16px; color: #C8102E; margin: 5px 0;">Final Verification</h3>
+                    <div><strong>Function O.K.</strong> ${job.functionOk ? 'Yes' : 'No'}</div>
+                    <div><strong>Safety O.K.</strong> ${job.safetyOk ? 'Yes' : 'No'}</div>
+                    <div><strong>COMMENTS</strong> ${job.comments || 'N/A'}</div>
+                    ${statusFields}
+                    <hr style="border: 1px solid #ddd; margin: 8px 0;" />
+                    <h3 style="font-size: 16px; color: #C8102E; margin: 5px 0;">Technician</h3>
+                    <div><strong>NAME</strong> ${job.techName || 'N/A'}</div>
+                    <div><strong>Signature</strong> ${job.techSignature ? 'Signed' : 'Not signed'}</div>
+                    <div><strong>DATE</strong> ${job.techDate || 'N/A'}</div>
+                    <div style="margin-top: 8px;"><strong>Supervisor NAME</strong> ${job.certName || 'N/A'}</div>
+                    <div><strong>Signature</strong> ${job.certSignature ? 'Signed' : 'Not signed'}</div>
+                    <div><strong>DATE</strong> ${job.certDate || 'N/A'}</div>
+                </div>
+                <div style="text-align: center; margin-top: 30px; font-size: 12px; color: #888;">Generated on ${new Date().toLocaleString()}</div>
             `;
             document.body.appendChild(tempDiv);
             const canvas = await html2canvas(tempDiv, { scale: 2, useCORS: true });
@@ -1221,7 +1229,6 @@
             const pdf = new jsPDF('p', 'mm', 'a4');
             const imgWidth = 210;
             const imgHeight = (canvas.height * imgWidth) / canvas.width;
-            // Handle multi-page if needed
             let heightLeft = imgHeight;
             let position = 0;
             const pageHeight = 297;
@@ -1242,23 +1249,331 @@
     };
 
     // ================================================================
-    // USER MANAGEMENT (unchanged, same as previous working version)
+    // USER MANAGEMENT (functions unchanged)
     // ================================================================
-    window.openUserModal = function() { /* ... */ };
-    window.editUser = async function(userId) { /* ... */ };
-    window.closeUserModal = function() { /* ... */ };
-    window.saveUser = async function() { /* ... */ };
-    function renderUserList() { /* ... */ }
-    window.updateUserRole = async function(userId, newRole) { /* ... */ };
-    window.deleteUser = async function(userId) { /* ... */ };
-    window.approveUser = async function(userId) { /* ... */ };
-    window.showPendingUsers = async function() { /* ... */ };
-    window.denyUser = async function(userId) { /* ... */ };
-    window.closeApprovalModal = function() { /* ... */ };
+    window.openUserModal = function() {
+        console.log('🔓 Opening user modal');
+        document.getElementById('editUserId').value = '';
+        document.getElementById('userModalTitle').innerHTML = '<i class="fas fa-users-cog"></i> Add New User';
+        document.getElementById('userFormTitle').textContent = '➕ Add New User';
+        document.getElementById('saveUserBtn').innerHTML = '<i class="fas fa-save"></i> Add User';
+        document.getElementById('newUserPassword').value = '';
+        document.getElementById('newUserPassword').required = true;
+        document.getElementById('passwordField').style.display = 'block';
+        document.getElementById('newUserName').value = '';
+        document.getElementById('newUserEmail').value = '';
+        document.getElementById('newUserDept').value = '';
+        document.getElementById('newUserDepts').selectedIndex = -1;
+        document.getElementById('newUserWhatsApp').value = '';
+        document.getElementById('newUserRole').value = 'requester';
+        toggleRoleFields();
+        document.getElementById('userModalError').textContent = '';
+        document.getElementById('userModalError').style.display = 'none';
+        document.getElementById('userModalSuccess').textContent = '';
+        document.getElementById('userModalSuccess').style.display = 'none';
+        document.getElementById('userModal').classList.add('show');
+        renderUserList();
+    };
+
+    window.editUser = async function(userId) {
+        try {
+            const userDoc = await getDoc(doc(db, USERS_COLL, userId));
+            if (!userDoc.exists()) {
+                showToast('User not found.', true);
+                return;
+            }
+            const userData = userDoc.data();
+
+            document.getElementById('editUserId').value = userId;
+            document.getElementById('userModalTitle').innerHTML = '<i class="fas fa-user-edit"></i> Edit User';
+            document.getElementById('userFormTitle').textContent = '✏️ Edit User Details';
+            document.getElementById('saveUserBtn').innerHTML = '<i class="fas fa-save"></i> Update User';
+
+            document.getElementById('newUserName').value = userData.name || '';
+            document.getElementById('newUserEmail').value = userData.email || '';
+            document.getElementById('newUserRole').value = userData.role || 'requester';
+            document.getElementById('newUserWhatsApp').value = userData.whatsapp || '';
+            if (userData.role === 'requester') {
+                document.getElementById('newUserDept').value = userData.department || '';
+            } else if (userData.role === 'maintenance') {
+                const depts = userData.departments || [];
+                const select = document.getElementById('newUserDepts');
+                Array.from(select.options).forEach(opt => {
+                    opt.selected = depts.includes(opt.value);
+                });
+            }
+
+            document.getElementById('passwordField').style.display = 'none';
+            document.getElementById('newUserPassword').required = false;
+
+            toggleRoleFields();
+            document.getElementById('userModalError').textContent = '';
+            document.getElementById('userModalError').style.display = 'none';
+            document.getElementById('userModalSuccess').textContent = '';
+            document.getElementById('userModalSuccess').style.display = 'none';
+
+            document.getElementById('userModal').classList.add('show');
+            renderUserList();
+        } catch (err) {
+            showToast('Error loading user: ' + err.message, true);
+        }
+    };
+
+    window.closeUserModal = function() {
+        document.getElementById('userModal').classList.remove('show');
+    };
+
+    window.saveUser = async function() {
+        const editId = document.getElementById('editUserId').value;
+        const email = document.getElementById('newUserEmail').value.trim();
+        const name = document.getElementById('newUserName').value.trim();
+        const password = document.getElementById('newUserPassword').value.trim();
+        const role = document.getElementById('newUserRole').value;
+        const countryCode = document.getElementById('newUserCountryCode').value;
+        const whatsappNumber = document.getElementById('newUserWhatsApp').value.trim();
+        const deptSingle = document.getElementById('newUserDept').value;
+        const deptSelect = document.getElementById('newUserDepts');
+        const selectedDepts = Array.from(deptSelect.selectedOptions).map(opt => opt.value);
+
+        const errorDiv = document.getElementById('userModalError');
+        const successDiv = document.getElementById('userModalSuccess');
+        errorDiv.style.display = 'none';
+        successDiv.style.display = 'none';
+
+        if (!email || !name || !role) {
+            errorDiv.textContent = 'Please fill in all required fields.';
+            errorDiv.style.display = 'block';
+            return;
+        }
+        if (!editId && password.length < 6) {
+            errorDiv.textContent = 'Password must be at least 6 characters.';
+            errorDiv.style.display = 'block';
+            return;
+        }
+        if (role === 'maintenance') {
+            if (!whatsappNumber) {
+                errorDiv.textContent = 'WhatsApp number is required for maintenance users.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            if (selectedDepts.length === 0) {
+                errorDiv.textContent = 'Please select at least one department for the engineer.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+        }
+        if (role === 'requester' && !deptSingle) {
+            errorDiv.textContent = 'Please select a department for the requester.';
+            errorDiv.style.display = 'block';
+            return;
+        }
+
+        try {
+            if (!editId) {
+                const payload = {
+                    email,
+                    password,
+                    name,
+                    role,
+                    whatsapp: role === 'maintenance' ? countryCode + whatsappNumber : '',
+                    department: role === 'requester' ? deptSingle : null,
+                    departments: role === 'maintenance' ? selectedDepts : null
+                };
+
+                const response = await fetch('/create-user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(result.error || 'Unknown error');
+                }
+                successDiv.textContent = `✅ ${result.message}`;
+                successDiv.style.display = 'block';
+                showToast(successDiv.textContent);
+                await fetchData();
+                renderUserList();
+                renderDashboard();
+                closeUserModal();
+                showToast('✅ User created successfully.');
+            } else {
+                const userData = {
+                    name: name,
+                    role: role,
+                    whatsapp: role === 'maintenance' ? countryCode + whatsappNumber : '',
+                    updatedAt: serverTimestamp()
+                };
+                if (role === 'requester') {
+                    userData.department = deptSingle;
+                    userData.departments = null;
+                } else if (role === 'maintenance') {
+                    userData.departments = selectedDepts;
+                    userData.department = null;
+                } else {
+                    userData.department = null;
+                    userData.departments = null;
+                }
+                await updateDoc(doc(db, USERS_COLL, editId), userData);
+                successDiv.textContent = `✅ User ${name} updated successfully!`;
+                successDiv.style.display = 'block';
+                showToast(successDiv.textContent);
+                await fetchData();
+                renderUserList();
+                renderDashboard();
+                closeUserModal();
+                showToast('✅ Update completed.');
+            }
+        } catch (err) {
+            console.error(err);
+            errorDiv.textContent = 'Error: ' + err.message;
+            errorDiv.style.display = 'block';
+            showToast(err.message, true);
+        }
+    };
+
+    function renderUserList() {
+        const list = document.getElementById('userList');
+        if (!allUsers.length) {
+            list.innerHTML = '<li>No users found.</li>';
+            return;
+        }
+        let html = '';
+        allUsers.forEach(u => {
+            const deptDisplay = u.role === 'requester' ? u.department : (u.departments ? u.departments.join(', ') : '');
+            html += `
+                <li>
+                    <div class="user-info">
+                        <strong>${u.name || 'Unnamed'}</strong> (${u.email})<br />
+                        <small>${u.role} | ${deptDisplay} ${u.whatsapp ? '📱 ' + u.whatsapp : ''}</small>
+                    </div>
+                    <div class="user-actions">
+                        <select class="role-select" onchange="updateUserRole('${u.id}', this.value)">
+                            <option value="requester" ${u.role === 'requester' ? 'selected' : ''}>Requester</option>
+                            <option value="maintenance" ${u.role === 'maintenance' ? 'selected' : ''}>Maintenance</option>
+                            <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>Admin</option>
+                        </select>
+                        <button class="edit-btn" onclick="editUser('${u.id}')"><i class="fas fa-edit"></i> Edit</button>
+                        ${!u.approved ? `<button class="approve-btn" onclick="approveUser('${u.id}')">Approve</button>` : ''}
+                        <button class="deny-btn" onclick="deleteUser('${u.id}')"><i class="fas fa-trash"></i></button>
+                    </div>
+                </li>
+            `;
+        });
+        list.innerHTML = html;
+    }
+
+    window.updateUserRole = async function(userId, newRole) {
+        try {
+            await updateDoc(doc(db, USERS_COLL, userId), { role: newRole });
+            showToast('User role updated.');
+            await fetchData();
+            renderUserList();
+            renderDashboard();
+        } catch (err) {
+            showToast('Error updating role: ' + err.message, true);
+        }
+    };
+
+    window.deleteUser = async function(userId) {
+        if (!confirm('Are you sure you want to delete this user?')) return;
+        try {
+            await deleteDoc(doc(db, USERS_COLL, userId));
+            showToast('User deleted.');
+            await fetchData();
+            renderUserList();
+            renderDashboard();
+        } catch (err) {
+            showToast('Error deleting user: ' + err.message, true);
+        }
+    };
+
+    window.approveUser = async function(userId) {
+        try {
+            await updateDoc(doc(db, USERS_COLL, userId), { approved: true });
+            showToast('✅ User approved successfully!');
+            await fetchData();
+            renderUserList();
+            renderDashboard();
+            if (document.getElementById('approvalModal').classList.contains('show')) {
+                showPendingUsers();
+            }
+        } catch (err) {
+            showToast('Error approving user: ' + err.message, true);
+        }
+    };
+
+    window.showPendingUsers = async function() {
+        console.log('🔔 Showing pending users');
+        const modal = document.getElementById('approvalModal');
+        modal.classList.add('show');
+        const list = document.getElementById('pendingList');
+        list.innerHTML = 'Loading...';
+        try {
+            const snap = await getDocs(collection(db, USERS_COLL));
+            const allUsersData = [];
+            snap.forEach(doc => { allUsersData.push({ id: doc.id, ...doc.data() }); });
+            const pending = allUsersData.filter(u => u.approved !== true);
+            if (pending.length === 0) {
+                list.innerHTML = `<p style="color:#9ca3af; text-align:center; padding:20px;">✅ No pending approvals.</p>
+                    <button class="btn btn-outline btn-sm" style="margin:12px auto; display:block;" onclick="showPendingUsers()"><i class="fas fa-sync-alt"></i> Refresh</button>
+                    <hr style="margin:16px 0;" />
+                    <p style="font-size:13px; font-weight:600;">All users:</p>
+                    ${allUsersData.map(u => `<div style="font-size:12px; padding:4px 0; border-bottom:1px solid #f1f3f5;">${u.name} - approved: ${u.approved} (${typeof u.approved})</div>`).join('')}`;
+                return;
+            }
+            let html = '';
+            pending.forEach(u => {
+                html += `
+                    <div class="pending-user-item">
+                        <div class="user-info">
+                            <strong>${u.name}</strong> (${u.email})<br />
+                            <small>${u.role} | ${u.department || u.departments?.join(', ') || ''} | WhatsApp: ${u.whatsapp || 'N/A'}</small>
+                        </div>
+                        <div>
+                            <button class="approve-btn" onclick="approveUser('${u.id}')"><i class="fas fa-check"></i> Approve</button>
+                            <button class="deny-btn" onclick="denyUser('${u.id}')"><i class="fas fa-times"></i> Deny</button>
+                        </div>
+                    </div>
+                `;
+            });
+            list.innerHTML = html;
+        } catch (err) {
+            list.innerHTML = '<p style="color:red;">Error loading users.</p>';
+            showToast('Error: ' + err.message, true);
+        }
+    };
+
+    window.denyUser = async function(userId) {
+        if (!confirm('Delete this user?')) return;
+        try {
+            await deleteDoc(doc(db, USERS_COLL, userId));
+            showToast('User deleted.');
+            await fetchData();
+            showPendingUsers();
+            renderDashboard();
+        } catch (err) {
+            showToast('Error: ' + err.message, true);
+        }
+    };
+
+    window.closeApprovalModal = function() {
+        document.getElementById('approvalModal').classList.remove('show');
+    };
+    document.getElementById('approvalModal').addEventListener('click', function(e) {
+        if (e.target === this) closeApprovalModal();
+    });
+    document.getElementById('userModal').addEventListener('click', function(e) {
+        if (e.target === this) closeUserModal();
+    });
+
     window.createJob = (requestNo) => window.location.href = `jobcard.html?request=${requestNo}`;
     window.editJobCard = (id) => window.open(`jobcard.html?view=${id}`, '_blank');
 
-    // ===== AUTH STATE =====
+    // ================================================================
+    // AUTH STATE
+    // ================================================================
     onAuthStateChanged(auth, async (user) => {
         console.log('🔐 Auth state changed.');
         if (!user) {
