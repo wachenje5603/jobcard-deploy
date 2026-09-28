@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MCRH - Job Card</title>
 
+    <!-- Firebase v9 -->
     <script type="importmap">
         {
             "imports": {
@@ -15,12 +16,15 @@
         }
     </script>
 
-    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+    <!-- Signature Pad -->
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js">
+    </script>
+
+    <!-- html2canvas & jsPDF for PDF Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <style>
-        /* (styles unchanged – keep your existing CSS) */
         * { margin:0; padding:0; box-sizing:border-box; }
         body { font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#f4f6f9; padding:20px; color:#1e2a3a; }
         .container { max-width:1200px; margin:0 auto; background:white; padding:25px 30px; border-radius:12px; box-shadow:0 8px 30px rgba(0,0,0,0.12); }
@@ -84,6 +88,47 @@
         .toast.show { transform:translateY(0); opacity:1; }
         .loading-spinner { display:inline-block; width:16px; height:16px; border:3px solid rgba(255,255,255,0.3); border-radius:50%; border-top-color:#fff; animation:spin 0.8s linear infinite; }
         @keyframes spin { to { transform:rotate(360deg); } }
+
+        /* ===== SAVING OVERLAY ===== */
+        .saving-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.55);
+            backdrop-filter: blur(4px);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .saving-overlay.show { display: flex; }
+        .saving-card {
+            background: white;
+            border-radius: 14px;
+            padding: 36px 44px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 440px;
+            width: 100%;
+        }
+        .saving-card .spinner {
+            width: 54px; height: 54px;
+            border: 5px solid #f1f3f5;
+            border-top-color: #C8102E;
+            border-radius: 50%;
+            animation: spin 0.9s linear infinite;
+            margin: 0 auto 18px;
+        }
+        .saving-card h2 { font-size: 20px; color:#C8102E; margin-bottom: 8px; }
+        .saving-card p { font-size: 14px; color:#495057; }
+        .saving-card .redirect-note {
+            margin-top: 14px;
+            font-size: 13px;
+            color: #6c757d;
+            background: #f8f9fc;
+            padding: 10px 14px;
+            border-radius: 8px;
+        }
 
         @media print { .action-bar,.btn,.sig-actions,.no-print { display:none !important; } .sig-pad-wrapper canvas { border:1px solid #000; max-width:200px; } .field-group input,.field-group select,.field-group textarea { border:none; background:transparent !important; padding:2px 0; box-shadow:none; color:#000 !important; font-weight:500; } .field-group input[readonly] { background:transparent !important; } .field-group select { -webkit-appearance:none; appearance:none; border:none; background:transparent; color:#000; font-weight:500; } .section-block { border:1px solid #ccc; background:#fafafa; break-inside:avoid; } .sig-placeholder { display:none !important; } .sig-status { display:none !important; } .container { box-shadow:none; padding:15px; } .sig-pad-wrapper canvas { border:1px solid #ddd; background:white; } }
         @media (max-width:768px) { .grid-2,.grid-3,.grid-4 { grid-template-columns:1fr; } .signature-grid { grid-template-columns:1fr; } .container { padding:15px; } .hospital-header { flex-direction:column; align-items:start; gap:6px; } .action-bar { flex-direction:column; } .action-bar .btn { justify-content:center; } }
@@ -162,7 +207,7 @@
                 </div>
             </div>
 
-            <!-- HIDDEN REQUESTER ID -->
+            <!-- ===== HIDDEN REQUESTER ID ===== -->
             <input type="hidden" id="jobRequesterId" />
 
             <!-- HANDOVER -->
@@ -338,8 +383,8 @@
                                 <div class="sig-placeholder" id="jobTechSigPlaceholder">✍️ Sign here</div>
                             </div>
                             <div class="sig-actions">
-                                <button class="btn-sm btn-clear" onclick="clearSignature('jobTech')">🗑️ Clear</button>
-                                <button class="btn-sm btn-undo" onclick="undoSignature('jobTech')">↩️ Undo</button>
+                                <button type="button" class="btn-sm btn-clear" onclick="clearSignature('jobTech')">🗑️ Clear</button>
+                                <button type="button" class="btn-sm btn-undo" onclick="undoSignature('jobTech')">↩️ Undo</button>
                             </div>
                             <div class="sig-status" id="jobTechSigStatus">✅ Signed</div>
                         </div>
@@ -363,8 +408,8 @@
                                 <div class="sig-placeholder" id="jobCertSigPlaceholder">✍️ Sign here</div>
                             </div>
                             <div class="sig-actions">
-                                <button class="btn-sm btn-clear" onclick="clearSignature('jobCert')">🗑️ Clear</button>
-                                <button class="btn-sm btn-undo" onclick="undoSignature('jobCert')">↩️ Undo</button>
+                                <button type="button" class="btn-sm btn-clear" onclick="clearSignature('jobCert')">🗑️ Clear</button>
+                                <button type="button" class="btn-sm btn-undo" onclick="undoSignature('jobCert')">↩️ Undo</button>
                             </div>
                             <div class="sig-status" id="jobCertSigStatus">✅ Signed</div>
                         </div>
@@ -378,18 +423,31 @@
 
             <!-- ACTION BAR -->
             <div class="action-bar no-print">
-                <button class="btn btn-success" onclick="saveJobCard()">💾 Save</button>
-                <button class="btn btn-outline" onclick="downloadJobcardPDF()">📄 PDF</button>
-                <button class="btn btn-outline" onclick="resetJobCardForm()">🔄 Reset</button>
+                <button type="button" class="btn btn-success" id="saveJobBtn" onclick="saveJobCard()">💾 Save Job Card</button>
+                <button type="button" class="btn btn-outline" onclick="window.print()">📄 Print Job Card</button>
+                <button type="button" class="btn btn-outline" onclick="goToDashboard()">⬅️ Back to Dashboard</button>
             </div>
         </form>
 
         <footer style="margin-top:22px;font-size:12px;color:#6c757d;text-align:center;border-top:1px solid #e9ecef;padding-top:14px;">
-            🔥 Firestore‑powered · ✍️ Drawable Signatures · MCRH Job Card v9.0
+            🔥 Firestore‑powered · ✍️ Drawable Signatures · MCRH Job Card v8.0
         </footer>
     </div>
 
     <div id="toast" class="toast">Message</div>
+
+    <!-- ===== SAVING OVERLAY ===== -->
+    <div class="saving-overlay" id="savingOverlay">
+        <div class="saving-card">
+            <div class="spinner"></div>
+            <h2 id="savingTitle">Saving your job card…</h2>
+            <p id="savingMessage">Please wait.</p>
+            <div class="redirect-note" id="redirectNote" style="display:none;">
+                ✅ Job card saved successfully!<br>
+                Redirecting you to the dashboard…
+            </div>
+        </div>
+    </div>
 
     <script type="module">
         // ============================================================
@@ -418,8 +476,7 @@
             query,
             orderBy,
             where,
-            serverTimestamp,
-            runTransaction
+            serverTimestamp
         } from 'firebase/firestore';
 
         const app = initializeApp(firebaseConfig);
@@ -428,7 +485,6 @@
         const REQUESTS_COLL = 'requests';
         const JOBCARDS_COLL = 'jobcards';
         const USERS_COLL = 'users';
-        const COUNTERS_COLL = 'counters';
 
         // ============================================================
         // GLOBALS
@@ -440,6 +496,7 @@
         let allUsers = [];
         let allRequests = [];
         let allJobCards = [];
+        let isSaving = false;
 
         // ============================================================
         // AUTH
@@ -470,7 +527,6 @@
                     return;
                 }
                 currentUser = { id: user.uid, ...userData };
-                console.log('🔍 Current user departments:', currentUser.departments);
                 await initPage();
             } catch (err) {
                 console.error('Auth error:', err);
@@ -483,6 +539,13 @@
         // ============================================================
         window.logout = function() {
             signOut(auth).then(() => window.location.href = 'login.html');
+        };
+
+        // ============================================================
+        // GO TO DASHBOARD
+        // ============================================================
+        window.goToDashboard = function() {
+            window.location.href = 'dashboard.html';
         };
 
         // ============================================================
@@ -523,28 +586,48 @@
             } catch { return '--:--'; }
         }
 
-        // ============================================================
-        // GENERATE JOB NUMBER USING COUNTER (MCRH001, MCRH002, ...)
-        // ============================================================
         async function generateJobNumber() {
-            const counterDocRef = doc(db, COUNTERS_COLL, 'jobCounter');
             try {
-                const newNumber = await runTransaction(db, async (transaction) => {
-                    const docSnap = await transaction.get(counterDocRef);
-                    if (!docSnap.exists()) {
-                        transaction.set(counterDocRef, { count: 0 });
-                        return 1;
+                const q = query(collection(db, JOBCARDS_COLL));
+                const snap = await getDocs(q);
+                let max = 0;
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    if (data.jobNo) {
+                        const match = data.jobNo.match(/MCRH(\d+)/);
+                        if (match) {
+                            const num = parseInt(match[1]);
+                            if (num > max) max = num;
+                        }
                     }
-                    const currentCount = docSnap.data().count || 0;
-                    const next = currentCount + 1;
-                    transaction.update(counterDocRef, { count: next });
-                    return next;
                 });
-                return `MCRH${String(newNumber).padStart(3, '0')}`;
-            } catch (error) {
-                console.error('Error generating job number:', error);
+                const next = max + 1;
+                return `MCRH${String(next).padStart(3, '0')}`;
+            } catch {
                 return `MCRH${Date.now().toString().slice(-6)}`;
             }
+        }
+
+        // ============================================================
+        // SAVING OVERLAY
+        // ============================================================
+        function showSavingOverlay(message, showRedirectNote = false) {
+            const overlay = document.getElementById('savingOverlay');
+            const title = document.getElementById('savingTitle');
+            const msg = document.getElementById('savingMessage');
+            const note = document.getElementById('redirectNote');
+
+            if (showRedirectNote) {
+                title.textContent = '✅ Job Card Saved!';
+                msg.style.display = 'none';
+                note.style.display = 'block';
+            } else {
+                title.textContent = 'Saving your job card…';
+                msg.textContent = message || 'Please wait.';
+                msg.style.display = 'block';
+                note.style.display = 'none';
+            }
+            overlay.classList.add('show');
         }
 
         // ============================================================
@@ -555,18 +638,13 @@
                 const snap = await getDocs(collection(db, USERS_COLL));
                 allUsers = [];
                 snap.forEach(doc => { allUsers.push({ id: doc.id, ...doc.data() }); });
-                console.log(`✅ Fetched ${allUsers.length} users.`);
-            } catch (err) {
-                console.error('Error fetching users:', err);
-                showToast('Error loading user list: ' + err.message, true);
-            }
+            } catch (err) { console.error('Error fetching users:', err); }
         }
 
         // ============================================================
         // POPULATE DROPDOWNS
         // ============================================================
         function populateDropdowns() {
-            // Handed back to (User) – all requesters
             const handedToSelect = document.getElementById('jobHandedTo');
             handedToSelect.innerHTML = '<option value="">-- Select --</option>';
             const requesters = allUsers.filter(u => u.role === 'requester');
@@ -577,7 +655,6 @@
                 handedToSelect.appendChild(opt);
             });
 
-            // Technician Name – maintenance or admin
             const techSelect = document.getElementById('jobTechName');
             techSelect.innerHTML = '<option value="">-- Select --</option>';
             const techUsers = allUsers.filter(u => u.role === 'maintenance' || u.role === 'admin');
@@ -589,9 +666,6 @@
             });
         }
 
-        // ============================================================
-        // POPULATE SUPERVISOR DROPDOWN (based on department)
-        // ============================================================
         function populateSupervisorDropdown(department) {
             const certSelect = document.getElementById('jobCertName');
             certSelect.innerHTML = '<option value="">-- Select --</option>';
@@ -614,7 +688,6 @@
                     opt.textContent = u.name + ' (' + (u.department || '') + ')';
                     certSelect.appendChild(opt);
                 });
-                console.warn(`No requesters found for department "${department}", showing all.`);
             } else {
                 deptRequesters.forEach(u => {
                     const opt = document.createElement('option');
@@ -723,56 +796,22 @@
         function loadSigData(pad, data) { if (pad && data) pad.fromData(data); }
 
         // ============================================================
-        // REQUEST DROPDOWN – FILTERED BY DEPARTMENT (for maintenance)
+        // REQUEST DROPDOWN
         // ============================================================
         async function populateRequestDropdown() {
             const dropdown = document.getElementById('jobRequestNo');
             dropdown.innerHTML = '<option value="">-- Select Request --</option>';
             try {
-                let requestsQuery;
-                const isAdmin = currentUser?.role === 'admin';
-                const isMaintenance = currentUser?.role === 'maintenance';
-
-                if (isAdmin) {
-                    requestsQuery = query(collection(db, REQUESTS_COLL), orderBy('createdAt', 'desc'));
-                } else if (isMaintenance) {
-                    const depts = currentUser?.departments || [];
-                    if (depts.length === 0) {
-                        showToast('No departments assigned to you.', true);
-                        return;
-                    }
-                    requestsQuery = query(collection(db, REQUESTS_COLL), where('unit', 'in', depts), orderBy('createdAt', 'desc'));
-                } else {
-                    return;
-                }
-
-                const reqSnap = await getDocs(requestsQuery);
+                const reqSnap = await getDocs(query(collection(db, REQUESTS_COLL), orderBy('createdAt', 'desc')));
                 allRequests = [];
                 reqSnap.forEach(doc => { const data = doc.data(); data.id = doc.id; allRequests.push(data); });
 
-                let jobQuery;
-                if (isAdmin) {
-                    jobQuery = collection(db, JOBCARDS_COLL);
-                } else {
-                    const depts = currentUser?.departments || [];
-                    if (depts.length > 0) {
-                        jobQuery = query(collection(db, JOBCARDS_COLL), where('unit', 'in', depts));
-                    } else {
-                        jobQuery = null;
-                    }
-                }
-                if (jobQuery) {
-                    const jobSnap = await getDocs(jobQuery);
-                    allJobCards = [];
-                    jobSnap.forEach(doc => { const data = doc.data(); data.id = doc.id; allJobCards.push(data); });
-                } else {
-                    allJobCards = [];
-                }
+                const jobSnap = await getDocs(collection(db, JOBCARDS_COLL));
+                allJobCards = [];
+                jobSnap.forEach(doc => { const data = doc.data(); data.id = doc.id; allJobCards.push(data); });
 
                 const jobMap = new Map();
-                allJobCards.forEach(j => {
-                    if (j.requestNo) jobMap.set(j.requestNo, j.status);
-                });
+                allJobCards.forEach(j => { if (j.requestNo) jobMap.set(j.requestNo, j.status); });
 
                 const availableRequests = allRequests.filter(r => {
                     const jobStatus = jobMap.get(r.requestNo);
@@ -795,22 +834,15 @@
                     }
                     loadRequestData();
                 }
-            } catch (err) {
-                console.error('Error populating request dropdown:', err);
-                showToast('Error loading requests: ' + err.message, true);
-            }
+            } catch (err) { console.error(err); }
         }
 
         // ============================================================
-        // LOAD REQUEST DATA – with debug logs
+        // LOAD REQUEST DATA
         // ============================================================
         window.loadRequestData = async function() {
-            const dropdown = document.getElementById('jobRequestNo');
-            const selectedOption = dropdown.options[dropdown.selectedIndex];
-            const requestNo = selectedOption?.value;
-            const docId = selectedOption?.dataset?.docId;
-
-            if (!requestNo || !docId) {
+            const requestNo = document.getElementById('jobRequestNo').value;
+            if (!requestNo) {
                 ['jobRequester', 'jobUnit', 'jobEquipName', 'jobInventory', 'jobSerial', 'jobModel', 'jobComplaint']
                 .forEach(id => document.getElementById(id).value = '');
                 document.getElementById('jobReportingDateTime').value = '';
@@ -819,16 +851,12 @@
                 document.getElementById('jobRequesterId').value = '';
                 return;
             }
-
             try {
-                const docSnap = await getDoc(doc(db, REQUESTS_COLL, docId));
-                if (!docSnap.exists()) {
-                    showToast('Request not found.', true);
-                    return;
-                }
-                const r = docSnap.data();
-                console.log('📄 Request unit:', r.unit);
-                console.log('🔧 User departments:', currentUser?.departments);
+                const q = query(collection(db, REQUESTS_COLL), where('requestNo', '==', requestNo));
+                const snap = await getDocs(q);
+                let r = null;
+                snap.forEach(doc => { r = doc.data(); });
+                if (!r) return;
 
                 document.getElementById('jobRequester').value = r.requesterName || '';
                 document.getElementById('jobUnit').value = r.unit || '';
@@ -844,11 +872,9 @@
                 if (!document.getElementById('jobReceivedDateTime').value) {
                     document.getElementById('jobReceivedDateTime').value = r.dateTime || '';
                 }
-
                 populateSupervisorDropdown(r.unit);
                 showToast('✅ Request data loaded.');
             } catch (err) {
-                console.error('Error loading request:', err);
                 showToast('Error loading request: ' + err.message, true);
             }
         };
@@ -897,18 +923,27 @@
         document.getElementById('jobReportingDateTime').addEventListener('change', updateJobTimeFields);
 
         // ============================================================
-        // SAVE JOB CARD
+        // SAVE JOB CARD – with overlay + redirect to dashboard
         // ============================================================
         window.saveJobCard = async function() {
-            const btn = document.querySelector('.btn-success');
+            if (isSaving) return;
+
+            const requestNo = document.getElementById('jobRequestNo').value;
+            if (!requestNo) {
+                showToast('Please select a request.', true);
+                return;
+            }
+
+            isSaving = true;
+            const btn = document.getElementById('saveJobBtn');
             btn.disabled = true;
-            btn.innerHTML = '<span class="loading-spinner"></span> Saving...';
+            btn.innerHTML = '<span class="loading-spinner"></span> Saving…';
+
+            // Show the overlay
+            showSavingOverlay('Saving job card details to the cloud…');
 
             try {
                 const jobNo = document.getElementById('jobNo').value;
-                const requestNo = document.getElementById('jobRequestNo').value;
-                if (!requestNo) { showToast('Please select a request.', true); btn.disabled = false; btn.innerHTML = '💾 Save'; return; }
-
                 const handedToId = document.getElementById('jobHandedTo').value;
                 const handedToName = handedToId ? allUsers.find(u => u.id === handedToId)?.name || '' : '';
                 const techId = document.getElementById('jobTechName').value;
@@ -973,64 +1008,107 @@
                     technicianId: currentUser ? currentUser.id : null,
                 };
 
+                // 1. Save or update the job card
                 if (currentJobCardId) {
                     await updateDoc(doc(db, JOBCARDS_COLL, currentJobCardId), data);
-                    showToast('✅ Job card updated.');
                 } else {
                     const docRef = await addDoc(collection(db, JOBCARDS_COLL), data);
                     currentJobCardId = docRef.id;
-                    showToast(`✅ Job card ${data.jobNo} saved.`);
                 }
 
-                if (requestNo) {
-                    try {
-                        const reqQuery = query(collection(db, REQUESTS_COLL), where('requestNo', '==', requestNo));
-                        const reqSnap = await getDocs(reqQuery);
-                        reqSnap.forEach(async (doc) => {
-                            await updateDoc(doc.ref, { jobStatus: data.status, jobNo: data.jobNo });
-                        });
-                    } catch (err) { console.warn('Could not update request status:', err); }
+                // 2. Update the linked request
+                try {
+                    const reqQuery = query(collection(db, REQUESTS_COLL), where('requestNo', '==', requestNo));
+                    const reqSnap = await getDocs(reqQuery);
+                    const updates = reqSnap.docs.map(d => updateDoc(d.ref, {
+                        jobStatus: data.status,
+                        jobNo: data.jobNo
+                    }));
+                    await Promise.all(updates);
+                } catch (err) {
+                    console.warn('Could not update request status:', err);
                 }
 
-                document.getElementById('jobNo').value = data.jobNo;
-                showToast('✅ Job card saved successfully.');
+                // 3. Show success and redirect
+                showSavingOverlay('', true);
+                showToast(`✅ Job card ${data.jobNo} saved. Redirecting…`);
+
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1800);
 
             } catch (err) {
+                console.error(err);
                 showToast('❌ Error: ' + err.message, true);
-            } finally {
+                document.getElementById('savingOverlay').classList.remove('show');
                 btn.disabled = false;
-                btn.innerHTML = '💾 Save';
+                btn.innerHTML = '💾 Save Job Card';
+                isSaving = false;
             }
         };
 
         // ============================================================
-        // PDF DOWNLOAD
+        // LOAD JOB CARD FOR EDITING
         // ============================================================
-        window.downloadJobcardPDF = function() {
-            showToast('Generating PDF...');
-            const element = document.querySelector('.container');
-            html2canvas(element, { scale: 2 }).then(canvas => {
-                const imgData = canvas.toDataURL('image/png');
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF('p', 'mm', 'a4');
-                const imgWidth = 210;
-                const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                let heightLeft = imgHeight;
-                let position = 0;
-                const pageHeight = 297;
-                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                heightLeft -= pageHeight;
-                while (heightLeft > 0) {
-                    position = heightLeft - imgHeight;
-                    pdf.addPage();
-                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                    heightLeft -= pageHeight;
+        window.loadJobCard = async function(id) {
+            try {
+                const snap = await getDoc(doc(db, JOBCARDS_COLL, id));
+                if (!snap.exists()) return;
+                const j = snap.data();
+                currentJobCardId = id;
+
+                const fields = {
+                    jobNo: j.jobNo, requestNo: j.requestNo, requester: j.requester, unit: j.unit,
+                    reportingDateTime: j.reportingDateTime, equipName: j.equipName, inventory: j.inventory,
+                    serial: j.serial, modelMake: j.modelMake, complaint: j.complaint, diagnosis: j.diagnosis,
+                    receivedFrom: j.receivedFrom, receivedDateTime: j.receivedDateTime, receivedBy: j.receivedBy || '',
+                    handedTo: j.handedTo || '', handedDateTime: j.handedDateTime, handedBy: j.handedBy || '',
+                    startDateTime: j.startDateTime, endDateTime: j.endDateTime, totalTime: j.totalTime,
+                    responseTime: j.responseTime, adminTime: j.adminTime, status: j.status || 'Pending',
+                    postponeReason: j.postponeReason || 'Low priority', postponeNote: j.postponeNote || '',
+                    expectedDate: j.expectedDate || '', defects: j.defects || '', actionTaken: j.actionTaken || '',
+                    writeOffReason: j.writeOffReason || 'Wear & Tear', writeOffNote: j.writeOffNote || '',
+                    measureCurrent: j.measureCurrent || '', measureVoltage: j.measureVoltage || '',
+                    measureInsulation: j.measureInsulation || '', measurePressure: j.measurePressure || '',
+                    functionOk: j.functionOk !== undefined ? j.functionOk : true,
+                    safetyOk: j.safetyOk !== undefined ? j.safetyOk : true,
+                    comments: j.comments || '', techName: j.techName || '', techDate: j.techDate || '',
+                    certName: j.certName || '', certDate: j.certDate || '', requesterId: j.requesterId || '',
+                };
+                for (const [key, val] of Object.entries(fields)) {
+                    const el = document.getElementById('job' + key.charAt(0).toUpperCase() + key.slice(1));
+                    if (el) {
+                        if (el.type === 'checkbox') el.checked = val;
+                        else if (el.tagName === 'SELECT') { /* handled later */ }
+                        else el.value = val || '';
+                    }
                 }
-                pdf.save('jobcard.pdf');
-                showToast('✅ PDF downloaded.');
-            }).catch(err => {
-                showToast('Error generating PDF: ' + err.message, true);
-            });
+
+                document.querySelectorAll('input[name="serviceType"]').forEach(el => {
+                    el.checked = (el.value === j.serviceType);
+                });
+
+                if (j.techSignature) loadSigData(techSigPad, j.techSignature);
+                else techSigPad && techSigPad.clear();
+                if (j.certSignature) loadSigData(certSigPad, j.certSignature);
+                else certSigPad && certSigPad.clear();
+
+                toggleStatusFields();
+
+                const dropdown = document.getElementById('jobRequestNo');
+                for (let opt of dropdown.options) {
+                    if (opt.value === j.requestNo) { dropdown.value = j.requestNo; break; }
+                }
+                await loadRequestData();
+
+                if (j.certId) document.getElementById('jobCertName').value = j.certId;
+                if (j.techId) document.getElementById('jobTechName').value = j.techId;
+                if (j.handedToId) document.getElementById('jobHandedTo').value = j.handedToId;
+
+                showToast('📂 Job card loaded for editing.');
+            } catch (err) {
+                showToast('Error loading: ' + err.message, true);
+            }
         };
 
         // ============================================================
@@ -1065,95 +1143,6 @@
             showToast('🔄 Form reset.');
         }
         window.resetJobCardForm = resetJobCardForm;
-
-        // ============================================================
-        // LOAD JOB CARD FOR EDITING
-        // ============================================================
-        window.loadJobCard = async function(id) {
-            try {
-                const snap = await getDoc(doc(db, JOBCARDS_COLL, id));
-                if (!snap.exists()) return;
-                const j = snap.data();
-                currentJobCardId = id;
-
-                const fields = {
-                    jobNo: j.jobNo,
-                    requestNo: j.requestNo,
-                    requester: j.requester,
-                    unit: j.unit,
-                    reportingDateTime: j.reportingDateTime,
-                    equipName: j.equipName,
-                    inventory: j.inventory,
-                    serial: j.serial,
-                    modelMake: j.modelMake,
-                    complaint: j.complaint,
-                    diagnosis: j.diagnosis,
-                    receivedFrom: j.receivedFrom,
-                    receivedDateTime: j.receivedDateTime,
-                    receivedBy: j.receivedBy || '',
-                    handedTo: j.handedTo || '',
-                    handedDateTime: j.handedDateTime,
-                    handedBy: j.handedBy || '',
-                    startDateTime: j.startDateTime,
-                    endDateTime: j.endDateTime,
-                    totalTime: j.totalTime,
-                    responseTime: j.responseTime,
-                    adminTime: j.adminTime,
-                    status: j.status || 'Pending',
-                    postponeReason: j.postponeReason || 'Low priority',
-                    postponeNote: j.postponeNote || '',
-                    expectedDate: j.expectedDate || '',
-                    defects: j.defects || '',
-                    actionTaken: j.actionTaken || '',
-                    writeOffReason: j.writeOffReason || 'Wear & Tear',
-                    writeOffNote: j.writeOffNote || '',
-                    measureCurrent: j.measureCurrent || '',
-                    measureVoltage: j.measureVoltage || '',
-                    measureInsulation: j.measureInsulation || '',
-                    measurePressure: j.measurePressure || '',
-                    functionOk: j.functionOk !== undefined ? j.functionOk : true,
-                    safetyOk: j.safetyOk !== undefined ? j.safetyOk : true,
-                    comments: j.comments || '',
-                    techName: j.techName || '',
-                    techDate: j.techDate || '',
-                    certName: j.certName || '',
-                    certDate: j.certDate || '',
-                    requesterId: j.requesterId || '',
-                };
-                for (const [key, val] of Object.entries(fields)) {
-                    const el = document.getElementById('job' + key.charAt(0).toUpperCase() + key.slice(1));
-                    if (el) {
-                        if (el.type === 'checkbox') el.checked = val;
-                        else if (el.tagName === 'SELECT') { /* handled later */ } else el.value = val || '';
-                    }
-                }
-
-                document.querySelectorAll('input[name="serviceType"]').forEach(el => {
-                    el.checked = (el.value === j.serviceType);
-                });
-
-                if (j.techSignature) loadSigData(techSigPad, j.techSignature);
-                else techSigPad && techSigPad.clear();
-                if (j.certSignature) loadSigData(certSigPad, j.certSignature);
-                else certSigPad && certSigPad.clear();
-
-                toggleStatusFields();
-
-                const dropdown = document.getElementById('jobRequestNo');
-                for (let opt of dropdown.options) {
-                    if (opt.value === j.requestNo) { dropdown.value = j.requestNo; break; }
-                }
-                await loadRequestData();
-
-                if (j.certId) document.getElementById('jobCertName').value = j.certId;
-                if (j.techId) document.getElementById('jobTechName').value = j.techId;
-                if (j.handedToId) document.getElementById('jobHandedTo').value = j.handedToId;
-
-                showToast('📂 Job card loaded for editing.');
-            } catch (err) {
-                showToast('Error loading: ' + err.message, true);
-            }
-        };
 
         // ============================================================
         // INIT PAGE
