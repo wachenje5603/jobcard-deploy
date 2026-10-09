@@ -22,1099 +22,1081 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
     <style>
-        /* ============================================================
-           PREMIUM DESIGN SYSTEM
-           ============================================================ */
         * { margin:0; padding:0; box-sizing:border-box; }
 
         :root {
-            /* Brand */
-            --primary: #C8102E;
-            --primary-600: #a00d24;
-            --primary-700: #7a0a1c;
-            --primary-light: #e81a3f;
-            --primary-glow: rgba(200, 16, 46, 0.35);
-            --primary-gradient: linear-gradient(135deg, #C8102E 0%, #e81a3f 50%, #ff2d55 100%);
-            --primary-gradient-soft: linear-gradient(135deg, #C8102E 0%, #e81a3f 100%);
-
-            /* Neutrals */
-            --bg: #f6f7fb;
-            --bg-elevated: #ffffff;
-            --card-bg: #ffffff;
-            --border: #eef0f4;
-            --border-strong: #e2e5eb;
-
-            /* Text */
-            --text: #0f172a;
-            --text-soft: #334155;
-            --text-muted: #64748b;
-            --text-subtle: #94a3b8;
-
-            /* Status Colors */
-            --success: #10b981;
-            --success-soft: #d1fae5;
-            --warning: #f59e0b;
-            --warning-soft: #fef3c7;
-            --danger: #ef4444;
-            --danger-soft: #fee2e2;
-            --info: #0ea5e9;
-            --info-soft: #e0f2fe;
-
-            /* Shadows */
-            --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
-            --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.04);
-            --shadow-md: 0 6px 20px rgba(15, 23, 42, 0.06);
-            --shadow-lg: 0 12px 40px rgba(15, 23, 42, 0.08);
-            --shadow-xl: 0 24px 64px rgba(15, 23, 42, 0.12);
-            --shadow-primary: 0 12px 32px rgba(200, 16, 46, 0.28);
-
-            /* Radius */
-            --radius-xs: 8px;
-            --radius-sm: 12px;
-            --radius: 18px;
-            --radius-lg: 24px;
-            --radius-xl: 32px;
-
-            /* Transitions */
-            --transition: 220ms cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-slow: 380ms cubic-bezier(0.4, 0, 0.2, 1);
+            --primary:#C8102E;
+            --primary-dark:#a00d24;
+            --primary-light:#e81a3f;
+            --primary-gradient:linear-gradient(135deg,#C8102E 0%,#e81a3f 100%);
+            --bg:#f4f6fb;
+            --card:#ffffff;
+            --border:#e8ebf1;
+            --border-soft:#f1f4f9;
+            --text:#0f172a;
+            --text-soft:#475569;
+            --text-muted:#94a3b8;
+            --success:#10b981;
+            --warning:#f59e0b;
+            --danger:#ef4444;
+            --info:#0ea5e9;
+            --purple:#8b5cf6;
+            --radius:12px;
+            --radius-sm:8px;
+            --shadow-sm:0 1px 3px rgba(15,23,42,0.04);
+            --shadow:0 4px 14px rgba(15,23,42,0.06);
+            --shadow-md:0 8px 24px rgba(15,23,42,0.08);
+            --transition:200ms cubic-bezier(0.4,0,0.2,1);
+            --sidebar-width:240px;
         }
-
-        html { scroll-behavior: smooth; }
 
         body {
-            font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg);
-            background-image:
-                radial-gradient(circle at 0% 0%, rgba(200, 16, 46, 0.05) 0%, transparent 40%),
-                radial-gradient(circle at 100% 100%, rgba(99, 102, 241, 0.05) 0%, transparent 40%);
-            background-attachment: fixed;
-            color: var(--text);
-            padding: 20px;
-            min-height: 100vh;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
+            font-family:'Plus Jakarta Sans','Inter',-apple-system,sans-serif;
+            background:var(--bg);
+            color:var(--text);
+            -webkit-font-smoothing:antialiased;
+            overflow-x:hidden;
         }
 
-        .container { max-width: 1360px; margin: 0 auto; }
+        /* ============ APP LAYOUT ============ */
+        .app-shell { display:flex; min-height:100vh; }
 
-        /* ============================================================
-           HERO / WELCOME BANNER
-           ============================================================ */
-        .hero {
-            position: relative;
-            background: var(--primary-gradient);
-            border-radius: var(--radius-lg);
-            padding: 34px 40px;
-            margin-bottom: 30px;
-            color: white;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: var(--shadow-primary);
-            overflow: hidden;
-            isolation: isolate;
+        /* ============ SIDEBAR ============ */
+        .sidebar {
+            width:var(--sidebar-width);
+            background:linear-gradient(180deg,#1a1a2e 0%,#0f172a 100%);
+            color:white;
+            display:flex;
+            flex-direction:column;
+            position:fixed;
+            top:0; left:0; bottom:0;
+            z-index:100;
+            transition:width var(--transition);
+            overflow:hidden;
         }
-        .hero::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background:
-                radial-gradient(circle at 20% 20%, rgba(255,255,255,0.18), transparent 45%),
-                radial-gradient(circle at 85% 80%, rgba(255,255,255,0.10), transparent 50%);
-            z-index: -1;
+        .sidebar-header {
+            padding:20px 18px;
+            border-bottom:1px solid rgba(255,255,255,0.08);
+            display:flex;
+            align-items:center;
+            gap:12px;
+            flex-shrink:0;
         }
-        .hero::after {
-            content: '';
-            position: absolute;
-            width: 400px; height: 400px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(255,255,255,0.15), transparent 70%);
-            top: -180px; right: -120px;
-            animation: floaty 8s ease-in-out infinite;
+        .sidebar-logo {
+            width:38px; height:38px;
+            background:var(--primary-gradient);
+            border-radius:10px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-weight:800;
+            font-size:17px;
+            flex-shrink:0;
+            box-shadow:0 4px 12px rgba(200,16,46,0.4);
         }
-        @keyframes floaty {
-            0%, 100% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-14px) scale(1.03); }
-        }
+        .sidebar-title { font-weight:700; font-size:14px; line-height:1.2; }
+        .sidebar-title small { font-size:10.5px; color:rgba(255,255,255,0.5); font-weight:500; display:block; }
 
-        .hero-left { z-index: 1; }
-        .hero-left h1 {
-            font-size: 28px;
-            font-weight: 800;
-            letter-spacing: -0.4px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .sidebar-nav {
+            flex:1;
+            padding:14px 10px;
+            overflow-y:auto;
+            display:flex;
+            flex-direction:column;
+            gap:4px;
         }
-        .hero-left .sub {
-            font-size: 15px;
-            opacity: 0.92;
-            margin-top: 6px;
-            font-weight: 400;
+        .nav-section-title {
+            font-size:10px;
+            text-transform:uppercase;
+            letter-spacing:0.8px;
+            color:rgba(255,255,255,0.4);
+            padding:10px 12px 6px;
+            font-weight:700;
         }
-        .hero-right {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-            z-index: 1;
+        .nav-item {
+            display:flex;
+            align-items:center;
+            gap:12px;
+            padding:11px 14px;
+            border-radius:10px;
+            color:rgba(255,255,255,0.75);
+            cursor:pointer;
+            font-size:13.5px;
+            font-weight:600;
+            transition:var(--transition);
+            border:none;
+            background:transparent;
+            width:100%;
+            text-align:left;
+            font-family:inherit;
+            position:relative;
         }
-        .user-badge {
-            background: rgba(255,255,255,0.18);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            padding: 10px 18px;
-            border-radius: 50px;
-            font-size: 13.5px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            border: 1px solid rgba(255,255,255,0.25);
-            transition: var(--transition);
+        .nav-item i { font-size:15px; width:20px; text-align:center; flex-shrink:0; }
+        .nav-item:hover { background:rgba(255,255,255,0.06); color:white; }
+        .nav-item.active {
+            background:var(--primary-gradient);
+            color:white;
+            box-shadow:0 4px 12px rgba(200,16,46,0.35);
         }
-        .user-badge:hover { background: rgba(255,255,255,0.24); }
-        .user-badge i { font-size: 16px; }
-        .role-tag {
-            background: rgba(255,255,255,0.28);
-            padding: 3px 12px;
-            border-radius: 20px;
-            font-size: 10.5px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.6px;
+        .nav-item .badge-count {
+            margin-left:auto;
+            background:rgba(255,255,255,0.15);
+            padding:2px 8px;
+            border-radius:20px;
+            font-size:10.5px;
+            font-weight:700;
         }
-        .btn-logout {
-            background: rgba(255,255,255,0.15);
-            border: 1px solid rgba(255,255,255,0.3);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 13px;
-            cursor: pointer;
-            transition: var(--transition);
-            backdrop-filter: blur(8px);
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .btn-logout:hover {
-            background: rgba(255,255,255,0.28);
-            transform: translateY(-2px);
-        }
+        .nav-item.active .badge-count { background:rgba(255,255,255,0.25); }
 
-        /* ============================================================
-           STATS CARDS – PREMIUM
-           ============================================================ */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 18px;
-            margin-bottom: 30px;
+        .sidebar-footer {
+            padding:14px 10px;
+            border-top:1px solid rgba(255,255,255,0.08);
+            flex-shrink:0;
         }
-        .stat-card {
-            position: relative;
-            background: var(--card-bg);
-            border-radius: var(--radius);
-            padding: 22px 24px;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border);
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            overflow: hidden;
+        .user-chip {
+            display:flex;
+            align-items:center;
+            gap:10px;
+            padding:10px 12px;
+            border-radius:10px;
+            background:rgba(255,255,255,0.05);
+            margin-bottom:8px;
         }
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            left: 0; top: 0; bottom: 0;
-            width: 4px;
-            background: var(--primary);
-            border-radius: 4px 0 0 4px;
-            transition: var(--transition);
+        .user-avatar {
+            width:34px; height:34px;
+            border-radius:50%;
+            background:var(--primary-gradient);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-weight:700;
+            font-size:13px;
+            flex-shrink:0;
         }
-        .stat-card::after {
-            content: '';
-            position: absolute;
-            right: -30px; top: -30px;
-            width: 120px; height: 120px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(200,16,46,0.06), transparent 70%);
-            opacity: 0;
-            transition: var(--transition-slow);
-        }
-        .stat-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-lg);
-            border-color: transparent;
-        }
-        .stat-card:hover::after { opacity: 1; }
-        .stat-card:active { transform: translateY(-1px); }
+        .user-chip-info { flex:1; min-width:0; }
+        .user-chip-info .name { font-size:12.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .user-chip-info .role { font-size:10px; color:rgba(255,255,255,0.55); text-transform:uppercase; letter-spacing:0.5px; font-weight:600; }
 
-        .stat-card .stat-left .number {
-            font-size: 32px;
-            font-weight: 800;
-            line-height: 1.1;
-            letter-spacing: -0.8px;
-            color: var(--text);
-            font-family: 'Inter', sans-serif;
-        }
-        .stat-card .stat-left .label {
-            font-size: 12.5px;
-            color: var(--text-muted);
-            font-weight: 600;
-            margin-top: 4px;
-            text-transform: uppercase;
-            letter-spacing: 0.4px;
-        }
-        .stat-card .stat-icon {
-            font-size: 22px;
-            width: 46px; height: 46px;
-            display: flex; align-items: center; justify-content: center;
-            border-radius: 14px;
-            background: var(--info-soft);
-            color: var(--primary);
-            opacity: 1;
-            transition: var(--transition);
-            flex-shrink: 0;
-        }
-        .stat-card:hover .stat-icon { transform: scale(1.08) rotate(-6deg); }
+        /* ============ MAIN ============ */
+        .main-area { flex:1; margin-left:var(--sidebar-width); display:flex; flex-direction:column; min-height:100vh; }
 
-        .stat-card.pending::before { background: var(--warning); }
-        .stat-card.pending .stat-icon { background: var(--warning-soft); color: #b45309; }
-        .stat-card.completed::before { background: var(--success); }
-        .stat-card.completed .stat-icon { background: var(--success-soft); color: #047857; }
-        .stat-card.writtenoff::before { background: var(--danger); }
-        .stat-card.writtenoff .stat-icon { background: var(--danger-soft); color: #b91c1c; }
-        .stat-card.new::before { background: var(--info); }
-        .stat-card.new .stat-icon { background: var(--info-soft); color: #0369a1; }
-        .stat-card.total::before { background: #64748b; }
-        .stat-card.total .stat-icon { background: #f1f5f9; color: #475569; }
-        .stat-card.users::before { background: #8b5cf6; }
-        .stat-card.users .stat-icon { background: #ede9fe; color: #6d28d9; }
-        .stat-card.pending-approval::before { background: #f59e0b; }
-        .stat-card.pending-approval .stat-icon { background: #fef3c7; color: #b45309; }
-        .stat-card.jobcards::before { background: #06b6d4; }
-        .stat-card.jobcards .stat-icon { background: #cffafe; color: #0e7490; }
-        .stat-card.myrequests::before { background: #8b5cf6; }
-        .stat-card.myrequests .stat-icon { background: #f3e8ff; color: #6d28d9; }
+        .topbar {
+            background:white;
+            border-bottom:1px solid var(--border);
+            padding:14px 24px;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:16px;
+            position:sticky;
+            top:0;
+            z-index:50;
+            box-shadow:var(--shadow-sm);
+        }
+        .topbar-left { display:flex; align-items:center; gap:14px; min-width:0; }
+        .menu-toggle {
+            display:none;
+            background:var(--bg);
+            border:1px solid var(--border);
+            width:38px; height:38px;
+            border-radius:10px;
+            cursor:pointer;
+            color:var(--text);
+            font-size:15px;
+        }
+        .page-title { font-size:18px; font-weight:800; letter-spacing:-0.3px; }
+        .page-title small { display:block; font-size:12px; font-weight:500; color:var(--text-muted); margin-top:1px; }
+        .topbar-actions { display:flex; gap:8px; align-items:center; flex-shrink:0; }
 
-        /* ============================================================
-           CHART SECTION
-           ============================================================ */
-        .chart-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 22px;
-            margin-bottom: 30px;
+        /* ============ BUTTONS ============ */
+        .btn {
+            padding:9px 16px;
+            border:none;
+            border-radius:10px;
+            font-weight:700;
+            font-size:12.5px;
+            cursor:pointer;
+            transition:var(--transition);
+            display:inline-flex;
+            align-items:center;
+            gap:7px;
+            font-family:inherit;
+            white-space:nowrap;
+            text-decoration:none;
+        }
+        .btn i { font-size:12px; }
+        .btn-primary { background:var(--primary-gradient); color:white; box-shadow:0 4px 12px rgba(200,16,46,0.28); }
+        .btn-primary:hover { transform:translateY(-1px); box-shadow:0 6px 16px rgba(200,16,46,0.36); }
+        .btn-success { background:linear-gradient(135deg,#10b981,#22c55e); color:white; box-shadow:0 4px 12px rgba(16,185,129,0.25); }
+        .btn-success:hover { transform:translateY(-1px); }
+        .btn-outline { background:white; border:1.5px solid var(--border); color:var(--text-soft); }
+        .btn-outline:hover { border-color:var(--primary); color:var(--primary); background:#fff5f6; }
+        .btn-danger { background:linear-gradient(135deg,#ef4444,#dc2626); color:white; }
+        .btn-danger:hover { transform:translateY(-1px); }
+        .btn-warning { background:linear-gradient(135deg,#f59e0b,#fbbf24); color:#1e293b; }
+        .btn-info { background:linear-gradient(135deg,#0ea5e9,#22d3ee); color:white; }
+        .btn-sm { padding:6px 11px; font-size:11.5px; border-radius:8px; gap:5px; }
+        .btn-icon { width:34px; height:34px; padding:0; justify-content:center; border-radius:8px; }
+
+        /* ============ CONTENT ============ */
+        .content { padding:20px 24px 40px; flex:1; }
+
+        /* KPI STRIP */
+        .kpi-strip {
+            display:grid;
+            grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));
+            gap:12px;
+            margin-bottom:20px;
+        }
+        .kpi-card {
+            background:white;
+            border-radius:var(--radius);
+            padding:14px 16px;
+            border:1px solid var(--border);
+            cursor:pointer;
+            transition:var(--transition);
+            position:relative;
+            overflow:hidden;
+            display:flex;
+            align-items:center;
+            gap:12px;
+        }
+        .kpi-card::before {
+            content:'';
+            position:absolute;
+            left:0; top:0; bottom:0;
+            width:3px;
+            background:var(--primary);
+        }
+        .kpi-card:hover { transform:translateY(-2px); box-shadow:var(--shadow); border-color:transparent; }
+        .kpi-icon {
+            width:38px; height:38px;
+            border-radius:10px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:15px;
+            flex-shrink:0;
+            background:#eef2ff;
+            color:var(--primary);
+        }
+        .kpi-body { min-width:0; }
+        .kpi-value {
+            font-size:20px;
+            font-weight:800;
+            line-height:1;
+            letter-spacing:-0.5px;
+            font-family:'Inter',sans-serif;
+        }
+        .kpi-label {
+            font-size:10.5px;
+            color:var(--text-muted);
+            font-weight:700;
+            text-transform:uppercase;
+            letter-spacing:0.3px;
+            margin-top:3px;
+            white-space:nowrap;
+            overflow:hidden;
+            text-overflow:ellipsis;
+        }
+        .kpi-card.pending::before { background:var(--warning); }
+        .kpi-card.pending .kpi-icon { background:#fef3c7; color:#b45309; }
+        .kpi-card.completed::before { background:var(--success); }
+        .kpi-card.completed .kpi-icon { background:#d1fae5; color:#047857; }
+        .kpi-card.writtenoff::before { background:var(--danger); }
+        .kpi-card.writtenoff .kpi-icon { background:#fee2e2; color:#b91c1c; }
+        .kpi-card.new::before { background:var(--info); }
+        .kpi-card.new .kpi-icon { background:#e0f2fe; color:#0369a1; }
+        .kpi-card.total::before { background:#64748b; }
+        .kpi-card.total .kpi-icon { background:#f1f5f9; color:#475569; }
+        .kpi-card.users::before { background:var(--purple); }
+        .kpi-card.users .kpi-icon { background:#f3e8ff; color:#6d28d9; }
+        .kpi-card.jobcards::before { background:#06b6d4; }
+        .kpi-card.jobcards .kpi-icon { background:#cffafe; color:#0e7490; }
+        .kpi-card.myrequests::before { background:var(--purple); }
+        .kpi-card.myrequests .kpi-icon { background:#f3e8ff; color:#6d28d9; }
+
+        /* ANALYTICS DRAWER */
+        .analytics-drawer {
+            background:white;
+            border-radius:var(--radius);
+            border:1px solid var(--border);
+            box-shadow:var(--shadow-sm);
+            margin-bottom:18px;
+            overflow:hidden;
+            transition:var(--transition);
+        }
+        .analytics-drawer-header {
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            padding:14px 18px;
+            cursor:pointer;
+            user-select:none;
+        }
+        .analytics-drawer-header:hover { background:#fafbfd; }
+        .analytics-drawer-title {
+            font-size:13px;
+            font-weight:700;
+            display:flex;
+            align-items:center;
+            gap:9px;
+            color:var(--text);
+        }
+        .analytics-drawer-title i { color:var(--primary); }
+        .analytics-drawer-chevron {
+            color:var(--text-muted);
+            transition:transform var(--transition);
+            font-size:12px;
+        }
+        .analytics-drawer.open .analytics-drawer-chevron { transform:rotate(180deg); }
+        .analytics-drawer-body {
+            max-height:0;
+            overflow:hidden;
+            transition:max-height 380ms cubic-bezier(0.4,0,0.2,1);
+            border-top:1px solid var(--border);
+        }
+        .analytics-drawer.open .analytics-drawer-body { max-height:400px; }
+        .charts-row {
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:16px;
+            padding:18px;
         }
         .chart-box {
-            background: var(--card-bg);
-            border-radius: var(--radius-lg);
-            padding: 24px 26px;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border);
-            transition: var(--transition);
+            background:#fafbfd;
+            border-radius:var(--radius-sm);
+            padding:14px;
+            border:1px solid var(--border);
         }
-        .chart-box:hover { box-shadow: var(--shadow-md); }
-        .chart-box h3 {
-            font-size: 15px;
-            font-weight: 700;
-            margin-bottom: 18px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: var(--text);
-            letter-spacing: -0.2px;
+        .chart-box h4 {
+            font-size:12px;
+            font-weight:700;
+            margin-bottom:10px;
+            color:var(--text);
+            display:flex;
+            align-items:center;
+            gap:7px;
         }
-        .chart-box h3::before {
-            content: '';
-            width: 6px; height: 6px;
-            background: var(--primary);
-            border-radius: 50%;
-        }
-        .chart-box canvas { max-height: 220px; width: 100% !important; }
+        .chart-box h4::before { content:''; width:5px; height:5px; background:var(--primary); border-radius:50%; }
+        .chart-box canvas { max-height:180px; width:100% !important; }
 
-        /* ============================================================
-           ACTION BUTTONS
-           ============================================================ */
-        .actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 26px;
+        /* PANEL */
+        .panel {
+            background:white;
+            border-radius:var(--radius);
+            border:1px solid var(--border);
+            box-shadow:var(--shadow-sm);
+            overflow:hidden;
         }
-        .btn {
-            padding: 11px 22px;
-            border: none;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 13.5px;
-            cursor: pointer;
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            gap: 9px;
-            text-decoration: none;
-            font-family: inherit;
-            letter-spacing: -0.1px;
-            position: relative;
-            overflow: hidden;
+        .panel-header {
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            padding:14px 18px;
+            border-bottom:1px solid var(--border);
+            gap:12px;
+            flex-wrap:wrap;
         }
-        .btn::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.25), transparent 70%);
-            transform: translateX(-100%);
-            transition: var(--transition-slow);
+        .tabs {
+            display:flex;
+            gap:4px;
+            background:var(--bg);
+            padding:4px;
+            border-radius:10px;
         }
-        .btn:hover::after { transform: translateX(100%); }
+        .tab {
+            padding:7px 14px;
+            border-radius:7px;
+            font-size:12.5px;
+            font-weight:700;
+            cursor:pointer;
+            transition:var(--transition);
+            color:var(--text-soft);
+            background:transparent;
+            border:none;
+            font-family:inherit;
+            display:flex;
+            align-items:center;
+            gap:6px;
+            white-space:nowrap;
+        }
+        .tab:hover { color:var(--text); }
+        .tab.active { background:white; color:var(--primary); box-shadow:0 1px 3px rgba(0,0,0,0.08); }
+        .tab .count {
+            background:#eef2f9;
+            padding:1px 7px;
+            border-radius:10px;
+            font-size:10.5px;
+            font-weight:800;
+            color:var(--text-soft);
+        }
+        .tab.active .count { background:#ffe0e6; color:var(--primary); }
 
-        .btn-primary {
-            background: var(--primary-gradient);
-            color: white;
-            box-shadow: 0 6px 18px rgba(200, 16, 46, 0.28);
+        .toolbar { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+        .search-box { position:relative; }
+        .search-box i {
+            position:absolute;
+            left:12px; top:50%;
+            transform:translateY(-50%);
+            color:var(--text-muted);
+            font-size:12px;
         }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 28px rgba(200, 16, 46, 0.38);
+        .search-box input {
+            padding:8px 14px 8px 32px;
+            border:1.5px solid var(--border);
+            border-radius:8px;
+            font-size:12.5px;
+            background:var(--bg);
+            font-family:inherit;
+            color:var(--text);
+            transition:var(--transition);
+            outline:none;
+            width:200px;
+            font-weight:500;
         }
-        .btn-success {
-            background: linear-gradient(135deg, #10b981, #22c55e);
-            color: white;
-            box-shadow: 0 6px 18px rgba(16, 185, 129, 0.25);
+        .search-box input:focus { border-color:var(--primary); background:white; box-shadow:0 0 0 3px rgba(200,16,46,0.08); }
+        .filter-select {
+            padding:8px 12px;
+            border:1.5px solid var(--border);
+            border-radius:8px;
+            font-size:12.5px;
+            background:var(--bg);
+            font-family:inherit;
+            color:var(--text);
+            font-weight:600;
+            cursor:pointer;
+            outline:none;
+            transition:var(--transition);
         }
-        .btn-success:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 28px rgba(16, 185, 129, 0.35);
-        }
-        .btn-outline {
-            background: white;
-            border: 1.5px solid var(--border-strong);
-            color: var(--text-soft);
-        }
-        .btn-outline:hover {
-            background: #f8fafc;
-            border-color: var(--primary);
-            color: var(--primary);
-            transform: translateY(-2px);
-        }
-        .btn-danger { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; }
-        .btn-danger:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(239, 68, 68, 0.32); }
-        .btn-warning { background: linear-gradient(135deg, #f59e0b, #fbbf24); color: #1e293b; }
-        .btn-warning:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(245, 158, 11, 0.32); }
-        .btn-info { background: linear-gradient(135deg, #0ea5e9, #22d3ee); color: white; }
-        .btn-info:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(14, 165, 233, 0.32); }
-        .btn-sm { padding: 8px 15px; font-size: 12px; border-radius: 30px; gap: 6px; }
+        .filter-select:focus { border-color:var(--primary); background:white; }
 
-        /* ============================================================
-           TABLE WRAPPER
-           ============================================================ */
-        .table-wrap {
-            background: var(--card-bg);
-            border-radius: var(--radius-lg);
-            padding: 26px 28px;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border);
-            overflow-x: auto;
-            margin-top: 24px;
+        /* TABLE */
+        .table-scroll { max-height:62vh; overflow-y:auto; overflow-x:auto; }
+        table { width:100%; border-collapse:collapse; font-size:13px; }
+        table thead th {
+            text-align:left;
+            padding:12px 16px;
+            font-weight:700;
+            color:var(--text-muted);
+            font-size:10.5px;
+            text-transform:uppercase;
+            letter-spacing:0.5px;
+            background:#fafbfd;
+            border-bottom:1px solid var(--border);
+            position:sticky;
+            top:0;
+            z-index:2;
+            white-space:nowrap;
         }
-        .table-wrap h3 {
-            font-size: 17px;
-            font-weight: 700;
-            margin-bottom: 18px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: var(--text);
-            letter-spacing: -0.3px;
+        table tbody td {
+            padding:13px 16px;
+            border-bottom:1px solid var(--border-soft);
+            vertical-align:middle;
+            color:var(--text-soft);
+            font-weight:500;
+            white-space:nowrap;
         }
-
-        .filter-bar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        .filter-bar select,
-        .filter-bar input {
-            padding: 10px 16px;
-            border: 1.5px solid var(--border-strong);
-            border-radius: 50px;
-            font-size: 13px;
-            background: white;
-            font-family: inherit;
-            outline: none;
-            transition: var(--transition);
-            color: var(--text);
-            font-weight: 500;
-        }
-        .filter-bar select:focus,
-        .filter-bar input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(200, 16, 46, 0.1);
-        }
-        .filter-bar input { min-width: 240px; }
-
-        table { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 700px; }
-        table th {
-            text-align: left;
-            padding: 14px 14px 14px 0;
-            font-weight: 700;
-            color: var(--text-muted);
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.6px;
-            border-bottom: 1.5px solid var(--border);
-            background: transparent;
-        }
-        table td {
-            padding: 16px 14px 16px 0;
-            border-bottom: 1px solid var(--border);
-            vertical-align: middle;
-            color: var(--text-soft);
-            font-weight: 500;
-        }
-        table tbody tr { transition: var(--transition); }
-        table tbody tr:hover { background: #fafbff; }
-        table tbody tr:last-child td { border-bottom: none; }
-        table td strong { color: var(--text); font-weight: 700; }
+        table tbody tr { transition:var(--transition); }
+        table tbody tr:hover { background:#fafbfd; }
+        table tbody tr:last-child td { border-bottom:none; }
+        table td strong { color:var(--text); font-weight:700; }
 
         .status-badge {
-            padding: 6px 14px;
-            border-radius: 30px;
-            font-size: 11.5px;
-            font-weight: 700;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
+            padding:4px 10px;
+            border-radius:20px;
+            font-size:10.5px;
+            font-weight:700;
+            display:inline-flex;
+            align-items:center;
+            gap:4px;
+            text-transform:uppercase;
+            letter-spacing:0.3px;
         }
-        .status-badge.pending { background: var(--warning-soft); color: #b45309; }
-        .status-badge.completed { background: var(--success-soft); color: #047857; }
-        .status-badge.writtenoff { background: var(--danger-soft); color: #b91c1c; }
-        .status-badge.postponed { background: var(--warning-soft); color: #b45309; }
-        .status-badge.open { background: var(--info-soft); color: #0369a1; }
-        .status-badge.received { background: #d1fae5; color: #065f46; }
+        .status-badge.pending { background:#fef3c7; color:#b45309; }
+        .status-badge.completed { background:#d1fae5; color:#047857; }
+        .status-badge.writtenoff { background:#fee2e2; color:#b91c1c; }
+        .status-badge.postponed { background:#fef3c7; color:#b45309; }
+        .status-badge.open { background:#e0f2fe; color:#0369a1; }
+        .status-badge.received { background:#d1fae5; color:#065f46; }
+        .row-actions { display:flex; gap:5px; }
 
-        .table-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+        /* EMPTY */
+        .empty-state { text-align:center; padding:60px 20px; color:var(--text-muted); }
+        .empty-state i { font-size:40px; margin-bottom:12px; opacity:0.35; }
+        .empty-state p { font-size:13px; font-weight:600; }
 
-        /* ============================================================
-           MODALS – PREMIUM
-           ============================================================ */
+        /* MODALS */
         .modal-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(15, 23, 42, 0.55);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            animation: fadeIn 220ms ease;
+            display:none;
+            position:fixed;
+            inset:0;
+            background:rgba(15,23,42,0.55);
+            backdrop-filter:blur(8px);
+            -webkit-backdrop-filter:blur(8px);
+            z-index:1000;
+            align-items:center;
+            justify-content:center;
+            padding:20px;
+            animation:fadeIn 180ms ease;
         }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .modal-overlay.show { display: flex; }
+        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+        .modal-overlay.show { display:flex; }
 
         .modal {
-            background: white;
-            border-radius: var(--radius-lg);
-            padding: 36px;
-            max-width: 720px;
-            width: 92%;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: var(--shadow-xl);
-            animation: modalSlide 300ms cubic-bezier(0.16, 1, 0.3, 1);
-            border: 1px solid var(--border);
+            background:white;
+            border-radius:16px;
+            padding:28px;
+            max-width:680px;
+            width:100%;
+            max-height:90vh;
+            overflow-y:auto;
+            box-shadow:0 24px 64px rgba(15,23,42,0.25);
+            animation:modalIn 260ms cubic-bezier(0.16,1,0.3,1);
         }
-        @keyframes modalSlide {
-            from { opacity: 0; transform: translateY(20px) scale(0.97); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
+        @keyframes modalIn {
+            from { opacity:0; transform:translateY(16px) scale(0.98); }
+            to { opacity:1; transform:translateY(0) scale(1); }
         }
         .modal .close-btn {
-            float: right;
-            background: #f1f5f9;
-            border: none;
-            width: 36px; height: 36px;
-            border-radius: 50%;
-            font-size: 20px;
-            cursor: pointer;
-            color: var(--text-muted);
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            float:right;
+            background:#f1f5f9;
+            border:none;
+            width:32px; height:32px;
+            border-radius:50%;
+            font-size:17px;
+            cursor:pointer;
+            color:var(--text-muted);
+            transition:var(--transition);
+            display:flex;
+            align-items:center;
+            justify-content:center;
         }
-        .modal .close-btn:hover { background: var(--primary); color: white; transform: rotate(90deg); }
+        .modal .close-btn:hover { background:var(--primary); color:white; transform:rotate(90deg); }
         .modal h2 {
-            font-size: 22px;
-            font-weight: 800;
-            margin-bottom: 22px;
-            color: var(--text);
-            letter-spacing: -0.4px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
+            font-size:19px;
+            font-weight:800;
+            margin-bottom:18px;
+            color:var(--text);
+            display:flex;
+            align-items:center;
+            gap:10px;
         }
-        .modal h2 i { color: var(--primary); font-size: 22px; }
-        .modal hr {
-            border: none;
-            border-top: 1px solid var(--border);
-            margin: 24px 0;
-        }
-        .modal .form-group { margin-bottom: 16px; }
+        .modal h2 i { color:var(--primary); font-size:18px; }
+        .modal hr { border:none; border-top:1px solid var(--border); margin:20px 0; }
+        .modal .form-group { margin-bottom:13px; }
         .modal .form-group label {
-            display: block;
-            font-weight: 600;
-            font-size: 12.5px;
-            margin-bottom: 6px;
-            color: var(--text-soft);
-            letter-spacing: 0.2px;
+            display:block;
+            font-weight:700;
+            font-size:11.5px;
+            margin-bottom:5px;
+            color:var(--text-soft);
+            text-transform:uppercase;
+            letter-spacing:0.3px;
         }
         .modal .form-group input,
         .modal .form-group select {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1.5px solid var(--border-strong);
-            border-radius: 12px;
-            font-size: 14px;
-            font-family: inherit;
-            transition: var(--transition);
-            background: #f8fafc;
-            color: var(--text);
-            font-weight: 500;
+            width:100%;
+            padding:10px 14px;
+            border:1.5px solid var(--border);
+            border-radius:9px;
+            font-size:13.5px;
+            font-family:inherit;
+            transition:var(--transition);
+            background:#fafbfd;
+            color:var(--text);
+            font-weight:500;
+            outline:none;
         }
         .modal .form-group input:focus,
         .modal .form-group select:focus {
-            border-color: var(--primary);
-            outline: none;
-            box-shadow: 0 0 0 4px rgba(200, 16, 46, 0.1);
-            background: white;
+            border-color:var(--primary);
+            box-shadow:0 0 0 3px rgba(200,16,46,0.08);
+            background:white;
         }
-        .modal .btn { width: 100%; justify-content: center; margin-top: 10px; padding: 14px; font-size: 14px; }
+        .modal .btn { width:100%; justify-content:center; margin-top:8px; padding:12px; font-size:13px; }
         .modal .error-text {
-            color: var(--danger);
-            font-size: 13px;
-            margin-top: 10px;
-            padding: 10px 14px;
-            background: var(--danger-soft);
-            border-radius: 10px;
-            font-weight: 500;
-            display: none;
+            color:var(--danger);
+            font-size:12.5px;
+            margin-top:10px;
+            padding:10px 14px;
+            background:#fee2e2;
+            border-radius:8px;
+            font-weight:600;
+            display:none;
         }
         .modal .success-text {
-            color: #047857;
-            font-size: 13px;
-            margin-top: 10px;
-            padding: 10px 14px;
-            background: var(--success-soft);
-            border-radius: 10px;
-            font-weight: 500;
-            display: none;
+            color:#047857;
+            font-size:12.5px;
+            margin-top:10px;
+            padding:10px 14px;
+            background:#d1fae5;
+            border-radius:8px;
+            font-weight:600;
+            display:none;
         }
 
-        /* ============================================================
-           USER LIST
-           ============================================================ */
-        .user-list { list-style: none; padding: 0; margin: 0; }
+        /* USER LIST */
+        .user-list { list-style:none; padding:0; margin:0; }
         .user-list li {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 18px;
-            margin-bottom: 10px;
-            background: #f8fafc;
-            border-radius: 14px;
-            gap: 12px;
-            border: 1px solid var(--border);
-            transition: var(--transition);
+            display:flex;
+            flex-wrap:wrap;
+            justify-content:space-between;
+            align-items:center;
+            padding:12px 14px;
+            margin-bottom:7px;
+            background:#fafbfd;
+            border-radius:10px;
+            gap:10px;
+            border:1px solid var(--border-soft);
+            transition:var(--transition);
         }
-        .user-list li:hover { background: #f1f5f9; border-color: var(--border-strong); }
-        .user-list .user-info { font-size: 14px; flex: 1; min-width: 200px; }
-        .user-list .user-info strong { color: var(--text); font-weight: 700; }
-        .user-list .user-info small { color: var(--text-muted); font-size: 12.5px; font-weight: 500; }
-        .user-list .user-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        .user-list li:hover { background:#f1f5f9; }
+        .user-list .user-info { font-size:13px; flex:1; min-width:180px; }
+        .user-list .user-info strong { color:var(--text); font-weight:700; }
+        .user-list .user-info small { color:var(--text-muted); font-size:11.5px; font-weight:500; display:block; margin-top:2px; }
+        .user-list .user-actions { display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
         .user-list .role-select {
-            padding: 7px 12px;
-            border: 1.5px solid var(--border-strong);
-            border-radius: 10px;
-            font-size: 12px;
-            font-family: inherit;
-            background: white;
-            cursor: pointer;
-            font-weight: 600;
-            color: var(--text-soft);
-            transition: var(--transition);
+            padding:5px 9px;
+            border:1.5px solid var(--border);
+            border-radius:7px;
+            font-size:11px;
+            font-family:inherit;
+            background:white;
+            cursor:pointer;
+            font-weight:700;
+            color:var(--text-soft);
+            outline:none;
         }
-        .user-list .role-select:focus { border-color: var(--primary); outline: none; }
+        .user-list .role-select:focus { border-color:var(--primary); }
 
-        .approve-btn {
-            background: linear-gradient(135deg, #10b981, #22c55e);
-            color: white;
-            border: none;
-            padding: 7px 16px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: 700;
-            font-size: 12px;
-            transition: var(--transition);
-            font-family: inherit;
+        .approve-btn, .deny-btn, .edit-btn {
+            border:none;
+            padding:5px 11px;
+            border-radius:20px;
+            cursor:pointer;
+            font-weight:700;
+            font-size:10.5px;
+            transition:var(--transition);
+            font-family:inherit;
+            text-transform:uppercase;
+            letter-spacing:0.3px;
         }
-        .approve-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3); }
-        .deny-btn {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            color: white;
-            border: none;
-            padding: 7px 14px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: 700;
-            font-size: 12px;
-            transition: var(--transition);
-            font-family: inherit;
-        }
-        .deny-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(239, 68, 68, 0.3); }
-        .edit-btn {
-            background: linear-gradient(135deg, #0ea5e9, #22d3ee);
-            color: white;
-            border: none;
-            padding: 7px 16px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: 700;
-            font-size: 12px;
-            transition: var(--transition);
-            font-family: inherit;
-        }
-        .edit-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(14, 165, 233, 0.3); }
+        .approve-btn { background:linear-gradient(135deg,#10b981,#22c55e); color:white; }
+        .approve-btn:hover { transform:translateY(-1px); }
+        .deny-btn { background:linear-gradient(135deg,#ef4444,#dc2626); color:white; }
+        .deny-btn:hover { transform:translateY(-1px); }
+        .edit-btn { background:linear-gradient(135deg,#0ea5e9,#22d3ee); color:white; }
+        .edit-btn:hover { transform:translateY(-1px); }
 
         .pending-user-item {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 18px;
-            margin-bottom: 10px;
-            background: #fffbeb;
-            border-radius: 14px;
-            gap: 12px;
-            border: 1px solid #fde68a;
+            display:flex;
+            flex-wrap:wrap;
+            justify-content:space-between;
+            align-items:center;
+            padding:12px 14px;
+            margin-bottom:7px;
+            background:#fffbeb;
+            border-radius:10px;
+            gap:10px;
+            border:1px solid #fde68a;
         }
-        .pending-user-item .user-info { font-size: 14px; flex: 1; min-width: 200px; }
-        .pending-user-item .user-info small { color: var(--text-muted); font-size: 12.5px; }
+        .pending-user-item .user-info { font-size:13px; flex:1; min-width:180px; }
+        .pending-user-item .user-info small { color:var(--text-muted); font-size:11.5px; display:block; margin-top:2px; }
 
-        /* ============================================================
-           WHATSAPP INLINE
-           ============================================================ */
-        .whatsapp-inline { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
-        .whatsapp-inline .field-group-small { display: flex; flex-direction: column; flex: 0 0 auto; }
-        .whatsapp-inline .field-group-small label {
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-bottom: 5px;
-            text-transform: uppercase;
-            letter-spacing: 0.4px;
-            font-weight: 700;
-        }
-        .whatsapp-inline select,
-        .whatsapp-inline input {
-            padding: 10px 14px;
-            border: 1.5px solid var(--border-strong);
-            border-radius: 12px;
-            background: #f8fafc;
-            font-size: 14px;
-            font-family: inherit;
-            transition: var(--transition);
-            color: var(--text);
-            font-weight: 500;
-        }
-        .whatsapp-inline select:focus,
-        .whatsapp-inline input:focus {
-            border-color: var(--primary);
-            outline: 0;
-            background: white;
-            box-shadow: 0 0 0 4px rgba(200, 16, 46, 0.1);
-        }
-        .whatsapp-inline input { flex: 2; min-width: 200px; }
-        @media (max-width: 500px) {
-            .whatsapp-inline { flex-direction: column; align-items: stretch; }
-            .whatsapp-inline select, .whatsapp-inline input { width: 100%; flex: none; min-width: unset; }
-        }
-
-        /* ============================================================
-           HIDDEN PDF TEMPLATES
-           ============================================================ */
-        #pdfTemplate, #requestPdfTemplate {
-            position: fixed;
-            left: -9999px;
-            top: 0;
-            width: 800px;
-            background: white;
-            padding: 30px;
-            font-family: 'Segoe UI', sans-serif;
-            font-size: 14px;
-            color: #000;
-            z-index: 9999;
-            opacity: 0;
-            pointer-events: none;
-            overflow: visible;
-            box-sizing: border-box;
-            height: auto;
-        }
-
-        /* ============================================================
-           TOAST – PREMIUM
-           ============================================================ */
+        /* TOAST */
         .toast {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: #0f172a;
-            color: white;
-            padding: 16px 26px;
-            border-radius: 14px;
-            font-weight: 600;
-            z-index: 9999;
-            transform: translateY(120px);
-            opacity: 0;
-            transition: var(--transition-slow);
-            border-left: 4px solid var(--primary);
-            max-width: 400px;
-            box-shadow: 0 20px 60px rgba(15, 23, 42, 0.3);
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            position:fixed;
+            bottom:24px;
+            right:24px;
+            background:#0f172a;
+            color:white;
+            padding:14px 22px;
+            border-radius:12px;
+            font-weight:700;
+            z-index:9999;
+            transform:translateY(100px);
+            opacity:0;
+            transition:320ms cubic-bezier(0.4,0,0.2,1);
+            border-left:4px solid var(--primary);
+            max-width:360px;
+            box-shadow:0 16px 48px rgba(15,23,42,0.3);
+            font-size:13px;
         }
-        .toast.show {
-            transform: translateY(0);
-            opacity: 1;
+        .toast.show { transform:translateY(0); opacity:1; }
+
+        /* HIDDEN PDF TEMPLATES */
+        #pdfTemplate, #requestPdfTemplate {
+            position:fixed;
+            left:-9999px;
+            top:0;
+            width:800px;
+            background:white;
+            padding:30px;
+            font-family:'Segoe UI',sans-serif;
+            font-size:14px;
+            color:#000;
+            z-index:9999;
+            opacity:0;
+            pointer-events:none;
+            overflow:visible;
+            box-sizing:border-box;
         }
 
-        select[multiple] { height: auto; min-height: 100px; padding: 10px; }
-
-        /* ============================================================
-           RESPONSIVE
-           ============================================================ */
-        @media (max-width: 900px) {
-            .chart-row { grid-template-columns: 1fr; }
-        }
-        @media (max-width: 768px) {
-            body { padding: 14px; }
-            .hero { padding: 24px; flex-direction: column; align-items: flex-start; gap: 16px; }
-            .hero-left h1 { font-size: 22px; }
-            .hero-left .sub { font-size: 13.5px; }
-            .hero-right { width: 100%; justify-content: space-between; }
-            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-            .stat-card { padding: 16px 18px; }
-            .stat-card .stat-left .number { font-size: 24px; }
-            .stat-card .stat-icon { width: 38px; height: 38px; font-size: 16px; }
-            .table-wrap { padding: 20px; }
-            .modal { padding: 26px 22px; }
-            .chart-box { padding: 20px; }
-        }
-        @media (max-width: 480px) {
-            .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
-            .hero-left h1 { font-size: 19px; }
-            .filter-bar select,
-            .filter-bar input { width: 100%; min-width: unset; }
-            .actions .btn { width: 100%; justify-content: center; }
+        /* MOBILE */
+        .sidebar-backdrop {
+            display:none;
+            position:fixed;
+            inset:0;
+            background:rgba(15,23,42,0.5);
+            z-index:99;
+            opacity:0;
+            transition:opacity var(--transition);
         }
 
-        /* ============================================================
-           SKELETON LOADER
-           ============================================================ */
-        .skeleton {
-            background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
-            border-radius: 8px;
+        @media (max-width:1024px) {
+            .sidebar { transform:translateX(-100%); transition:transform var(--transition); }
+            .sidebar.open { transform:translateX(0); }
+            .main-area { margin-left:0; }
+            .menu-toggle { display:flex; align-items:center; justify-content:center; }
+            .sidebar-backdrop.show { display:block; opacity:1; }
+            .charts-row { grid-template-columns:1fr; }
         }
-        @keyframes shimmer {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
+        @media (max-width:640px) {
+            .content { padding:16px; }
+            .topbar { padding:12px 16px; }
+            .kpi-strip { grid-template-columns:repeat(2, 1fr); gap:10px; }
+            .kpi-value { font-size:18px; }
+            .page-title { font-size:15px; }
+            .page-title small { display:none; }
+            .tabs { width:100%; justify-content:stretch; }
+            .tab { flex:1; justify-content:center; font-size:11.5px; padding:7px 8px; }
+            .search-box input { width:140px; }
+            .topbar-actions .btn { padding:8px 12px; }
+            .topbar-actions .btn span { display:none; }
+            .modal { padding:22px; }
         }
 
-        /* Scrollbar */
-        ::-webkit-scrollbar { width: 10px; height: 10px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 10px;
-            border: 2px solid var(--bg);
-        }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        ::-webkit-scrollbar { width:8px; height:8px; }
+        ::-webkit-scrollbar-track { background:transparent; }
+        ::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:10px; }
+        ::-webkit-scrollbar-thumb:hover { background:#94a3b8; }
     </style>
 </head>
 <body>
 
-<div class="container">
+<div class="app-shell">
 
-    <!-- ===== HERO ===== -->
-    <div class="hero">
-        <div class="hero-left">
-            <h1><i class="fas fa-hand-sparkles"></i> Welcome back, <span id="userNameDisplay">User</span></h1>
-            <div class="sub">Manage requests, users, and reports — all in one place.</div>
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">M</div>
+            <div class="sidebar-title">MCRH<small>Maintenance</small></div>
         </div>
-        <div class="hero-right">
-            <div class="user-badge">
-                <i class="fas fa-user-circle"></i>
-                <span id="userRoleDisplay">(role)</span>
-                <span class="role-tag" id="roleTag">role</span>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section-title">Overview</div>
+            <button class="nav-item active" id="navRequests" onclick="switchView('requests')">
+                <i class="fas fa-clipboard-list"></i>
+                <span>Requests</span>
+                <span class="badge-count" id="navReqCount">0</span>
+            </button>
+            <button class="nav-item" id="navJobcards" onclick="switchView('jobcards')">
+                <i class="fas fa-tools"></i>
+                <span>Jobcards</span>
+                <span class="badge-count" id="navJobCount">0</span>
+            </button>
+
+            <div class="nav-section-title">Admin</div>
+            <button class="nav-item" id="navUsers" onclick="openUserModal()">
+                <i class="fas fa-users-cog"></i>
+                <span>Manage Users</span>
+            </button>
+            <button class="nav-item" id="navApprovals" onclick="showPendingUsers()">
+                <i class="fas fa-user-check"></i>
+                <span>Approvals</span>
+                <span class="badge-count" id="navApprovalCount">0</span>
+            </button>
+
+            <div class="nav-section-title">Reports</div>
+            <button class="nav-item" onclick="window.location.href='analytics.html'">
+                <i class="fas fa-chart-bar"></i>
+                <span>Analytics</span>
+            </button>
+            <button class="nav-item" onclick="window.location.href='report.html'">
+                <i class="fas fa-file-alt"></i>
+                <span>Monthly Report</span>
+            </button>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-chip">
+                <div class="user-avatar" id="avatarInitial">U</div>
+                <div class="user-chip-info">
+                    <div class="name" id="sidebarUserName">User</div>
+                    <div class="role" id="sidebarUserRole">role</div>
+                </div>
             </div>
-            <button class="btn-logout" id="logoutBtn">
-                <i class="fas fa-sign-out-alt"></i> Logout
+            <button class="nav-item" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
             </button>
         </div>
-    </div>
+    </aside>
 
-    <!-- ===== STATS CARDS ===== -->
-    <div class="stats-grid" id="statsContainer"></div>
+    <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
 
-    <!-- ===== CHARTS ===== -->
-    <div class="chart-row">
-        <div class="chart-box">
-            <h3>Job Status Distribution</h3>
-            <canvas id="statusChart"></canvas>
+    <!-- MAIN AREA -->
+    <div class="main-area">
+        <div class="topbar">
+            <div class="topbar-left">
+                <button class="menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                <div class="page-title">
+                    <span id="pageTitleText">Requests</span>
+                    <small id="pageTitleSub">Manage all service requests</small>
+                </div>
+            </div>
+            <div class="topbar-actions" id="topbarActions"></div>
         </div>
-        <div class="chart-box">
-            <h3>Monthly Job Trend</h3>
-            <canvas id="trendChart"></canvas>
-        </div>
-    </div>
 
-    <!-- ===== ACTIONS ===== -->
-    <div class="actions" id="actionButtons"></div>
+        <div class="content">
+            <div class="kpi-strip" id="statsContainer"></div>
 
-    <!-- ===== TABLE ===== -->
-    <div class="table-wrap" id="tableContainer">
-        <h3 id="tableTitle">📋 Requests</h3>
-        <div class="filter-bar" id="filterBar"></div>
-        <div id="tableBody"><p style="text-align:center; color:#94a3b8; padding:40px;">Loading…</p></div>
-    </div>
-
-    <!-- ===== MODAL: User Management ===== -->
-    <div class="modal-overlay" id="userModal">
-        <div class="modal">
-            <button class="close-btn" onclick="closeUserModal()">&times;</button>
-            <h2 id="userModalTitle"><i class="fas fa-users-cog"></i> Add New User</h2>
-            <div id="userListContainer"><ul class="user-list" id="userList"></ul></div>
-            <hr />
-            <h3 style="margin-bottom:14px; font-size:17px; font-weight:800; color:var(--text);" id="userFormTitle">➕ Add New User</h3>
-            <input type="hidden" id="editUserId" value="" />
-            <div class="form-group"><label>Full Name</label><input type="text" id="newUserName" placeholder="e.g. Jane Mwangi" /></div>
-            <div class="form-group"><label>Email Address</label><input type="email" id="newUserEmail" placeholder="user@hospital.com" /></div>
-            <div class="form-group" id="passwordField"><label>Password</label><input type="text" id="newUserPassword" placeholder="Set a password for the user" /></div>
-            <div class="form-group">
-                <label>Role</label>
-                <select id="newUserRole" onchange="toggleRoleFields()">
-                    <option value="requester">Requester</option>
-                    <option value="maintenance">Maintenance</option>
-                    <option value="admin">Admin</option>
-                </select>
-            </div>
-
-            <!-- Single Department -->
-            <div class="form-group" id="deptFieldContainer" style="display:block;">
-                <label id="deptLabel">Department (for requester)</label>
-                <select id="newUserDept">
-                    <option value="">-- Select department --</option>
-                    <optgroup label="🏥 CURATIVE & CLINICAL WARDS">
-                        <option value="ACCIDENTS AND EMERGENCY">ACCIDENTS AND EMERGENCY</option>
-                        <option value="TRIAGE">TRIAGE</option>
-                        <option value="MEDICAL">MEDICAL</option>
-                        <option value="SURGICAL">SURGICAL</option>
-                        <option value="MATERNITY">MATERNITY</option>
-                        <option value="PEDIATRIC">PEDIATRIC</option>
-                        <option value="ORTHOPAEDIC AND TRAUMA">ORTHOPAEDIC AND TRAUMA</option>
-                        <option value="THEATRE">THEATRE</option>
-                        <option value="MALE WARD">MALE WARD</option>
-                        <option value="FEMALE WARD">FEMALE WARD</option>
-                        <option value="MENTAL HEALTH">MENTAL HEALTH</option>
-                        <option value="NBU">NBU</option>
-                        <option value="HAEMOPHILIA">HAEMOPHILIA</option>
-                    </optgroup>
-                    <optgroup label="🧪 ALLIED HEALTH & RECORDS">
-                        <option value="HMIS RECORDS">HMIS RECORDS</option>
-                        <option value="DIAGNOSTIC">DIAGNOSTIC</option>
-                        <option value="PREWORM & REHAB SERVICES">PREWORM & REHAB SERVICES</option>
-                        <option value="PHYSIOTHERAPY">PHYSIOTHERAPY</option>
-                        <option value="OCCUPATIONAL THERAPY">OCCUPATIONAL THERAPY</option>
-                        <option value="MCH">MCH</option>
-                        <option value="PUBLIC HEALTH">PUBLIC HEALTH</option>
-                        <option value="NCT">NCT</option>
-                        <option value="LAB SERVICE">LAB SERVICE</option>
-                        <option value="RADIOLOGY DEPARTMENT">RADIOLOGY DEPARTMENT</option>
-                    </optgroup>
-                    <optgroup label="📋 ADMINISTRATION & SUPPORT">
-                        <option value="ADMINISTRATION">ADMINISTRATION</option>
-                        <option value="HUMAN RESOURCE">HUMAN RESOURCE</option>
-                        <option value="PERSONNEL">PERSONNEL</option>
-                        <option value="SHA">SHA</option>
-                        <option value="SOCIAL WORK">SOCIAL WORK</option>
-                        <option value="SUPPLY SERVICES">SUPPLY SERVICES</option>
-                        <option value="KITCHEN">KITCHEN</option>
-                        <option value="LAUNDRY">LAUNDRY</option>
-                        <option value="HMU">HMU</option>
-                        <option value="MORTUARY">MORTUARY</option>
-                        <option value="TRANSPORT">TRANSPORT</option>
-                        <option value="COMMUNICATION">COMMUNICATION</option>
-                        <option value="PHARMACY">PHARMACY</option>
-                        <option value="FINANCE">FINANCE</option>
-                    </optgroup>
-                    <optgroup label="🩺 SPECIALIZED CLINICS & UNITS">
-                        <option value="CSSD">CSSD</option>
-                        <option value="CCC">CCC</option>
-                        <option value="HOSPICE">HOSPICE</option>
-                        <option value="OUTPATIENT DEPARTMENT">OUTPATIENT DEPARTMENT</option>
-                        <option value="DOCTORS CLINIC">DOCTORS CLINIC</option>
-                        <option value="ENT CLINIC">ENT CLINIC</option>
-                        <option value="DERMATOLOGY CLINIC">DERMATOLOGY CLINIC</option>
-                        <option value="EYE CENTER">EYE CENTER</option>
-                        <option value="RENAL DEPARTMENT">RENAL DEPARTMENT</option>
-                    </optgroup>
-                </select>
-            </div>
-
-            <!-- Multi Department -->
-            <div class="form-group" id="multiDeptContainer" style="display:none;">
-                <label>Select departments the engineer will handle (hold Ctrl/Cmd to choose multiple)</label>
-                <select id="newUserDepts" multiple size="5">
-                    <optgroup label="🏥 CURATIVE & CLINICAL WARDS">
-                        <option value="ACCIDENTS AND EMERGENCY">ACCIDENTS AND EMERGENCY</option>
-                        <option value="TRIAGE">TRIAGE</option>
-                        <option value="MEDICAL">MEDICAL</option>
-                        <option value="SURGICAL">SURGICAL</option>
-                        <option value="MATERNITY">MATERNITY</option>
-                        <option value="PEDIATRIC">PEDIATRIC</option>
-                        <option value="ORTHOPAEDIC AND TRAUMA">ORTHOPAEDIC AND TRAUMA</option>
-                        <option value="THEATRE">THEATRE</option>
-                        <option value="MALE WARD">MALE WARD</option>
-                        <option value="FEMALE WARD">FEMALE WARD</option>
-                        <option value="MENTAL HEALTH">MENTAL HEALTH</option>
-                        <option value="NBU">NBU</option>
-                        <option value="HAEMOPHILIA">HAEMOPHILIA</option>
-                    </optgroup>
-                    <optgroup label="🧪 ALLIED HEALTH & RECORDS">
-                        <option value="HMIS RECORDS">HMIS RECORDS</option>
-                        <option value="DIAGNOSTIC">DIAGNOSTIC</option>
-                        <option value="PREWORM & REHAB SERVICES">PREWORM & REHAB SERVICES</option>
-                        <option value="PHYSIOTHERAPY">PHYSIOTHERAPY</option>
-                        <option value="OCCUPATIONAL THERAPY">OCCUPATIONAL THERAPY</option>
-                        <option value="MCH">MCH</option>
-                        <option value="PUBLIC HEALTH">PUBLIC HEALTH</option>
-                        <option value="NCT">NCT</option>
-                        <option value="LAB SERVICE">LAB SERVICE</option>
-                        <option value="RADIOLOGY DEPARTMENT">RADIOLOGY DEPARTMENT</option>
-                    </optgroup>
-                    <optgroup label="📋 ADMINISTRATION & SUPPORT">
-                        <option value="ADMINISTRATION">ADMINISTRATION</option>
-                        <option value="HUMAN RESOURCE">HUMAN RESOURCE</option>
-                        <option value="PERSONNEL">PERSONNEL</option>
-                        <option value="SHA">SHA</option>
-                        <option value="SOCIAL WORK">SOCIAL WORK</option>
-                        <option value="SUPPLY SERVICES">SUPPLY SERVICES</option>
-                        <option value="KITCHEN">KITCHEN</option>
-                        <option value="LAUNDRY">LAUNDRY</option>
-                        <option value="HMU">HMU</option>
-                        <option value="MORTUARY">MORTUARY</option>
-                        <option value="TRANSPORT">TRANSPORT</option>
-                        <option value="COMMUNICATION">COMMUNICATION</option>
-                        <option value="PHARMACY">PHARMACY</option>
-                        <option value="FINANCE">FINANCE</option>
-                    </optgroup>
-                    <optgroup label="🩺 SPECIALIZED CLINICS & UNITS">
-                        <option value="CSSD">CSSD</option>
-                        <option value="CCC">CCC</option>
-                        <option value="HOSPICE">HOSPICE</option>
-                        <option value="OUTPATIENT DEPARTMENT">OUTPATIENT DEPARTMENT</option>
-                        <option value="DOCTORS CLINIC">DOCTORS CLINIC</option>
-                        <option value="ENT CLINIC">ENT CLINIC</option>
-                        <option value="DERMATOLOGY CLINIC">DERMATOLOGY CLINIC</option>
-                        <option value="EYE CENTER">EYE CENTER</option>
-                        <option value="RENAL DEPARTMENT">RENAL DEPARTMENT</option>
-                    </optgroup>
-                </select>
-                <small style="color:var(--text-muted); font-size:12px;">Hold Ctrl (Windows) or Cmd (Mac) to select multiple.</small>
-            </div>
-
-            <!-- WhatsApp -->
-            <div class="form-group" id="whatsappFieldContainer">
-                <label>WhatsApp Number (for maintenance)</label>
-                <div class="whatsapp-inline">
-                    <div class="field-group-small">
-                        <label>Country</label>
-                        <select id="newUserCountryCode">
-                            <option value="+254">🇰🇪 +254 (Kenya)</option>
-                            <option value="+256">🇺🇬 +256 (Uganda)</option>
-                            <option value="+255">🇹🇿 +255 (Tanzania)</option>
-                            <option value="+250">🇷🇼 +250 (Rwanda)</option>
-                            <option value="+1">🇺🇸 +1 (USA)</option>
-                            <option value="+44">🇬🇧 +44 (UK)</option>
-                            <option value="+91">🇮🇳 +91 (India)</option>
-                            <option value="+61">🇦🇺 +61 (Australia)</option>
-                            <option value="+234">🇳🇬 +234 (Nigeria)</option>
-                            <option value="+27">🇿🇦 +27 (South Africa)</option>
-                        </select>
+            <div class="analytics-drawer" id="analyticsDrawer">
+                <div class="analytics-drawer-header" onclick="toggleAnalytics()">
+                    <div class="analytics-drawer-title">
+                        <i class="fas fa-chart-pie"></i>
+                        <span>Analytics Snapshot</span>
                     </div>
-                    <div class="field-group-small" style="flex:2;">
-                        <label>Number</label>
-                        <input type="text" id="newUserWhatsApp" placeholder="e.g. 712345678" />
+                    <i class="fas fa-chevron-down analytics-drawer-chevron"></i>
+                </div>
+                <div class="analytics-drawer-body">
+                    <div class="charts-row">
+                        <div class="chart-box">
+                            <h4>Job Status Distribution</h4>
+                            <canvas id="statusChart"></canvas>
+                        </div>
+                        <div class="chart-box">
+                            <h4>Monthly Job Trend</h4>
+                            <canvas id="trendChart"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <button class="btn btn-success" id="saveUserBtn" onclick="saveUser()"><i class="fas fa-save"></i> Save User</button>
-            <div id="userModalError" class="error-text"></div>
-            <div id="userModalSuccess" class="success-text"></div>
-        </div>
-    </div>
-
-    <!-- ===== MODAL: Pending Approvals ===== -->
-    <div class="modal-overlay" id="approvalModal">
-        <div class="modal">
-            <button class="close-btn" onclick="closeApprovalModal()">&times;</button>
-            <h2><i class="fas fa-user-clock"></i> Pending Approvals</h2>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-                <span style="font-size:13.5px; color:var(--text-muted); font-weight:500;">Users waiting for approval</span>
-                <button class="btn btn-outline btn-sm" id="refreshPendingBtn" onclick="showPendingUsers()"><i class="fas fa-sync-alt"></i> Refresh</button>
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="tabs">
+                        <button class="tab active" id="tabRequests" onclick="switchView('requests')">
+                            <i class="fas fa-clipboard-list"></i> Requests
+                            <span class="count" id="tabReqCount">0</span>
+                        </button>
+                        <button class="tab" id="tabJobcards" onclick="switchView('jobcards')">
+                            <i class="fas fa-tools"></i> Jobcards
+                            <span class="count" id="tabJobCount">0</span>
+                        </button>
+                    </div>
+                    <div class="toolbar" id="filterBar"></div>
+                </div>
+                <div class="table-scroll">
+                    <div id="tableBody">
+                        <div class="empty-state">
+                            <i class="fas fa-circle-notch fa-spin"></i>
+                            <p>Loading…</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div id="pendingList"><p>Loading…</p></div>
         </div>
-    </div>
-
-    <!-- ===== QUICK LINKS ===== -->
-    <div style="margin-top:28px; text-align:right; padding:18px 24px; background:white; border-radius:var(--radius); box-shadow:var(--shadow-sm); border:1px solid var(--border); display:flex; flex-wrap:wrap; justify-content:flex-end; gap:12px;">
-        <button class="btn btn-outline btn-sm" onclick="window.location.href='analytics.html'"><i class="fas fa-chart-bar"></i> Analytics</button>
-        <button class="btn btn-primary btn-sm" onclick="window.location.href='report.html'"><i class="fas fa-file-alt"></i> Monthly Report</button>
     </div>
 </div>
 
-<!-- ===== TOAST ===== -->
-<div id="toast" class="toast">Message</div>
+<!-- MODAL: User Management -->
+<div class="modal-overlay" id="userModal">
+    <div class="modal">
+        <button class="close-btn" onclick="closeUserModal()">&times;</button>
+        <h2 id="userModalTitle"><i class="fas fa-users-cog"></i> Add New User</h2>
+        <div id="userListContainer"><ul class="user-list" id="userList"></ul></div>
+        <hr />
+        <h3 style="margin-bottom:12px; font-size:15px; font-weight:800;" id="userFormTitle">➕ Add New User</h3>
+        <input type="hidden" id="editUserId" value="" />
+        <div class="form-group"><label>Full Name</label><input type="text" id="newUserName" placeholder="e.g. Jane Mwangi" /></div>
+        <div class="form-group"><label>Email Address</label><input type="email" id="newUserEmail" placeholder="user@hospital.com" /></div>
+        <div class="form-group" id="passwordField"><label>Password</label><input type="text" id="newUserPassword" placeholder="Set a password for the user" /></div>
+        <div class="form-group">
+            <label>Role</label>
+            <select id="newUserRole" onchange="toggleRoleFields()">
+                <option value="requester">Requester</option>
+                <option value="maintenance">Maintenance</option>
+                <option value="admin">Admin</option>
+            </select>
+        </div>
 
-<!-- ===== PDF HIDDEN TEMPLATES ===== -->
+        <div class="form-group" id="deptFieldContainer" style="display:block;">
+            <label id="deptLabel">Department (for requester)</label>
+            <select id="newUserDept">
+                <option value="">-- Select department --</option>
+                <optgroup label="🏥 CURATIVE & CLINICAL WARDS">
+                    <option value="ACCIDENTS AND EMERGENCY">ACCIDENTS AND EMERGENCY</option>
+                    <option value="TRIAGE">TRIAGE</option>
+                    <option value="MEDICAL">MEDICAL</option>
+                    <option value="SURGICAL">SURGICAL</option>
+                    <option value="MATERNITY">MATERNITY</option>
+                    <option value="PEDIATRIC">PEDIATRIC</option>
+                    <option value="ORTHOPAEDIC AND TRAUMA">ORTHOPAEDIC AND TRAUMA</option>
+                    <option value="THEATRE">THEATRE</option>
+                    <option value="MALE WARD">MALE WARD</option>
+                    <option value="FEMALE WARD">FEMALE WARD</option>
+                    <option value="MENTAL HEALTH">MENTAL HEALTH</option>
+                    <option value="NBU">NBU</option>
+                    <option value="HAEMOPHILIA">HAEMOPHILIA</option>
+                </optgroup>
+                <optgroup label="🧪 ALLIED HEALTH & RECORDS">
+                    <option value="HMIS RECORDS">HMIS RECORDS</option>
+                    <option value="DIAGNOSTIC">DIAGNOSTIC</option>
+                    <option value="PREWORM & REHAB SERVICES">PREWORM & REHAB SERVICES</option>
+                    <option value="PHYSIOTHERAPY">PHYSIOTHERAPY</option>
+                    <option value="OCCUPATIONAL THERAPY">OCCUPATIONAL THERAPY</option>
+                    <option value="MCH">MCH</option>
+                    <option value="PUBLIC HEALTH">PUBLIC HEALTH</option>
+                    <option value="NCT">NCT</option>
+                    <option value="LAB SERVICE">LAB SERVICE</option>
+                    <option value="RADIOLOGY DEPARTMENT">RADIOLOGY DEPARTMENT</option>
+                </optgroup>
+                <optgroup label="📋 ADMINISTRATION & SUPPORT">
+                    <option value="ADMINISTRATION">ADMINISTRATION</option>
+                    <option value="HUMAN RESOURCE">HUMAN RESOURCE</option>
+                    <option value="PERSONNEL">PERSONNEL</option>
+                    <option value="SHA">SHA</option>
+                    <option value="SOCIAL WORK">SOCIAL WORK</option>
+                    <option value="SUPPLY SERVICES">SUPPLY SERVICES</option>
+                    <option value="KITCHEN">KITCHEN</option>
+                    <option value="LAUNDRY">LAUNDRY</option>
+                    <option value="HMU">HMU</option>
+                    <option value="MORTUARY">MORTUARY</option>
+                    <option value="TRANSPORT">TRANSPORT</option>
+                    <option value="COMMUNICATION">COMMUNICATION</option>
+                    <option value="PHARMACY">PHARMACY</option>
+                    <option value="FINANCE">FINANCE</option>
+                </optgroup>
+                <optgroup label="🩺 SPECIALIZED CLINICS & UNITS">
+                    <option value="CSSD">CSSD</option>
+                    <option value="CCC">CCC</option>
+                    <option value="HOSPICE">HOSPICE</option>
+                    <option value="OUTPATIENT DEPARTMENT">OUTPATIENT DEPARTMENT</option>
+                    <option value="DOCTORS CLINIC">DOCTORS CLINIC</option>
+                    <option value="ENT CLINIC">ENT CLINIC</option>
+                    <option value="DERMATOLOGY CLINIC">DERMATOLOGY CLINIC</option>
+                    <option value="EYE CENTER">EYE CENTER</option>
+                    <option value="RENAL DEPARTMENT">RENAL DEPARTMENT</option>
+                </optgroup>
+            </select>
+        </div>
+
+        <div class="form-group" id="multiDeptContainer" style="display:none;">
+            <label>Departments (hold Ctrl/Cmd to choose multiple)</label>
+            <select id="newUserDepts" multiple size="5">
+                <optgroup label="🏥 CURATIVE & CLINICAL WARDS">
+                    <option value="ACCIDENTS AND EMERGENCY">ACCIDENTS AND EMERGENCY</option>
+                    <option value="TRIAGE">TRIAGE</option>
+                    <option value="MEDICAL">MEDICAL</option>
+                    <option value="SURGICAL">SURGICAL</option>
+                    <option value="MATERNITY">MATERNITY</option>
+                    <option value="PEDIATRIC">PEDIATRIC</option>
+                    <option value="ORTHOPAEDIC AND TRAUMA">ORTHOPAEDIC AND TRAUMA</option>
+                    <option value="THEATRE">THEATRE</option>
+                    <option value="MALE WARD">MALE WARD</option>
+                    <option value="FEMALE WARD">FEMALE WARD</option>
+                    <option value="MENTAL HEALTH">MENTAL HEALTH</option>
+                    <option value="NBU">NBU</option>
+                    <option value="HAEMOPHILIA">HAEMOPHILIA</option>
+                </optgroup>
+                <optgroup label="🧪 ALLIED HEALTH & RECORDS">
+                    <option value="HMIS RECORDS">HMIS RECORDS</option>
+                    <option value="DIAGNOSTIC">DIAGNOSTIC</option>
+                    <option value="PREWORM & REHAB SERVICES">PREWORM & REHAB SERVICES</option>
+                    <option value="PHYSIOTHERAPY">PHYSIOTHERAPY</option>
+                    <option value="OCCUPATIONAL THERAPY">OCCUPATIONAL THERAPY</option>
+                    <option value="MCH">MCH</option>
+                    <option value="PUBLIC HEALTH">PUBLIC HEALTH</option>
+                    <option value="NCT">NCT</option>
+                    <option value="LAB SERVICE">LAB SERVICE</option>
+                    <option value="RADIOLOGY DEPARTMENT">RADIOLOGY DEPARTMENT</option>
+                </optgroup>
+                <optgroup label="📋 ADMINISTRATION & SUPPORT">
+                    <option value="ADMINISTRATION">ADMINISTRATION</option>
+                    <option value="HUMAN RESOURCE">HUMAN RESOURCE</option>
+                    <option value="PERSONNEL">PERSONNEL</option>
+                    <option value="SHA">SHA</option>
+                    <option value="SOCIAL WORK">SOCIAL WORK</option>
+                    <option value="SUPPLY SERVICES">SUPPLY SERVICES</option>
+                    <option value="KITCHEN">KITCHEN</option>
+                    <option value="LAUNDRY">LAUNDRY</option>
+                    <option value="HMU">HMU</option>
+                    <option value="MORTUARY">MORTUARY</option>
+                    <option value="TRANSPORT">TRANSPORT</option>
+                    <option value="COMMUNICATION">COMMUNICATION</option>
+                    <option value="PHARMACY">PHARMACY</option>
+                    <option value="FINANCE">FINANCE</option>
+                </optgroup>
+                <optgroup label="🩺 SPECIALIZED CLINICS & UNITS">
+                    <option value="CSSD">CSSD</option>
+                    <option value="CCC">CCC</option>
+                    <option value="HOSPICE">HOSPICE</option>
+                    <option value="OUTPATIENT DEPARTMENT">OUTPATIENT DEPARTMENT</option>
+                    <option value="DOCTORS CLINIC">DOCTORS CLINIC</option>
+                    <option value="ENT CLINIC">ENT CLINIC</option>
+                    <option value="DERMATOLOGY CLINIC">DERMATOLOGY CLINIC</option>
+                    <option value="EYE CENTER">EYE CENTER</option>
+                    <option value="RENAL DEPARTMENT">RENAL DEPARTMENT</option>
+                </optgroup>
+            </select>
+        </div>
+
+        <div class="form-group" id="whatsappFieldContainer">
+            <label>WhatsApp Number (for maintenance)</label>
+            <div style="display:flex; gap:8px; align-items:stretch;">
+                <select id="newUserCountryCode" style="flex:0 0 130px;">
+                    <option value="+254">🇰🇪 +254</option>
+                    <option value="+256">🇺🇬 +256</option>
+                    <option value="+255">🇹🇿 +255</option>
+                    <option value="+250">🇷🇼 +250</option>
+                    <option value="+1">🇺🇸 +1</option>
+                    <option value="+44">🇬🇧 +44</option>
+                    <option value="+91">🇮🇳 +91</option>
+                    <option value="+27">🇿🇦 +27</option>
+                </select>
+                <input type="text" id="newUserWhatsApp" placeholder="e.g. 712345678" style="flex:1;" />
+            </div>
+        </div>
+
+        <button class="btn btn-success" id="saveUserBtn" onclick="saveUser()"><i class="fas fa-save"></i> Save User</button>
+        <div id="userModalError" class="error-text"></div>
+        <div id="userModalSuccess" class="success-text"></div>
+    </div>
+</div>
+
+<!-- MODAL: Pending Approvals -->
+<div class="modal-overlay" id="approvalModal">
+    <div class="modal">
+        <button class="close-btn" onclick="closeApprovalModal()">&times;</button>
+        <h2><i class="fas fa-user-clock"></i> Pending Approvals</h2>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <span style="font-size:12.5px; color:var(--text-muted); font-weight:600;">Users waiting for approval</span>
+            <button class="btn btn-outline btn-sm" onclick="showPendingUsers()"><i class="fas fa-sync-alt"></i> Refresh</button>
+        </div>
+        <div id="pendingList"><p>Loading…</p></div>
+    </div>
+</div>
+
+<div id="toast" class="toast">Message</div>
 <div id="pdfTemplate"></div>
 <div id="requestPdfTemplate"></div>
 
 <script type="module">
-    // ============================================================
-    // FIREBASE CONFIG
-    // ============================================================
     const firebaseConfig = {
         apiKey: "AIzaSyDnsz1s-VnewbUszXNJptcdMZ_h0QsNHYQ",
         authDomain: "moivoibiomed.firebaseapp.com",
@@ -1139,8 +1121,6 @@
     const REQUESTS_COLL = 'requests';
     const JOBCARDS_COLL = 'jobcards';
 
-    console.log('🚀 Dashboard loaded');
-
     let currentUser = null;
     let userRole = '';
     let allRequests = [];
@@ -1151,31 +1131,40 @@
     let statusChartInstance = null;
     let trendChartInstance = null;
 
-    // DOM refs
-    const userNameDisplay = document.getElementById('userNameDisplay');
-    const userRoleDisplay = document.getElementById('userRoleDisplay');
-    const roleTag = document.getElementById('roleTag');
     const statsContainer = document.getElementById('statsContainer');
-    const actionButtons = document.getElementById('actionButtons');
-    const tableTitle = document.getElementById('tableTitle');
-    const filterBar = document.getElementById('filterBar');
     const tableBody = document.getElementById('tableBody');
+    const filterBar = document.getElementById('filterBar');
     const toast = document.getElementById('toast');
-    const logoutBtn = document.getElementById('logoutBtn');
+    const topbarActions = document.getElementById('topbarActions');
+    const pageTitleText = document.getElementById('pageTitleText');
+    const pageTitleSub = document.getElementById('pageTitleSub');
 
-    // ===== LOGOUT =====
-    logoutBtn.addEventListener('click', () => {
+    // ============ SIDEBAR ============
+    window.toggleSidebar = function() {
+        document.getElementById('sidebar').classList.toggle('open');
+        document.getElementById('sidebarBackdrop').classList.toggle('show');
+    };
+    window.closeSidebar = function() {
+        document.getElementById('sidebar').classList.remove('open');
+        document.getElementById('sidebarBackdrop').classList.remove('show');
+    };
+    window.toggleAnalytics = function() {
+        document.getElementById('analyticsDrawer').classList.toggle('open');
+    };
+
+    // ============ LOGOUT ============
+    document.getElementById('logoutBtn').addEventListener('click', () => {
         signOut(auth).then(() => window.location.href = 'login.html')
             .catch(err => showToast('Logout error: ' + err.message, true));
     });
 
-    // ===== TOAST =====
+    // ============ TOAST ============
     function showToast(msg, isError = false) {
         toast.textContent = msg;
         toast.style.borderLeftColor = isError ? '#ef4444' : '#C8102E';
         toast.classList.add('show');
         clearTimeout(toast._timer);
-        toast._timer = setTimeout(() => toast.classList.remove('show'), 3500);
+        toast._timer = setTimeout(() => toast.classList.remove('show'), 3200);
     }
 
     function getStatusClass(status) {
@@ -1188,9 +1177,6 @@
         return 'open';
     }
 
-    // ================================================================
-    // TOGGLE FIELDS
-    // ================================================================
     function toggleRoleFields() {
         const role = document.getElementById('newUserRole').value;
         const deptContainer = document.getElementById('deptFieldContainer');
@@ -1209,102 +1195,76 @@
         if (role === 'requester') {
             deptContainer.style.display = 'block';
             deptLabel.textContent = 'Department (for requester)';
-            document.getElementById('newUserDept').required = true;
         } else if (role === 'maintenance') {
             multiDeptContainer.style.display = 'block';
             whatsappContainer.style.display = 'block';
-            document.getElementById('newUserWhatsApp').required = true;
         }
     }
     window.toggleRoleFields = toggleRoleFields;
 
-    // ================================================================
-    // FETCH DATA
-    // ================================================================
+    // ============ FETCH DATA ============
     async function fetchData() {
-        console.log('🔍 fetchData() called.');
         try {
             const isAdmin = userRole === 'admin';
             const isMaintenance = userRole === 'maintenance';
             const isRequester = userRole === 'requester';
 
             let reqQuery = null;
-            if (isAdmin) {
-                reqQuery = query(collection(db, REQUESTS_COLL), orderBy('createdAt', 'desc'));
-            } else if (isMaintenance) {
+            if (isAdmin) reqQuery = query(collection(db, REQUESTS_COLL), orderBy('createdAt', 'desc'));
+            else if (isMaintenance) {
                 const depts = currentUser?.departments || [];
-                if (depts.length > 0) {
-                    reqQuery = query(collection(db, REQUESTS_COLL), where('unit', 'in', depts), orderBy('createdAt', 'desc'));
-                } else {
-                    reqQuery = null;
-                }
+                if (depts.length > 0) reqQuery = query(collection(db, REQUESTS_COLL), where('unit', 'in', depts), orderBy('createdAt', 'desc'));
             } else if (isRequester) {
                 reqQuery = query(collection(db, REQUESTS_COLL), where('requesterId', '==', currentUser.id), orderBy('createdAt', 'desc'));
             }
 
             if (reqQuery) {
-                const reqSnap = await getDocs(reqQuery);
+                const snap = await getDocs(reqQuery);
                 allRequests = [];
-                reqSnap.forEach(doc => {
-                    const data = doc.data();
-                    data.id = doc.id;
+                snap.forEach(d => {
+                    const data = d.data();
+                    data.id = d.id;
                     if (data.received === undefined) data.received = false;
                     allRequests.push(data);
                 });
-                console.log(`✅ Fetched ${allRequests.length} requests.`);
-            } else {
-                allRequests = [];
-            }
+            } else allRequests = [];
 
             let jobcards = [];
             if (isAdmin) {
                 const snap = await getDocs(collection(db, JOBCARDS_COLL));
-                snap.forEach(doc => { jobcards.push({ id: doc.id, ...doc.data() }); });
+                snap.forEach(d => jobcards.push({ id: d.id, ...d.data() }));
                 allJobCards = jobcards;
             } else if (isMaintenance) {
                 const depts = currentUser?.departments || [];
                 if (depts.length > 0) {
-                    const snap1 = await getDocs(query(collection(db, JOBCARDS_COLL), where('unit', 'in', depts), orderBy('updatedAt', 'desc')));
-                    snap1.forEach(doc => { jobcards.push({ id: doc.id, ...doc.data() }); });
+                    const s1 = await getDocs(query(collection(db, JOBCARDS_COLL), where('unit', 'in', depts), orderBy('updatedAt', 'desc')));
+                    s1.forEach(d => jobcards.push({ id: d.id, ...d.data() }));
                 }
-                const snap2 = await getDocs(query(collection(db, JOBCARDS_COLL), where('techId', '==', currentUser.id), orderBy('updatedAt', 'desc')));
-                snap2.forEach(doc => { jobcards.push({ id: doc.id, ...doc.data() }); });
+                const s2 = await getDocs(query(collection(db, JOBCARDS_COLL), where('techId', '==', currentUser.id), orderBy('updatedAt', 'desc')));
+                s2.forEach(d => jobcards.push({ id: d.id, ...d.data() }));
                 const seen = new Set();
-                allJobCards = jobcards.filter(j => {
-                    if (seen.has(j.id)) return false;
-                    seen.add(j.id);
-                    return true;
-                });
+                allJobCards = jobcards.filter(j => { if (seen.has(j.id)) return false; seen.add(j.id); return true; });
             } else if (isRequester) {
                 const dept = currentUser?.department;
-                let queries = [];
-                if (dept) {
-                    queries.push(query(collection(db, JOBCARDS_COLL), where('unit', '==', dept), orderBy('updatedAt', 'desc')));
-                }
+                const queries = [];
+                if (dept) queries.push(query(collection(db, JOBCARDS_COLL), where('unit', '==', dept), orderBy('updatedAt', 'desc')));
                 queries.push(query(collection(db, JOBCARDS_COLL), where('requesterId', '==', currentUser.id), orderBy('updatedAt', 'desc')));
                 const seen = new Set();
                 for (const q of queries) {
                     try {
                         const snap = await getDocs(q);
-                        snap.forEach(doc => {
-                            const data = doc.data();
-                            data.id = doc.id;
-                            if (!seen.has(doc.id)) {
-                                seen.add(doc.id);
-                                jobcards.push(data);
-                            }
+                        snap.forEach(d => {
+                            const data = d.data();
+                            data.id = d.id;
+                            if (!seen.has(d.id)) { seen.add(d.id); jobcards.push(data); }
                         });
-                    } catch (err) { console.warn('Query failed:', err); }
+                    } catch (err) { console.warn(err); }
                 }
                 allJobCards = jobcards;
-            } else {
-                allJobCards = [];
-            }
+            } else allJobCards = [];
 
             const jobMap = new Map();
-            allJobCards.forEach(j => {
-                if (j.requestNo) jobMap.set(j.requestNo, j);
-            });
+            allJobCards.forEach(j => { if (j.requestNo) jobMap.set(j.requestNo, j); });
             allRequests.forEach(r => {
                 const job = jobMap.get(r.requestNo);
                 if (job) {
@@ -1319,13 +1279,10 @@
             });
 
             if (isAdmin) {
-                const userSnap = await getDocs(collection(db, USERS_COLL));
+                const snap = await getDocs(collection(db, USERS_COLL));
                 allUsers = [];
-                userSnap.forEach(doc => {
-                    allUsers.push({ id: doc.id, ...doc.data() });
-                });
+                snap.forEach(d => allUsers.push({ id: d.id, ...d.data() }));
                 pendingApprovalCount = allUsers.filter(u => u.approved !== true).length;
-                console.log(`✅ Fetched ${allUsers.length} users, ${pendingApprovalCount} pending.`);
             } else {
                 allUsers = [];
                 pendingApprovalCount = 0;
@@ -1341,14 +1298,7 @@
         return allRequests.filter(r => r.requesterId === currentUser.id);
     }
 
-    function getDepartmentJobcards() {
-        if (!currentUser || !currentUser.department) return [];
-        return allJobCards.filter(j => j.unit === currentUser.department);
-    }
-
-    // ================================================================
-    // RENDER DASHBOARD
-    // ================================================================
+    // ============ RENDER DASHBOARD ============
     function renderDashboard() {
         if (!currentUser) return;
         const isAdmin = userRole === 'admin';
@@ -1358,131 +1308,97 @@
         const totalRequests = allRequests.length;
         const totalJobcards = allJobCards.length;
         const myRequests = getMyRequests();
-        const deptJobcards = getDepartmentJobcards();
 
         const pendingReqs = allRequests.filter(r => r.jobStatus === 'Pending' || r.jobStatus === 'No Job').length;
         const completedReqs = allRequests.filter(r => r.jobStatus === 'Completed').length;
         const writtenOffReqs = allRequests.filter(r => r.jobStatus === 'Written Off').length;
 
-        let statsHtml = '';
+        let kpiHtml = '';
         if (isAdmin) {
-            statsHtml = `
-                <div class="stat-card total" onclick="switchView('requests')">
-                    <div class="stat-left"><div class="number">${totalRequests}</div><div class="label">All Requests</div></div>
-                    <div class="stat-icon"><i class="fas fa-list"></i></div>
-                </div>
-                <div class="stat-card jobcards" onclick="switchView('jobcards')">
-                    <div class="stat-left"><div class="number">${totalJobcards}</div><div class="label">All Jobcards</div></div>
-                    <div class="stat-icon"><i class="fas fa-tools"></i></div>
-                </div>
-                <div class="stat-card pending" onclick="applyFilter('pending')">
-                    <div class="stat-left"><div class="number">${pendingReqs}</div><div class="label">Pending Requests</div></div>
-                    <div class="stat-icon"><i class="fas fa-clock"></i></div>
-                </div>
-                <div class="stat-card completed" onclick="applyFilter('completed')">
-                    <div class="stat-left"><div class="number">${completedReqs}</div><div class="label">Completed</div></div>
-                    <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
-                </div>
-                <div class="stat-card writtenoff" onclick="applyFilter('writtenoff')">
-                    <div class="stat-left"><div class="number">${writtenOffReqs}</div><div class="label">Written Off</div></div>
-                    <div class="stat-icon"><i class="fas fa-times-circle"></i></div>
-                </div>
-                <div class="stat-card users" onclick="openUserModal()">
-                    <div class="stat-left"><div class="number">${allUsers.length}</div><div class="label">Users</div></div>
-                    <div class="stat-icon"><i class="fas fa-users"></i></div>
-                </div>
-                <div class="stat-card pending-approval" onclick="showPendingUsers()">
-                    <div class="stat-left"><div class="number">${pendingApprovalCount}</div><div class="label">Pending Approvals</div></div>
-                    <div class="stat-icon"><i class="fas fa-user-clock"></i></div>
-                </div>
+            kpiHtml = `
+                <div class="kpi-card total" onclick="switchView('requests')"><div class="kpi-icon"><i class="fas fa-list"></i></div><div class="kpi-body"><div class="kpi-value">${totalRequests}</div><div class="kpi-label">All Requests</div></div></div>
+                <div class="kpi-card jobcards" onclick="switchView('jobcards')"><div class="kpi-icon"><i class="fas fa-tools"></i></div><div class="kpi-body"><div class="kpi-value">${totalJobcards}</div><div class="kpi-label">All Jobcards</div></div></div>
+                <div class="kpi-card pending" onclick="applyFilter('pending')"><div class="kpi-icon"><i class="fas fa-clock"></i></div><div class="kpi-body"><div class="kpi-value">${pendingReqs}</div><div class="kpi-label">Pending</div></div></div>
+                <div class="kpi-card completed" onclick="applyFilter('completed')"><div class="kpi-icon"><i class="fas fa-check-circle"></i></div><div class="kpi-body"><div class="kpi-value">${completedReqs}</div><div class="kpi-label">Completed</div></div></div>
+                <div class="kpi-card writtenoff" onclick="applyFilter('writtenoff')"><div class="kpi-icon"><i class="fas fa-times-circle"></i></div><div class="kpi-body"><div class="kpi-value">${writtenOffReqs}</div><div class="kpi-label">Written Off</div></div></div>
+                <div class="kpi-card users" onclick="openUserModal()"><div class="kpi-icon"><i class="fas fa-users"></i></div><div class="kpi-body"><div class="kpi-value">${allUsers.length}</div><div class="kpi-label">Users</div></div></div>
+                <div class="kpi-card pending" onclick="showPendingUsers()"><div class="kpi-icon"><i class="fas fa-user-clock"></i></div><div class="kpi-body"><div class="kpi-value">${pendingApprovalCount}</div><div class="kpi-label">Approvals</div></div></div>
             `;
         } else if (isMaintenance) {
             const newReqs = allRequests.filter(r => r.jobStatus === 'No Job').length;
-            statsHtml = `
-                <div class="stat-card total" onclick="switchView('requests')">
-                    <div class="stat-left"><div class="number">${totalRequests}</div><div class="label">Dept. Requests</div></div>
-                    <div class="stat-icon"><i class="fas fa-list"></i></div>
-                </div>
-                <div class="stat-card jobcards" onclick="switchView('jobcards')">
-                    <div class="stat-left"><div class="number">${totalJobcards}</div><div class="label">My Jobcards</div></div>
-                    <div class="stat-icon"><i class="fas fa-tools"></i></div>
-                </div>
-                <div class="stat-card new" onclick="applyFilter('new')">
-                    <div class="stat-left"><div class="number">${newReqs}</div><div class="label">New (No Job)</div></div>
-                    <div class="stat-icon"><i class="fas fa-plus-circle"></i></div>
-                </div>
-                <div class="stat-card pending" onclick="applyFilter('pending')">
-                    <div class="stat-left"><div class="number">${pendingReqs}</div><div class="label">Pending</div></div>
-                    <div class="stat-icon"><i class="fas fa-clock"></i></div>
-                </div>
-                <div class="stat-card completed" onclick="applyFilter('completed')">
-                    <div class="stat-left"><div class="number">${completedReqs}</div><div class="label">Completed</div></div>
-                    <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
-                </div>
+            kpiHtml = `
+                <div class="kpi-card total" onclick="switchView('requests')"><div class="kpi-icon"><i class="fas fa-list"></i></div><div class="kpi-body"><div class="kpi-value">${totalRequests}</div><div class="kpi-label">Dept. Requests</div></div></div>
+                <div class="kpi-card jobcards" onclick="switchView('jobcards')"><div class="kpi-icon"><i class="fas fa-tools"></i></div><div class="kpi-body"><div class="kpi-value">${totalJobcards}</div><div class="kpi-label">My Jobcards</div></div></div>
+                <div class="kpi-card new" onclick="applyFilter('new')"><div class="kpi-icon"><i class="fas fa-plus-circle"></i></div><div class="kpi-body"><div class="kpi-value">${newReqs}</div><div class="kpi-label">New</div></div></div>
+                <div class="kpi-card pending" onclick="applyFilter('pending')"><div class="kpi-icon"><i class="fas fa-clock"></i></div><div class="kpi-body"><div class="kpi-value">${pendingReqs}</div><div class="kpi-label">Pending</div></div></div>
+                <div class="kpi-card completed" onclick="applyFilter('completed')"><div class="kpi-icon"><i class="fas fa-check-circle"></i></div><div class="kpi-body"><div class="kpi-value">${completedReqs}</div><div class="kpi-label">Completed</div></div></div>
             `;
         } else {
-            statsHtml = `
-                <div class="stat-card myrequests" onclick="switchView('requests')">
-                    <div class="stat-left"><div class="number">${myRequests.length}</div><div class="label">My Requests</div></div>
-                    <div class="stat-icon"><i class="fas fa-file-alt"></i></div>
-                </div>
-                <div class="stat-card jobcards" onclick="switchView('jobcards')">
-                    <div class="stat-left"><div class="number">${totalJobcards}</div><div class="label">Dept. Jobcards</div></div>
-                    <div class="stat-icon"><i class="fas fa-tools"></i></div>
-                </div>
-                <div class="stat-card pending" onclick="applyFilter('pending')">
-                    <div class="stat-left"><div class="number">${myRequests.filter(r => r.jobStatus === 'Pending' || r.jobStatus === 'No Job').length}</div><div class="label">Pending</div></div>
-                    <div class="stat-icon"><i class="fas fa-clock"></i></div>
-                </div>
-                <div class="stat-card completed" onclick="applyFilter('completed')">
-                    <div class="stat-left"><div class="number">${myRequests.filter(r => r.jobStatus === 'Completed').length}</div><div class="label">Completed</div></div>
-                    <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
-                </div>
-                <div class="stat-card writtenoff" onclick="applyFilter('writtenoff')">
-                    <div class="stat-left"><div class="number">${myRequests.filter(r => r.jobStatus === 'Written Off').length}</div><div class="label">Written Off</div></div>
-                    <div class="stat-icon"><i class="fas fa-times-circle"></i></div>
-                </div>
+            kpiHtml = `
+                <div class="kpi-card myrequests" onclick="switchView('requests')"><div class="kpi-icon"><i class="fas fa-file-alt"></i></div><div class="kpi-body"><div class="kpi-value">${myRequests.length}</div><div class="kpi-label">My Requests</div></div></div>
+                <div class="kpi-card jobcards" onclick="switchView('jobcards')"><div class="kpi-icon"><i class="fas fa-tools"></i></div><div class="kpi-body"><div class="kpi-value">${totalJobcards}</div><div class="kpi-label">Dept. Jobcards</div></div></div>
+                <div class="kpi-card pending" onclick="applyFilter('pending')"><div class="kpi-icon"><i class="fas fa-clock"></i></div><div class="kpi-body"><div class="kpi-value">${myRequests.filter(r => r.jobStatus === 'Pending' || r.jobStatus === 'No Job').length}</div><div class="kpi-label">Pending</div></div></div>
+                <div class="kpi-card completed" onclick="applyFilter('completed')"><div class="kpi-icon"><i class="fas fa-check-circle"></i></div><div class="kpi-body"><div class="kpi-value">${myRequests.filter(r => r.jobStatus === 'Completed').length}</div><div class="kpi-label">Completed</div></div></div>
+                <div class="kpi-card writtenoff" onclick="applyFilter('writtenoff')"><div class="kpi-icon"><i class="fas fa-times-circle"></i></div><div class="kpi-body"><div class="kpi-value">${myRequests.filter(r => r.jobStatus === 'Written Off').length}</div><div class="kpi-label">Written Off</div></div></div>
             `;
         }
-        statsContainer.innerHTML = statsHtml;
+        statsContainer.innerHTML = kpiHtml;
+
+        document.getElementById('navReqCount').textContent = allRequests.length;
+        document.getElementById('navJobCount').textContent = allJobCards.length;
+        document.getElementById('navApprovalCount').textContent = pendingApprovalCount;
+        document.getElementById('tabReqCount').textContent = allRequests.length;
+        document.getElementById('tabJobCount').textContent = allJobCards.length;
 
         renderCharts();
-
-        let actionsHtml = '';
-        if (isRequester) {
-            actionsHtml = `<button class="btn btn-primary" id="newRequestBtn"><i class="fas fa-plus"></i> New Request</button>`;
-        } else if (isMaintenance) {
-            actionsHtml = `
-                <button class="btn btn-success" id="createJobBtn"><i class="fas fa-tools"></i> Create Job Card</button>
-                <button class="btn btn-outline" id="analyticsBtn"><i class="fas fa-chart-bar"></i> Analytics</button>
-            `;
-        } else if (isAdmin) {
-            actionsHtml = `
-                <button class="btn btn-primary" id="newRequestBtn"><i class="fas fa-plus"></i> New Request</button>
-                <button class="btn btn-success" id="createJobBtn"><i class="fas fa-tools"></i> Create Job Card</button>
-                <button class="btn btn-outline" id="manageUsersBtn"><i class="fas fa-users-cog"></i> Manage Users</button>
-                <button class="btn btn-outline" id="approveUsersBtn"><i class="fas fa-user-check"></i> Approve Users</button>
-                <button class="btn btn-outline" id="analyticsBtn"><i class="fas fa-chart-bar"></i> Analytics</button>
-            `;
-        }
-        actionButtons.innerHTML = actionsHtml;
-
-        document.getElementById('manageUsersBtn')?.addEventListener('click', openUserModal);
-        document.getElementById('approveUsersBtn')?.addEventListener('click', showPendingUsers);
-        document.getElementById('newRequestBtn')?.addEventListener('click', () => window.location.href='request.html');
-        document.getElementById('createJobBtn')?.addEventListener('click', () => window.location.href='jobcard.html');
-        document.getElementById('analyticsBtn')?.addEventListener('click', () => window.location.href='analytics.html');
-
+        renderTopbarActions();
         buildFilterBar();
         updateTableTitle();
         applyFilters();
     }
 
+    function renderTopbarActions() {
+        const isAdmin = userRole === 'admin';
+        const isMaintenance = userRole === 'maintenance';
+        const isRequester = userRole === 'requester';
+
+        let html = '';
+        if (isRequester) {
+            html = `<button class="btn btn-primary btn-sm" onclick="window.location.href='request.html'"><i class="fas fa-plus"></i> <span>New Request</span></button>`;
+        } else if (isMaintenance) {
+            html = `
+                <button class="btn btn-success btn-sm" onclick="window.location.href='jobcard.html'"><i class="fas fa-tools"></i> <span>Create Job</span></button>
+                <button class="btn btn-outline btn-sm" onclick="window.location.href='analytics.html'"><i class="fas fa-chart-bar"></i> <span>Analytics</span></button>
+            `;
+        } else if (isAdmin) {
+            html = `
+                <button class="btn btn-primary btn-sm" onclick="window.location.href='request.html'"><i class="fas fa-plus"></i> <span>Request</span></button>
+                <button class="btn btn-success btn-sm" onclick="window.location.href='jobcard.html'"><i class="fas fa-tools"></i> <span>Job Card</span></button>
+                <button class="btn btn-outline btn-sm" onclick="openUserModal()"><i class="fas fa-users-cog"></i> <span>Users</span></button>
+                <button class="btn btn-outline btn-sm" onclick="refreshData()"><i class="fas fa-sync-alt"></i></button>
+            `;
+        }
+        topbarActions.innerHTML = html;
+    }
+
+    window.refreshData = function() {
+        showToast('🔄 Refreshing…');
+        fetchData().then(() => {
+            renderDashboard();
+            showToast('✅ Data refreshed.');
+        });
+    };
+
     window.switchView = function(view) {
         currentView = view;
+        document.getElementById('tabRequests').classList.toggle('active', view === 'requests');
+        document.getElementById('tabJobcards').classList.toggle('active', view === 'jobcards');
+        document.getElementById('navRequests').classList.toggle('active', view === 'requests');
+        document.getElementById('navJobcards').classList.toggle('active', view === 'jobcards');
         buildFilterBar();
         updateTableTitle();
         applyFilters();
+        closeSidebar();
     };
 
     function buildFilterBar() {
@@ -1493,7 +1409,7 @@
         if (currentView === 'requests') {
             if (isAdmin || isMaintenance) {
                 filterHtml = `
-                    <select id="statusFilter" onchange="applyFilters()">
+                    <select id="statusFilter" class="filter-select" onchange="applyFilters()">
                         <option value="all">All Statuses</option>
                         <option value="new">New (No Job)</option>
                         <option value="pending">Pending</option>
@@ -1503,21 +1419,21 @@
                         <option value="postponed">Postponed</option>
                         <option value="writtenoff">Written Off</option>
                     </select>
-                    <input type="text" id="searchFilter" placeholder="Search request # or equipment..." oninput="applyFilters()" />
+                    <div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchFilter" placeholder="Search…" oninput="applyFilters()" /></div>
                 `;
             } else {
-                filterHtml = `<input type="text" id="searchFilter" placeholder="Search request # or equipment..." oninput="applyFilters()" />`;
+                filterHtml = `<div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchFilter" placeholder="Search…" oninput="applyFilters()" /></div>`;
             }
         } else {
             filterHtml = `
-                <select id="statusFilter" onchange="applyFilters()">
+                <select id="statusFilter" class="filter-select" onchange="applyFilters()">
                     <option value="all">All Statuses</option>
                     <option value="pending">Pending</option>
                     <option value="completed">Completed</option>
                     <option value="writtenoff">Written Off</option>
                     <option value="postponed">Postponed</option>
                 </select>
-                <input type="text" id="searchFilter" placeholder="Search job # or equipment..." oninput="applyFilters()" />
+                <div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchFilter" placeholder="Search…" oninput="applyFilters()" /></div>
             `;
         }
         filterBar.innerHTML = filterHtml;
@@ -1525,29 +1441,23 @@
 
     function updateTableTitle() {
         const isRequester = userRole === 'requester';
-        let title = '';
         if (currentView === 'requests') {
-            title = isRequester ? '📋 My Requests' : '📋 All Requests';
+            pageTitleText.textContent = isRequester ? 'My Requests' : 'All Requests';
+            pageTitleSub.textContent = 'Manage all service requests';
         } else {
-            title = isRequester ? '📋 Dept. Jobcards' : '📋 All Jobcards';
+            pageTitleText.textContent = isRequester ? 'Department Jobcards' : 'All Jobcards';
+            pageTitleSub.textContent = 'Track and complete job cards';
         }
-        tableTitle.textContent = title;
     }
 
     function renderCharts() {
-        let requestsForCharts = [];
-        if (userRole === 'requester') {
-            requestsForCharts = getMyRequests();
-        } else {
-            requestsForCharts = allRequests;
-        }
+        let requestsForCharts = userRole === 'requester' ? getMyRequests() : allRequests;
 
         const statusCounts = { 'Pending':0, 'Completed':0, 'Written Off':0, 'Postponed':0, 'No Job':0, 'Received':0 };
         requestsForCharts.forEach(r => {
             let s = r.jobStatus || 'No Job';
             if (r.received === true && (s === 'No Job' || s === 'Pending')) s = 'Received';
-            if (statusCounts.hasOwnProperty(s)) statusCounts[s]++;
-            else statusCounts[s] = 1;
+            statusCounts[s] = (statusCounts[s] || 0) + 1;
         });
         const labels = Object.keys(statusCounts);
         const data = Object.values(statusCounts);
@@ -1556,33 +1466,9 @@
         const ctx1 = document.getElementById('statusChart').getContext('2d');
         if (statusChartInstance) statusChartInstance.destroy();
         statusChartInstance = new Chart(ctx1, {
-            type: 'doughnut',
-            data: {
-                labels,
-                datasets: [{
-                    data,
-                    backgroundColor: colors,
-                    borderWidth: 3,
-                    borderColor: '#fff',
-                    hoverOffset: 8
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            boxWidth: 10,
-                            padding: 14,
-                            font: { size: 12, family: 'Plus Jakarta Sans', weight: '600' },
-                            color: '#334155'
-                        }
-                    }
-                },
-                cutout: '65%'
-            }
+            type:'doughnut',
+            data:{ labels, datasets:[{ data, backgroundColor:colors, borderWidth:2, borderColor:'#fff' }] },
+            options:{ responsive:true, maintainAspectRatio:false, cutout:'62%', plugins:{ legend:{ position:'bottom', labels:{ boxWidth:9, padding:10, font:{ size:10, family:'Plus Jakarta Sans', weight:'600' }, color:'#475569' } } } }
         });
 
         const months = {};
@@ -1596,44 +1482,15 @@
         const ctx2 = document.getElementById('trendChart').getContext('2d');
         if (trendChartInstance) trendChartInstance.destroy();
         trendChartInstance = new Chart(ctx2, {
-            type: 'line',
-            data: {
-                labels: sortedMonths,
-                datasets: [{
-                    label: 'Requests',
-                    data: trendData,
-                    borderColor: '#C8102E',
-                    backgroundColor: 'rgba(200,16,46,0.08)',
-                    fill: true,
-                    tension: 0.4,
-                    pointBackgroundColor: '#C8102E',
-                    pointBorderColor: '#fff',
-                    pointBorderWidth: 3,
-                    pointRadius: 5,
-                    pointHoverRadius: 7
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: { stepSize: 1, font: { family: 'Plus Jakarta Sans', weight: '500' }, color: '#64748b' },
-                        grid: { color: '#f1f5f9', drawBorder: false }
-                    },
-                    x: {
-                        ticks: { font: { family: 'Plus Jakarta Sans', weight: '500' }, color: '#64748b' },
-                        grid: { display: false }
-                    }
-                }
-            }
+            type:'line',
+            data:{ labels:sortedMonths, datasets:[{ label:'Requests', data:trendData, borderColor:'#C8102E', backgroundColor:'rgba(200,16,46,0.08)', fill:true, tension:0.4, pointBackgroundColor:'#C8102E', pointBorderColor:'#fff', pointBorderWidth:2, pointRadius:4 }] },
+            options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, ticks:{ stepSize:1, font:{ size:10 }, color:'#94a3b8' }, grid:{ color:'#f1f5f9', drawBorder:false } }, x:{ ticks:{ font:{ size:10 }, color:'#94a3b8' }, grid:{ display:false } } } }
         });
     }
 
     window.applyFilter = function(status) {
-        const select = document.getElementById('statusFilter');
-        if (select) { select.value = status; applyFilters(); }
+        const s = document.getElementById('statusFilter');
+        if (s) { s.value = status; applyFilters(); }
     };
 
     window.applyFilters = function() {
@@ -1642,38 +1499,24 @@
 
         let data = [];
         let isRequests = (currentView === 'requests');
-
         if (isRequests) {
-            if (userRole === 'requester') data = getMyRequests();
-            else data = allRequests;
-        } else {
-            if (userRole === 'requester') data = allJobCards;
-            else data = allJobCards;
-        }
+            data = userRole === 'requester' ? getMyRequests() : allRequests;
+        } else data = allJobCards;
 
         if (statusFilter !== 'all') {
             if (isRequests) {
-                if (statusFilter === 'new') data = data.filter(item => item.jobStatus === 'No Job' && item.received !== true);
-                else if (statusFilter === 'received') data = data.filter(item => item.received === true);
-                else if (statusFilter === 'pending-receiving') data = data.filter(item => (item.received !== true) && (item.jobStatus === 'No Job' || item.jobStatus === 'Pending'));
-                else data = data.filter(item => item.jobStatus && item.jobStatus.toLowerCase() === statusFilter);
+                if (statusFilter === 'new') data = data.filter(i => i.jobStatus === 'No Job' && i.received !== true);
+                else if (statusFilter === 'received') data = data.filter(i => i.received === true);
+                else if (statusFilter === 'pending-receiving') data = data.filter(i => (i.received !== true) && (i.jobStatus === 'No Job' || i.jobStatus === 'Pending'));
+                else data = data.filter(i => i.jobStatus && i.jobStatus.toLowerCase() === statusFilter);
             } else {
-                data = data.filter(item => item.status && item.status.toLowerCase() === statusFilter);
+                data = data.filter(i => i.status && i.status.toLowerCase() === statusFilter);
             }
         }
 
         if (searchFilter) {
-            if (isRequests) {
-                data = data.filter(item =>
-                    item.requestNo?.toLowerCase().includes(searchFilter) ||
-                    item.equipName?.toLowerCase().includes(searchFilter)
-                );
-            } else {
-                data = data.filter(item =>
-                    item.jobNo?.toLowerCase().includes(searchFilter) ||
-                    item.equipName?.toLowerCase().includes(searchFilter)
-                );
-            }
+            if (isRequests) data = data.filter(i => i.requestNo?.toLowerCase().includes(searchFilter) || i.equipName?.toLowerCase().includes(searchFilter));
+            else data = data.filter(i => i.jobNo?.toLowerCase().includes(searchFilter) || i.equipName?.toLowerCase().includes(searchFilter));
         }
 
         renderTable(data);
@@ -1681,7 +1524,7 @@
 
     function renderTable(data) {
         if (!data || data.length === 0) {
-            tableBody.innerHTML = '<p style="color:#94a3b8; padding:40px; text-align:center; font-weight:500;">No records found.</p>';
+            tableBody.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i><p>No records found.</p></div>`;
             return;
         }
         if (currentView === 'requests') renderRequestsTable(data);
@@ -1689,58 +1532,34 @@
     }
 
     function renderRequestsTable(requests) {
-        let html = `
-            <table>
-                <thead>
-                    <tr>
-                        <th>Request No.</th>
-                        <th>Requester</th>
-                        <th>Unit/Ward</th>
-                        <th>Equipment</th>
-                        <th>Status</th>
-                        <th>Receiving</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-        `;
+        let html = `<table><thead><tr><th>Request No.</th><th>Requester</th><th>Unit/Ward</th><th>Equipment</th><th>Status</th><th>Receiving</th><th>Actions</th></tr></thead><tbody>`;
         requests.forEach(r => {
             const status = r.jobStatus || 'No Job';
             const statusClass = getStatusClass(status);
             const isReceived = r.received === true;
-            const receiveBadge = isReceived
-                ? '<span class="status-badge received">✅ Received</span>'
-                : '<span class="status-badge pending">⏳ Pending</span>';
-
+            const receiveBadge = isReceived ? '<span class="status-badge received">✅ Received</span>' : '<span class="status-badge pending">⏳ Pending</span>';
             const canReceive = (userRole === 'admin' || userRole === 'maintenance') && !isReceived && (status === 'No Job' || status === 'Pending');
-
             const actions = `
-                <div class="table-actions">
-                    <button class="btn btn-info btn-sm" onclick="downloadRequestPDF('${r.id}')" title="Download PDF"><i class="fas fa-file-pdf"></i></button>
-                    ${canReceive ? `<button class="btn btn-success btn-sm receive-btn" data-id="${r.id}" title="Mark as Received"><i class="fas fa-check-double"></i></button>` : ''}
-                    ${(userRole === 'maintenance' || userRole === 'admin') && status === 'No Job' ? `<button class="btn btn-warning btn-sm" onclick="createJob('${r.requestNo}')" title="Create Job"><i class="fas fa-tools"></i></button>` : ''}
+                <div class="row-actions">
+                    <button class="btn btn-info btn-icon btn-sm" onclick="downloadRequestPDF('${r.id}')" title="PDF"><i class="fas fa-file-pdf"></i></button>
+                    ${canReceive ? `<button class="btn btn-success btn-icon btn-sm receive-btn" data-id="${r.id}" title="Mark Received"><i class="fas fa-check-double"></i></button>` : ''}
+                    ${(userRole === 'maintenance' || userRole === 'admin') && status === 'No Job' ? `<button class="btn btn-warning btn-icon btn-sm" onclick="createJob('${r.requestNo}')" title="Create Job"><i class="fas fa-tools"></i></button>` : ''}
                 </div>
             `;
-            html += `
-                <tr>
-                    <td><strong>${r.requestNo}</strong></td>
-                    <td>${r.requesterName || 'N/A'}</td>
-                    <td>${r.unit || 'N/A'}</td>
-                    <td>${r.equipName || 'N/A'}</td>
-                    <td><span class="status-badge ${statusClass}">${status}</span></td>
-                    <td>${receiveBadge}</td>
-                    <td>${actions}</td>
-                </tr>
-            `;
+            html += `<tr>
+                <td><strong>${r.requestNo}</strong></td>
+                <td>${r.requesterName || 'N/A'}</td>
+                <td>${r.unit || 'N/A'}</td>
+                <td>${r.equipName || 'N/A'}</td>
+                <td><span class="status-badge ${statusClass}">${status}</span></td>
+                <td>${receiveBadge}</td>
+                <td>${actions}</td>
+            </tr>`;
         });
         html += '</tbody></table>';
         tableBody.innerHTML = html;
-
         document.querySelectorAll('.receive-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const id = this.dataset.id;
-                if (id) markAsReceived(id);
-            });
+            btn.addEventListener('click', function() { const id = this.dataset.id; if (id) markAsReceived(id); });
         });
     }
 
@@ -1748,132 +1567,90 @@
         if (!requestId) return;
         try {
             await updateDoc(doc(db, REQUESTS_COLL, requestId), {
-                received: true,
-                receivedAt: serverTimestamp(),
+                received: true, receivedAt: serverTimestamp(),
                 receivedBy: currentUser?.id || null,
                 receivedByName: currentUser?.name || 'Unknown'
             });
             showToast('✅ Request marked as Received.');
             await fetchData();
             applyFilters();
-        } catch (err) {
-            console.error('Error marking as received:', err);
-            showToast('Error: ' + err.message, true);
-        }
+        } catch (err) { showToast('Error: ' + err.message, true); }
     }
 
     function renderJobcardsTable(jobcards) {
-        let html = `
-            <table>
-                <thead>
-                    <tr>
-                        <th>Job No.</th>
-                        <th>Request No.</th>
-                        <th>Equipment</th>
-                        <th>Unit/Ward</th>
-                        <th>Status</th>
-                        <th>Technician</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-        `;
+        let html = `<table><thead><tr><th>Job No.</th><th>Request No.</th><th>Equipment</th><th>Unit/Ward</th><th>Status</th><th>Technician</th><th>Actions</th></tr></thead><tbody>`;
         jobcards.forEach(j => {
             const status = j.status || 'Pending';
             const statusClass = getStatusClass(status);
             const isEditable = (status === 'Pending' || status === 'Postponed');
-            const canEdit = (isEditable && (userRole === 'admin' || userRole === 'maintenance'));
+            const canEdit = isEditable && (userRole === 'admin' || userRole === 'maintenance');
             const actions = `
-                <div class="table-actions">
-                    <button class="btn btn-info btn-sm" onclick="downloadJobcardPDF('${j.id}')" title="Download PDF"><i class="fas fa-file-pdf"></i></button>
-                    ${canEdit ? `<button class="btn btn-primary btn-sm" onclick="editJobCard('${j.id}')" title="Edit / Complete"><i class="fas fa-edit"></i></button>` : ''}
-                    ${(!isEditable && (userRole === 'admin' || userRole === 'maintenance')) ? `<span style="font-size:10.5px; color:#64748b; padding:5px 10px; background:#f1f5f9; border-radius:6px; font-weight:600;"><i class="fas fa-lock"></i></span>` : ''}
+                <div class="row-actions">
+                    <button class="btn btn-info btn-icon btn-sm" onclick="downloadJobcardPDF('${j.id}')" title="PDF"><i class="fas fa-file-pdf"></i></button>
+                    ${canEdit ? `<button class="btn btn-primary btn-icon btn-sm" onclick="editJobCard('${j.id}')" title="Edit"><i class="fas fa-edit"></i></button>` : ''}
+                    ${(!isEditable && (userRole === 'admin' || userRole === 'maintenance')) ? `<span style="font-size:10px; color:#64748b; padding:5px 8px; background:#f1f5f9; border-radius:6px;"><i class="fas fa-lock"></i></span>` : ''}
                 </div>
             `;
-            html += `
-                <tr>
-                    <td><strong>${j.jobNo || 'N/A'}</strong></td>
-                    <td>${j.requestNo || 'N/A'}</td>
-                    <td>${j.equipName || 'N/A'}</td>
-                    <td>${j.unit || 'N/A'}</td>
-                    <td><span class="status-badge ${statusClass}">${status}</span></td>
-                    <td>${j.techName || 'N/A'}</td>
-                    <td>${actions}</td>
-                </tr>
-            `;
+            html += `<tr>
+                <td><strong>${j.jobNo || 'N/A'}</strong></td>
+                <td>${j.requestNo || 'N/A'}</td>
+                <td>${j.equipName || 'N/A'}</td>
+                <td>${j.unit || 'N/A'}</td>
+                <td><span class="status-badge ${statusClass}">${status}</span></td>
+                <td>${j.techName || 'N/A'}</td>
+                <td>${actions}</td>
+            </tr>`;
         });
         html += '</tbody></table>';
         tableBody.innerHTML = html;
     }
 
-    // ================================================================
-    // PDF GENERATION
-    // ================================================================
+    // ============ PDF FUNCTIONS ============
     function signatureToDataURL(signatureData, width = 250, height = 70) {
         if (!signatureData || !Array.isArray(signatureData) || signatureData.length === 0) return null;
         const canvas = document.createElement('canvas');
         canvas.width = width; canvas.height = height;
         const ctx = canvas.getContext('2d');
-        ctx.fillStyle = 'white';
-        ctx.fillRect(0, 0, width, height);
-        ctx.strokeStyle = 'black';
-        ctx.lineWidth = 1.8;
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-
+        ctx.fillStyle = 'white'; ctx.fillRect(0, 0, width, height);
+        ctx.strokeStyle = 'black'; ctx.lineWidth = 1.8; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
         signatureData.forEach(stroke => {
             let points = stroke;
             if (!Array.isArray(points)) {
-                if (points.points) points = points.points;
-                else if (points.data) points = points.data;
-                else return;
+                if (points.points) points = points.points; else if (points.data) points = points.data; else return;
             }
             if (!Array.isArray(points) || points.length === 0) return;
             ctx.beginPath();
             let first = true;
-            points.forEach(point => {
+            points.forEach(p => {
                 let x, y;
-                if (typeof point === 'object' && point !== null) {
-                    x = point.x; y = point.y;
-                    if (x === undefined && point[0] !== undefined) { x = point[0]; y = point[1]; }
-                } else if (Array.isArray(point) && point.length >= 2) {
-                    x = point[0]; y = point[1];
-                } else return;
+                if (typeof p === 'object' && p !== null) { x = p.x; y = p.y; if (x === undefined && p[0] !== undefined) { x = p[0]; y = p[1]; } }
+                else if (Array.isArray(p) && p.length >= 2) { x = p[0]; y = p[1]; } else return;
                 if (x === undefined || y === undefined) return;
-                if (first) { ctx.moveTo(x, y); first = false; }
-                else ctx.lineTo(x, y);
+                if (first) { ctx.moveTo(x, y); first = false; } else ctx.lineTo(x, y);
             });
             ctx.stroke();
         });
-
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const data = imageData.data;
-        let hasNonWhite = false;
-        for (let i = 0; i < data.length; i += 4) {
-            if (data[i] < 255 || data[i+1] < 255 || data[i+2] < 255) { hasNonWhite = true; break; }
-        }
-        if (!hasNonWhite) return null;
+        const d = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+        let hasInk = false;
+        for (let i = 0; i < d.length; i += 4) { if (d[i] < 255 || d[i+1] < 255 || d[i+2] < 255) { hasInk = true; break; } }
+        if (!hasInk) return null;
         return canvas.toDataURL('image/png');
     }
 
     function formatDateForPDF(dateString) {
         if (!dateString) return 'N/A';
-        try {
-            const d = new Date(dateString);
-            if (isNaN(d)) return dateString;
-            return d.toLocaleString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true });
-        } catch { return dateString; }
+        try { const d = new Date(dateString); if (isNaN(d)) return dateString; return d.toLocaleString('en-US', { month:'numeric', day:'numeric', year:'numeric', hour:'numeric', minute:'2-digit', hour12:true }); } catch { return dateString; }
     }
 
     function getHeaderHTML() {
         return `
-            <div style="display:flex; align-items:center; gap:12px; border-bottom:3px solid #C8102E; padding-bottom:8px; margin-bottom:12px;">
-                <div style="background:#C8102E; color:white; width:48px; height:48px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:28px; font-weight:700; flex-shrink:0;">M</div>
+            <div style="display:flex;align-items:center;gap:12px;border-bottom:3px solid #C8102E;padding-bottom:8px;margin-bottom:12px;">
+                <div style="background:#C8102E;color:white;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;">M</div>
                 <div style="flex:1;">
-                    <h1 style="font-size:18px; color:#C8102E; letter-spacing:0.5px; font-weight:700; margin:0; line-height:1.2;">MOI VOI COUNTY REFERRAL HOSPITAL</h1>
-                    <div style="font-size:10px; color:#333; font-weight:500;">P.O. BOX 18-80300 VOI | Email: biomedsmoivoi@gmail.com</div>
-                    <div style="font-size:11px; font-weight:700; color:#C8102E; margin-top:1px;">TAITA TAVETA COUNTY</div>
-                    <div style="font-size:9px; font-weight:600; color:#C8102E;">DEPARTMENT OF HEALTH SERVICES</div>
+                    <h1 style="font-size:18px;color:#C8102E;font-weight:700;margin:0;">MOI VOI COUNTY REFERRAL HOSPITAL</h1>
+                    <div style="font-size:10px;color:#333;">P.O. BOX 18-80300 VOI | biomedsmoivoi@gmail.com</div>
+                    <div style="font-size:11px;font-weight:700;color:#C8102E;">TAITA TAVETA COUNTY</div>
+                    <div style="font-size:9px;font-weight:600;color:#C8102E;">DEPARTMENT OF HEALTH SERVICES</div>
                 </div>
             </div>
         `;
@@ -1883,203 +1660,123 @@
         if (!requestId) { showToast('Invalid request ID.', true); return; }
         showToast('Generating PDF...');
         try {
-            const docSnap = await getDoc(doc(db, REQUESTS_COLL, requestId));
-            if (!docSnap.exists()) { showToast('Request not found.', true); return; }
-            const req = docSnap.data();
-            const tempDiv = document.createElement('div');
-            tempDiv.style.position = 'fixed';
-            tempDiv.style.left = '-9999px';
-            tempDiv.style.top = '0';
-            tempDiv.style.width = '800px';
-            tempDiv.style.padding = '15px 20px';
-            tempDiv.style.background = 'white';
-            tempDiv.style.fontFamily = 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif';
-            tempDiv.style.color = '#1e2a3a';
-            tempDiv.style.fontSize = '12px';
-            tempDiv.innerHTML = `
+            const snap = await getDoc(doc(db, REQUESTS_COLL, requestId));
+            if (!snap.exists()) { showToast('Request not found.', true); return; }
+            const req = snap.data();
+            const temp = document.createElement('div');
+            temp.style.cssText = 'position:fixed;left:-9999px;top:0;width:800px;padding:15px 20px;background:white;font-family:Segoe UI,sans-serif;color:#1e2a3a;font-size:12px;';
+            temp.innerHTML = `
                 ${getHeaderHTML()}
-                <div style="display:flex; justify-content:space-between; align-items:center; background:#f8f9fc; padding:4px 12px; border-radius:6px; margin-bottom:10px;">
-                    <h2 style="font-size:16px; font-weight:600; margin:0;">📋 SERVICE REQUEST FORM</h2>
-                    <span style="background:#28a745; color:white; padding:2px 10px; border-radius:20px; font-size:11px; font-weight:600;">● OPEN</span>
+                <div style="display:flex;justify-content:space-between;background:#f8f9fc;padding:4px 12px;border-radius:6px;margin-bottom:10px;">
+                    <h2 style="font-size:16px;font-weight:600;margin:0;">📋 SERVICE REQUEST FORM</h2>
+                    <span style="background:#28a745;color:white;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;">● OPEN</span>
                 </div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px 12px;">
-                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Request No.</label><div style="font-weight:500; font-size:12px;">${req.requestNo || 'N/A'}</div></div>
-                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Date</label><div style="font-size:12px;">${formatDateForPDF(req.dateTime)}</div></div>
-                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Requester Name</label><div style="font-size:12px;">${req.requesterName || 'N/A'}</div></div>
-                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Department / Unit / Ward</label><div style="font-size:12px;">${req.unit || 'N/A'}</div></div>
-                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Equipment / Item Type</label><div style="font-size:12px;">${req.type || 'N/A'}</div></div>
-                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Equipment Name</label><div style="font-size:12px;">${req.equipName || 'N/A'}</div></div>
-                    <div style="grid-column:1 / -1;"><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase; letter-spacing:0.3px;">Description of Fault / Complaint</label><div style="font-size:12px;">${req.complaint || 'N/A'}</div></div>
-                </div>
-                <div style="margin-top:10px; font-size:9px; color:#6c757d; text-align:center; border-top:1px solid #e9ecef; padding-top:8px;">
-                    🔥 Firestore‑powered · MCRH Request Slip
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;">
+                    <div><label style="font-size:9px;font-weight:600;color:#495057;text-transform:uppercase;">Request No.</label><div style="font-size:12px;">${req.requestNo || 'N/A'}</div></div>
+                    <div><label style="font-size:9px;font-weight:600;color:#495057;text-transform:uppercase;">Date</label><div style="font-size:12px;">${formatDateForPDF(req.dateTime)}</div></div>
+                    <div><label style="font-size:9px;font-weight:600;color:#495057;text-transform:uppercase;">Requester</label><div style="font-size:12px;">${req.requesterName || 'N/A'}</div></div>
+                    <div><label style="font-size:9px;font-weight:600;color:#495057;text-transform:uppercase;">Unit/Ward</label><div style="font-size:12px;">${req.unit || 'N/A'}</div></div>
+                    <div><label style="font-size:9px;font-weight:600;color:#495057;text-transform:uppercase;">Equipment Type</label><div style="font-size:12px;">${req.type || 'N/A'}</div></div>
+                    <div><label style="font-size:9px;font-weight:600;color:#495057;text-transform:uppercase;">Equipment Name</label><div style="font-size:12px;">${req.equipName || 'N/A'}</div></div>
+                    <div style="grid-column:1/-1;"><label style="font-size:9px;font-weight:600;color:#495057;text-transform:uppercase;">Complaint</label><div style="font-size:12px;">${req.complaint || 'N/A'}</div></div>
                 </div>
             `;
-            document.body.appendChild(tempDiv);
-            const canvas = await html2canvas(tempDiv, { scale: 2, useCORS: true });
-            document.body.removeChild(tempDiv);
-            const imgData = canvas.toDataURL('image/png');
+            document.body.appendChild(temp);
+            const canvas = await html2canvas(temp, { scale:2, useCORS:true });
+            document.body.removeChild(temp);
+            const img = canvas.toDataURL('image/png');
             const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF('p', 'mm', 'a4');
-            const imgWidth = 210;
-            const imgHeight = (canvas.height * imgWidth) / canvas.width;
-            pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-            pdf.save(`RequestSlip_${req.requestNo || 'unknown'}.pdf`);
+            const pdf = new jsPDF('p','mm','a4');
+            const iw = 210, ih = (canvas.height * iw) / canvas.width;
+            pdf.addImage(img, 'PNG', 0, 0, iw, ih);
+            pdf.save(`RequestSlip_${req.requestNo || 'export'}.pdf`);
             showToast('✅ PDF downloaded.');
-        } catch (err) {
-            console.error('PDF generation error:', err);
-            showToast('Error generating PDF: ' + err.message, true);
-        }
+        } catch (err) { showToast('Error: ' + err.message, true); }
     };
 
     window.downloadJobcardPDF = async function(jobcardId) {
         if (!jobcardId) { showToast('Invalid jobcard ID.', true); return; }
         showToast('Generating PDF...');
         try {
-            const docSnap = await getDoc(doc(db, JOBCARDS_COLL, jobcardId));
-            if (!docSnap.exists()) { showToast('Job card not found.', true); return; }
-            const job = docSnap.data();
-            const techSigImg = signatureToDataURL(job.techSignature);
-            const certSigImg = signatureToDataURL(job.certSignature);
-
+            const snap = await getDoc(doc(db, JOBCARDS_COLL, jobcardId));
+            if (!snap.exists()) { showToast('Job card not found.', true); return; }
+            const job = snap.data();
+            const techSig = signatureToDataURL(job.techSignature);
+            const certSig = signatureToDataURL(job.certSignature);
             let statusColor = '#ffc107';
             if (job.status === 'Completed') statusColor = '#28a745';
             else if (job.status === 'Written Off') statusColor = '#dc3545';
 
-            let statusFields = '';
-            if (job.status === 'Postponed' || job.status === 'Pending') {
-                statusFields = `
-                    <div style="grid-column:1 / -1; display:grid; grid-template-columns:1fr 1fr; gap:6px 12px;">
-                        <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase;">Reason for Postponement</label><div style="font-size:12px;">${job.postponeReason || 'N/A'} ${job.postponeNote ? '- ' + job.postponeNote : ''}</div></div>
-                        <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase;">Expected Completion</label><div style="font-size:12px;">${formatDateForPDF(job.expectedDate)}</div></div>
-                    </div>
-                `;
-            } else if (job.status === 'Completed') {
-                statusFields = `
-                    <div style="grid-column:1 / -1; display:grid; grid-template-columns:1fr 1fr; gap:6px 12px;">
-                        <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase;">Defects Found</label><div style="font-size:12px;">${job.defects || 'N/A'}</div></div>
-                        <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase;">Action Taken</label><div style="font-size:12px;">${job.actionTaken || 'N/A'}</div></div>
-                    </div>
-                `;
-            } else if (job.status === 'Written Off') {
-                statusFields = `<div style="grid-column:1 / -1;"><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase;">Write‑Off Reason</label><div style="font-size:12px;">${job.writeOffReason || 'N/A'} ${job.writeOffNote ? '- ' + job.writeOffNote : ''}</div></div>`;
-            }
-
-            const tempDiv = document.createElement('div');
-            tempDiv.style.position = 'fixed';
-            tempDiv.style.left = '-9999px';
-            tempDiv.style.top = '0';
-            tempDiv.style.width = '800px';
-            tempDiv.style.padding = '12px 18px';
-            tempDiv.style.background = 'white';
-            tempDiv.style.fontFamily = 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif';
-            tempDiv.style.color = '#1e2a3a';
-            tempDiv.style.fontSize = '12px';
-            tempDiv.innerHTML = `
+            const temp = document.createElement('div');
+            temp.style.cssText = 'position:fixed;left:-9999px;top:0;width:800px;padding:12px 18px;background:white;font-family:Segoe UI,sans-serif;color:#1e2a3a;font-size:12px;';
+            temp.innerHTML = `
                 ${getHeaderHTML()}
-                <div style="display:flex; justify-content:space-between; align-items:center; background:#f8f9fc; padding:4px 12px; border-radius:6px; margin-bottom:8px;">
-                    <h2 style="font-size:16px; font-weight:600; margin:0;">⚙️ EQUIPMENT MAINTENANCE JOB CARD</h2>
-                    <span style="background:${statusColor}; color:${job.status === 'Pending' ? '#1e2a3a' : 'white'}; padding:2px 10px; border-radius:20px; font-size:11px; font-weight:600;">● ${job.status || 'PENDING'}</span>
+                <div style="display:flex;justify-content:space-between;background:#f8f9fc;padding:4px 12px;border-radius:6px;margin-bottom:8px;">
+                    <h2 style="font-size:16px;font-weight:600;margin:0;">⚙️ JOB CARD</h2>
+                    <span style="background:${statusColor};color:${job.status === 'Pending' ? '#1e2a3a' : 'white'};padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;">● ${job.status || 'PENDING'}</span>
                 </div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px 12px;">
-                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase;">Job Card No.</label><div style="font-size:12px;">${job.jobNo || 'N/A'}</div></div>
-                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase;">Request No.</label><div style="font-size:12px;">${job.requestNo || 'N/A'}</div></div>
-                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase;">Reporting Date/Time</label><div style="font-size:12px;">${formatDateForPDF(job.reportingDateTime)}</div></div>
-                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase;">Unit / Ward</label><div style="font-size:12px;">${job.unit || 'N/A'}</div></div>
-                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase;">Requester Name</label><div style="font-size:12px;">${job.requester || 'N/A'}</div></div>
-                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase;">Equipment Name</label><div style="font-size:12px;">${job.equipName || 'N/A'}</div></div>
-                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase;">Inventory / Asset No.</label><div style="font-size:12px;">${job.inventory || 'N/A'}</div></div>
-                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase;">Serial No.</label><div style="font-size:12px;">${job.serial || 'N/A'}</div></div>
-                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase;">Model / Make</label><div style="font-size:12px;">${job.modelMake || 'N/A'}</div></div>
-                    <div style="grid-column:1 / -1;"><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase;">Complaint</label><div style="font-size:12px;">${job.complaint || 'N/A'}</div></div>
-                    <div style="grid-column:1 / -1;"><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase;">Diagnosis</label><div style="font-size:12px;">${job.diagnosis || 'N/A'}</div></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;">
+                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Job Card No.</label><div style="font-size:12px;">${job.jobNo || 'N/A'}</div></div>
+                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Request No.</label><div style="font-size:12px;">${job.requestNo || 'N/A'}</div></div>
+                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Reporting Date/Time</label><div style="font-size:12px;">${formatDateForPDF(job.reportingDateTime)}</div></div>
+                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Unit/Ward</label><div style="font-size:12px;">${job.unit || 'N/A'}</div></div>
+                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Requester</label><div style="font-size:12px;">${job.requester || 'N/A'}</div></div>
+                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Equipment</label><div style="font-size:12px;">${job.equipName || 'N/A'}</div></div>
+                    <div style="grid-column:1/-1;"><label style="font-size:9px;font-weight:600;color:#495057;">Complaint</label><div style="font-size:12px;">${job.complaint || 'N/A'}</div></div>
+                    <div style="grid-column:1/-1;"><label style="font-size:9px;font-weight:600;color:#495057;">Diagnosis</label><div style="font-size:12px;">${job.diagnosis || 'N/A'}</div></div>
                 </div>
-
-                <div style="border-top:1px solid #e9ecef; margin:8px 0 6px 0;"></div>
-                <h3 style="font-size:13px; font-weight:600; color:#1e2a3a; border-left:3px solid #C8102E; padding-left:8px; margin:4px 0;">📌 Handover</h3>
-                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:4px 12px;">
-                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase;">Received From</label><div style="font-size:12px;">${job.receivedFrom || 'N/A'}</div></div>
-                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase;">Date/Time Received</label><div style="font-size:12px;">${formatDateForPDF(job.receivedDateTime)}</div></div>
-                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase;">Received By</label><div style="font-size:12px;">${job.receivedBy || 'N/A'}</div></div>
-                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase;">Handed To</label><div style="font-size:12px;">${job.handedTo || 'N/A'}</div></div>
-                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase;">Date/Time Handed</label><div style="font-size:12px;">${formatDateForPDF(job.handedDateTime)}</div></div>
-                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase;">Handed By</label><div style="font-size:12px;">${job.handedBy || 'N/A'}</div></div>
+                <div style="border-top:1px solid #e9ecef;margin:8px 0 6px;"></div>
+                <h3 style="font-size:13px;font-weight:600;border-left:3px solid #C8102E;padding-left:8px;margin:4px 0;">Handover</h3>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px 12px;">
+                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Received From</label><div style="font-size:12px;">${job.receivedFrom || 'N/A'}</div></div>
+                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Received At</label><div style="font-size:12px;">${formatDateForPDF(job.receivedDateTime)}</div></div>
+                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Received By</label><div style="font-size:12px;">${job.receivedBy || 'N/A'}</div></div>
+                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Handed To</label><div style="font-size:12px;">${job.handedTo || 'N/A'}</div></div>
+                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Handed At</label><div style="font-size:12px;">${formatDateForPDF(job.handedDateTime)}</div></div>
+                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Handed By</label><div style="font-size:12px;">${job.handedBy || 'N/A'}</div></div>
                 </div>
-
-                <div style="border-top:1px solid #e9ecef; margin:8px 0 6px 0;"></div>
-                <h3 style="font-size:13px; font-weight:600; color:#1e2a3a; border-left:3px solid #C8102E; padding-left:8px; margin:4px 0;">⏱️ Service & Timeline</h3>
-                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:4px 12px;">
-                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase;">Service Type</label><div style="font-size:12px;">${job.serviceType || 'N/A'}</div></div>
-                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase;">Job Started</label><div style="font-size:12px;">${formatDateForPDF(job.startDateTime)}</div></div>
-                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase;">Job Completed</label><div style="font-size:12px;">${formatDateForPDF(job.endDateTime)}</div></div>
-                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase;">Total Time</label><div style="font-size:12px;">${job.totalTime || 'N/A'}</div></div>
-                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase;">Response Time</label><div style="font-size:12px;">${job.responseTime || 'N/A'}</div></div>
-                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase;">Admin Time</label><div style="font-size:12px;">${job.adminTime || 'N/A'}</div></div>
+                <div style="border-top:1px solid #e9ecef;margin:8px 0 6px;"></div>
+                <h3 style="font-size:13px;font-weight:600;border-left:3px solid #C8102E;padding-left:8px;margin:4px 0;">Service</h3>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px 12px;">
+                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Service Type</label><div style="font-size:12px;">${job.serviceType || 'N/A'}</div></div>
+                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Started</label><div style="font-size:12px;">${formatDateForPDF(job.startDateTime)}</div></div>
+                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Completed</label><div style="font-size:12px;">${formatDateForPDF(job.endDateTime)}</div></div>
+                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Total</label><div style="font-size:12px;">${job.totalTime || 'N/A'}</div></div>
+                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Response</label><div style="font-size:12px;">${job.responseTime || 'N/A'}</div></div>
+                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Admin</label><div style="font-size:12px;">${job.adminTime || 'N/A'}</div></div>
                 </div>
-
-                ${statusFields ? `<div style="border-top:1px solid #e9ecef; margin:8px 0 6px 0;"></div><h3 style="font-size:13px; font-weight:600; color:#1e2a3a; border-left:3px solid #C8102E; padding-left:8px; margin:4px 0;">📌 Status Details</h3><div style="margin-top:4px;">${statusFields}</div>` : ''}
-
-                <div style="border-top:1px solid #e9ecef; margin:8px 0 6px 0;"></div>
-                <h3 style="font-size:13px; font-weight:600; color:#1e2a3a; border-left:3px solid #C8102E; padding-left:8px; margin:4px 0;">✅ Final Verification</h3>
-                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:4px 12px;">
-                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase;">Function O.K.</label><div style="font-size:12px;">${job.functionOk ? 'Yes' : 'No'}</div></div>
-                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase;">Safety O.K.</label><div style="font-size:12px;">${job.safetyOk ? 'Yes' : 'No'}</div></div>
-                    <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase;">Comments</label><div style="font-size:12px;">${job.comments || 'N/A'}</div></div>
-                </div>
-
-                <div style="border-top:1px solid #e9ecef; margin:8px 0 6px 0;"></div>
-                <h3 style="font-size:13px; font-weight:600; color:#1e2a3a; border-left:3px solid #C8102E; padding-left:8px; margin:4px 0;">✍️ Signatures</h3>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:4px;">
-                    <div style="border:1px solid #e9ecef; border-radius:6px; padding:8px 12px; background:#f8f9fa;">
-                        <h4 style="font-size:12px; color:#C8102E; margin:0 0 4px 0;">👨‍🔧 Technician</h4>
-                        <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase;">Name</label><div style="font-size:12px;">${job.techName || 'N/A'}</div></div>
-                        <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase;">Signature</label><div style="font-size:12px;">${techSigImg ? `<img src="${techSigImg}" style="max-width:180px; max-height:60px; border:1px solid #ddd; background:white;" />` : 'Not signed'}</div></div>
-                        <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase;">Date</label><div style="font-size:12px;">${job.techDate || 'N/A'}</div></div>
+                <div style="border-top:1px solid #e9ecef;margin:8px 0 6px;"></div>
+                <h3 style="font-size:13px;font-weight:600;border-left:3px solid #C8102E;padding-left:8px;margin:4px 0;">Signatures</h3>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px;">
+                    <div style="border:1px solid #e9ecef;border-radius:6px;padding:8px 12px;background:#f8f9fa;">
+                        <h4 style="font-size:12px;color:#C8102E;margin:0 0 4px;">👨‍🔧 Technician</h4>
+                        <div><label style="font-size:9px;font-weight:600;color:#495057;">Name</label><div style="font-size:12px;">${job.techName || 'N/A'}</div></div>
+                        <div><label style="font-size:9px;font-weight:600;color:#495057;">Signature</label><div>${techSig ? `<img src="${techSig}" style="max-width:180px;max-height:60px;border:1px solid #ddd;" />` : 'Not signed'}</div></div>
+                        <div><label style="font-size:9px;font-weight:600;color:#495057;">Date</label><div style="font-size:12px;">${job.techDate || 'N/A'}</div></div>
                     </div>
-                    <div style="border:1px solid #e9ecef; border-radius:6px; padding:8px 12px; background:#f8f9fa;">
-                        <h4 style="font-size:12px; color:#C8102E; margin:0 0 4px 0;">✅ Supervisor</h4>
-                        <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase;">Name</label><div style="font-size:12px;">${job.certName || 'N/A'}</div></div>
-                        <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase;">Signature</label><div style="font-size:12px;">${certSigImg ? `<img src="${certSigImg}" style="max-width:180px; max-height:60px; border:1px solid #ddd; background:white;" />` : 'Not signed'}</div></div>
-                        <div><label style="font-size:9px; font-weight:600; color:#495057; text-transform:uppercase;">Date</label><div style="font-size:12px;">${job.certDate || 'N/A'}</div></div>
+                    <div style="border:1px solid #e9ecef;border-radius:6px;padding:8px 12px;background:#f8f9fa;">
+                        <h4 style="font-size:12px;color:#C8102E;margin:0 0 4px;">✅ Supervisor</h4>
+                        <div><label style="font-size:9px;font-weight:600;color:#495057;">Name</label><div style="font-size:12px;">${job.certName || 'N/A'}</div></div>
+                        <div><label style="font-size:9px;font-weight:600;color:#495057;">Signature</label><div>${certSig ? `<img src="${certSig}" style="max-width:180px;max-height:60px;border:1px solid #ddd;" />` : 'Not signed'}</div></div>
+                        <div><label style="font-size:9px;font-weight:600;color:#495057;">Date</label><div style="font-size:12px;">${job.certDate || 'N/A'}</div></div>
                     </div>
-                </div>
-
-                <div style="margin-top:8px; font-size:9px; color:#6c757d; text-align:center; border-top:1px solid #e9ecef; padding-top:6px;">
-                    🔥 Firestore‑powered · ✍️ Drawable Signatures · MCRH Job Card
                 </div>
             `;
-            document.body.appendChild(tempDiv);
-            const canvas = await html2canvas(tempDiv, { scale: 2, useCORS: true });
-            document.body.removeChild(tempDiv);
-            const imgData = canvas.toDataURL('image/png');
+            document.body.appendChild(temp);
+            const canvas = await html2canvas(temp, { scale:2, useCORS:true });
+            document.body.removeChild(temp);
+            const img = canvas.toDataURL('image/png');
             const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF('p', 'mm', 'a4');
-            const imgWidth = 210;
-            const imgHeight = (canvas.height * imgWidth) / canvas.width;
-            let heightLeft = imgHeight;
-            let position = 0;
-            const pageHeight = 297;
-            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-            heightLeft -= pageHeight;
-            while (heightLeft > 0) {
-                position = heightLeft - imgHeight;
-                pdf.addPage();
-                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                heightLeft -= pageHeight;
-            }
-            pdf.save(`JobCard_${job.jobNo || 'unknown'}.pdf`);
+            const pdf = new jsPDF('p','mm','a4');
+            const iw = 210, ih = (canvas.height * iw) / canvas.width;
+            pdf.addImage(img, 'PNG', 0, 0, iw, ih);
+            pdf.save(`JobCard_${job.jobNo || 'export'}.pdf`);
             showToast('✅ PDF downloaded.');
-        } catch (err) {
-            console.error('PDF generation error:', err);
-            showToast('Error generating PDF: ' + err.message, true);
-        }
+        } catch (err) { showToast('Error: ' + err.message, true); }
     };
 
-    // ================================================================
-    // USER MANAGEMENT
-    // ================================================================
+    // ============ USER MANAGEMENT ============
     window.openUserModal = function() {
-        console.log('🔓 Opening user modal');
         document.getElementById('editUserId').value = '';
         document.getElementById('userModalTitle').innerHTML = '<i class="fas fa-users-cog"></i> Add New User';
         document.getElementById('userFormTitle').textContent = '➕ Add New User';
@@ -2094,33 +1791,31 @@
         document.getElementById('newUserWhatsApp').value = '';
         document.getElementById('newUserRole').value = 'requester';
         toggleRoleFields();
-        document.getElementById('userModalError').textContent = '';
         document.getElementById('userModalError').style.display = 'none';
-        document.getElementById('userModalSuccess').textContent = '';
         document.getElementById('userModalSuccess').style.display = 'none';
         document.getElementById('userModal').classList.add('show');
         renderUserList();
+        closeSidebar();
     };
 
     window.editUser = async function(userId) {
         try {
-            const userDoc = await getDoc(doc(db, USERS_COLL, userId));
-            if (!userDoc.exists()) { showToast('User not found.', true); return; }
-            const userData = userDoc.data();
+            const snap = await getDoc(doc(db, USERS_COLL, userId));
+            if (!snap.exists()) { showToast('User not found.', true); return; }
+            const u = snap.data();
             document.getElementById('editUserId').value = userId;
             document.getElementById('userModalTitle').innerHTML = '<i class="fas fa-user-edit"></i> Edit User';
             document.getElementById('userFormTitle').textContent = '✏️ Edit User Details';
             document.getElementById('saveUserBtn').innerHTML = '<i class="fas fa-save"></i> Update User';
-            document.getElementById('newUserName').value = userData.name || '';
-            document.getElementById('newUserEmail').value = userData.email || '';
-            document.getElementById('newUserRole').value = userData.role || 'requester';
-            document.getElementById('newUserWhatsApp').value = userData.whatsapp || '';
-            if (userData.role === 'requester') {
-                document.getElementById('newUserDept').value = userData.department || '';
-            } else if (userData.role === 'maintenance') {
-                const depts = userData.departments || [];
-                const select = document.getElementById('newUserDepts');
-                Array.from(select.options).forEach(opt => { opt.selected = depts.includes(opt.value); });
+            document.getElementById('newUserName').value = u.name || '';
+            document.getElementById('newUserEmail').value = u.email || '';
+            document.getElementById('newUserRole').value = u.role || 'requester';
+            document.getElementById('newUserWhatsApp').value = u.whatsapp || '';
+            if (u.role === 'requester') document.getElementById('newUserDept').value = u.department || '';
+            else if (u.role === 'maintenance') {
+                const depts = u.departments || [];
+                const sel = document.getElementById('newUserDepts');
+                Array.from(sel.options).forEach(opt => { opt.selected = depts.includes(opt.value); });
             }
             document.getElementById('passwordField').style.display = 'none';
             document.getElementById('newUserPassword').required = false;
@@ -2129,12 +1824,10 @@
             document.getElementById('userModalSuccess').style.display = 'none';
             document.getElementById('userModal').classList.add('show');
             renderUserList();
-        } catch (err) { showToast('Error loading user: ' + err.message, true); }
+        } catch (err) { showToast('Error: ' + err.message, true); }
     };
 
-    window.closeUserModal = function() {
-        document.getElementById('userModal').classList.remove('show');
-    };
+    window.closeUserModal = function() { document.getElementById('userModal').classList.remove('show'); };
 
     window.saveUser = async function() {
         const editId = document.getElementById('editUserId').value;
@@ -2146,40 +1839,18 @@
         const whatsappNumber = document.getElementById('newUserWhatsApp').value.trim();
         const deptSingle = document.getElementById('newUserDept').value;
         const deptSelect = document.getElementById('newUserDepts');
-        const selectedDepts = Array.from(deptSelect.selectedOptions).map(opt => opt.value);
+        const selectedDepts = Array.from(deptSelect.selectedOptions).map(o => o.value);
 
-        const errorDiv = document.getElementById('userModalError');
-        const successDiv = document.getElementById('userModalSuccess');
-        errorDiv.style.display = 'none';
-        successDiv.style.display = 'none';
+        const errD = document.getElementById('userModalError');
+        const sucD = document.getElementById('userModalSuccess');
+        errD.style.display = 'none'; sucD.style.display = 'none';
 
-        if (!email || !name || !role) {
-            errorDiv.textContent = 'Please fill in all required fields.';
-            errorDiv.style.display = 'block';
-            return;
+        if (!email || !name || !role) { errD.textContent = 'Please fill all required fields.'; errD.style.display = 'block'; return; }
+        if (!editId && password.length < 6) { errD.textContent = 'Password must be at least 6 characters.'; errD.style.display = 'block'; return; }
+        if (role === 'maintenance' && (!whatsappNumber || selectedDepts.length === 0)) {
+            errD.textContent = 'WhatsApp and at least one department required for engineers.'; errD.style.display = 'block'; return;
         }
-        if (!editId && password.length < 6) {
-            errorDiv.textContent = 'Password must be at least 6 characters.';
-            errorDiv.style.display = 'block';
-            return;
-        }
-        if (role === 'maintenance') {
-            if (!whatsappNumber) {
-                errorDiv.textContent = 'WhatsApp number is required for maintenance users.';
-                errorDiv.style.display = 'block';
-                return;
-            }
-            if (selectedDepts.length === 0) {
-                errorDiv.textContent = 'Please select at least one department for the engineer.';
-                errorDiv.style.display = 'block';
-                return;
-            }
-        }
-        if (role === 'requester' && !deptSingle) {
-            errorDiv.textContent = 'Please select a department for the requester.';
-            errorDiv.style.display = 'block';
-            return;
-        }
+        if (role === 'requester' && !deptSingle) { errD.textContent = 'Please select a department.'; errD.style.display = 'block'; return; }
 
         try {
             if (!editId) {
@@ -2189,16 +1860,14 @@
                     department: role === 'requester' ? deptSingle : null,
                     departments: role === 'maintenance' ? selectedDepts : null
                 };
-                const response = await fetch('/create-user', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                const res = await fetch('/create-user', {
+                    method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify(payload)
                 });
-                const result = await response.json();
-                if (!response.ok) throw new Error(result.error || 'Unknown error');
-                successDiv.textContent = `✅ ${result.message}`;
-                successDiv.style.display = 'block';
-                showToast(successDiv.textContent);
+                const result = await res.json();
+                if (!res.ok) throw new Error(result.error || 'Unknown error');
+                sucD.textContent = `✅ ${result.message}`;
+                sucD.style.display = 'block';
+                showToast(sucD.textContent);
                 await fetchData();
                 renderUserList();
                 renderDashboard();
@@ -2213,49 +1882,40 @@
                 else if (role === 'maintenance') { userData.departments = selectedDepts; userData.department = null; }
                 else { userData.department = null; userData.departments = null; }
                 await updateDoc(doc(db, USERS_COLL, editId), userData);
-                successDiv.textContent = `✅ User ${name} updated successfully!`;
-                successDiv.style.display = 'block';
-                showToast(successDiv.textContent);
+                sucD.textContent = `✅ User ${name} updated!`;
+                sucD.style.display = 'block';
+                showToast(sucD.textContent);
                 await fetchData();
                 renderUserList();
                 renderDashboard();
                 closeUserModal();
             }
         } catch (err) {
-            console.error(err);
-            errorDiv.textContent = 'Error: ' + err.message;
-            errorDiv.style.display = 'block';
+            errD.textContent = 'Error: ' + err.message;
+            errD.style.display = 'block';
             showToast(err.message, true);
         }
     };
 
     function renderUserList() {
         const list = document.getElementById('userList');
-        if (!allUsers.length) {
-            list.innerHTML = '<li>No users found.</li>';
-            return;
-        }
+        if (!allUsers.length) { list.innerHTML = '<li>No users found.</li>'; return; }
         let html = '';
         allUsers.forEach(u => {
             const deptDisplay = u.role === 'requester' ? u.department : (u.departments ? u.departments.join(', ') : '');
-            html += `
-                <li>
-                    <div class="user-info">
-                        <strong>${u.name || 'Unnamed'}</strong> (${u.email})<br />
-                        <small>${u.role} | ${deptDisplay} ${u.whatsapp ? '📱 ' + u.whatsapp : ''}</small>
-                    </div>
-                    <div class="user-actions">
-                        <select class="role-select" onchange="updateUserRole('${u.id}', this.value)">
-                            <option value="requester" ${u.role === 'requester' ? 'selected' : ''}>Requester</option>
-                            <option value="maintenance" ${u.role === 'maintenance' ? 'selected' : ''}>Maintenance</option>
-                            <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>Admin</option>
-                        </select>
-                        <button class="edit-btn" onclick="editUser('${u.id}')"><i class="fas fa-edit"></i></button>
-                        ${!u.approved ? `<button class="approve-btn" onclick="approveUser('${u.id}')">Approve</button>` : ''}
-                        <button class="deny-btn" onclick="deleteUser('${u.id}')"><i class="fas fa-trash"></i></button>
-                    </div>
-                </li>
-            `;
+            html += `<li>
+                <div class="user-info"><strong>${u.name || 'Unnamed'}</strong> (${u.email})<small>${u.role} | ${deptDisplay} ${u.whatsapp ? '📱 ' + u.whatsapp : ''}</small></div>
+                <div class="user-actions">
+                    <select class="role-select" onchange="updateUserRole('${u.id}', this.value)">
+                        <option value="requester" ${u.role === 'requester' ? 'selected' : ''}>Requester</option>
+                        <option value="maintenance" ${u.role === 'maintenance' ? 'selected' : ''}>Maintenance</option>
+                        <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>Admin</option>
+                    </select>
+                    <button class="edit-btn" onclick="editUser('${u.id}')"><i class="fas fa-edit"></i></button>
+                    ${!u.approved ? `<button class="approve-btn" onclick="approveUser('${u.id}')">Approve</button>` : ''}
+                    <button class="deny-btn" onclick="deleteUser('${u.id}')"><i class="fas fa-trash"></i></button>
+                </div>
+            </li>`;
         });
         list.innerHTML = html;
     }
@@ -2264,32 +1924,24 @@
         try {
             await updateDoc(doc(db, USERS_COLL, userId), { role: newRole });
             showToast('User role updated.');
-            await fetchData();
-            renderUserList();
-            renderDashboard();
-        } catch (err) { showToast('Error updating role: ' + err.message, true); }
+            await fetchData(); renderUserList(); renderDashboard();
+        } catch (err) { showToast('Error: ' + err.message, true); }
     };
-
     window.deleteUser = async function(userId) {
         if (!confirm('Are you sure you want to delete this user?')) return;
         try {
             await deleteDoc(doc(db, USERS_COLL, userId));
             showToast('User deleted.');
-            await fetchData();
-            renderUserList();
-            renderDashboard();
-        } catch (err) { showToast('Error deleting user: ' + err.message, true); }
+            await fetchData(); renderUserList(); renderDashboard();
+        } catch (err) { showToast('Error: ' + err.message, true); }
     };
-
     window.approveUser = async function(userId) {
         try {
             await updateDoc(doc(db, USERS_COLL, userId), { approved: true });
-            showToast('✅ User approved successfully!');
-            await fetchData();
-            renderUserList();
-            renderDashboard();
+            showToast('✅ User approved!');
+            await fetchData(); renderUserList(); renderDashboard();
             if (document.getElementById('approvalModal').classList.contains('show')) showPendingUsers();
-        } catch (err) { showToast('Error approving user: ' + err.message, true); }
+        } catch (err) { showToast('Error: ' + err.message, true); }
     };
 
     window.showPendingUsers = async function() {
@@ -2299,37 +1951,23 @@
         list.innerHTML = 'Loading…';
         try {
             const snap = await getDocs(collection(db, USERS_COLL));
-            const allUsersData = [];
-            snap.forEach(doc => { allUsersData.push({ id: doc.id, ...doc.data() }); });
-            const pending = allUsersData.filter(u => u.approved !== true);
-            if (pending.length === 0) {
-                list.innerHTML = `<p style="color:#64748b; text-align:center; padding:30px; font-weight:500;">✅ No pending approvals.</p>
-                    <button class="btn btn-outline btn-sm" style="margin:12px auto; display:block;" onclick="showPendingUsers()"><i class="fas fa-sync-alt"></i> Refresh</button>
-                    <hr style="margin:20px 0; border:none; border-top:1px solid var(--border);" />
-                    <p style="font-size:13px; font-weight:700; margin-bottom:10px;">All users:</p>
-                    ${allUsersData.map(u => `<div style="font-size:12.5px; padding:8px 0; border-bottom:1px solid var(--border); color:var(--text-soft);">${u.name} — approved: ${u.approved} (${typeof u.approved})</div>`).join('')}`;
+            const data = [];
+            snap.forEach(d => data.push({ id: d.id, ...d.data() }));
+            const pending = data.filter(u => u.approved !== true);
+            if (!pending.length) {
+                list.innerHTML = `<p style="color:#64748b;text-align:center;padding:24px;font-weight:600;">✅ No pending approvals.</p>`;
                 return;
             }
-            let html = '';
-            pending.forEach(u => {
-                html += `
-                    <div class="pending-user-item">
-                        <div class="user-info">
-                            <strong>${u.name}</strong> (${u.email})<br />
-                            <small>${u.role} | ${u.department || u.departments?.join(', ') || ''} | WhatsApp: ${u.whatsapp || 'N/A'}</small>
-                        </div>
-                        <div>
-                            <button class="approve-btn" onclick="approveUser('${u.id}')"><i class="fas fa-check"></i> Approve</button>
-                            <button class="deny-btn" onclick="denyUser('${u.id}')"><i class="fas fa-times"></i> Deny</button>
-                        </div>
+            list.innerHTML = pending.map(u => `
+                <div class="pending-user-item">
+                    <div class="user-info"><strong>${u.name}</strong> (${u.email})<small>${u.role} | ${u.department || u.departments?.join(', ') || ''}</small></div>
+                    <div style="display:flex;gap:6px;">
+                        <button class="approve-btn" onclick="approveUser('${u.id}')">Approve</button>
+                        <button class="deny-btn" onclick="denyUser('${u.id}')">Deny</button>
                     </div>
-                `;
-            });
-            list.innerHTML = html;
-        } catch (err) {
-            list.innerHTML = '<p style="color:red;">Error loading users.</p>';
-            showToast('Error: ' + err.message, true);
-        }
+                </div>`).join('');
+        } catch (err) { list.innerHTML = '<p style="color:red;">Error loading users.</p>'; }
+        closeSidebar();
     };
 
     window.denyUser = async function(userId) {
@@ -2337,60 +1975,40 @@
         try {
             await deleteDoc(doc(db, USERS_COLL, userId));
             showToast('User deleted.');
-            await fetchData();
-            showPendingUsers();
-            renderDashboard();
+            await fetchData(); showPendingUsers(); renderDashboard();
         } catch (err) { showToast('Error: ' + err.message, true); }
     };
 
-    window.closeApprovalModal = function() {
-        document.getElementById('approvalModal').classList.remove('show');
-    };
-    document.getElementById('approvalModal').addEventListener('click', function(e) {
-        if (e.target === this) closeApprovalModal();
-    });
-    document.getElementById('userModal').addEventListener('click', function(e) {
-        if (e.target === this) closeUserModal();
-    });
+    window.closeApprovalModal = function() { document.getElementById('approvalModal').classList.remove('show'); };
+    document.getElementById('approvalModal').addEventListener('click', function(e) { if (e.target === this) closeApprovalModal(); });
+    document.getElementById('userModal').addEventListener('click', function(e) { if (e.target === this) closeUserModal(); });
 
     window.createJob = (requestNo) => window.location.href = `jobcard.html?request=${requestNo}`;
     window.editJobCard = (id) => window.open(`jobcard.html?view=${id}`, '_blank');
 
-    // ================================================================
-    // AUTH STATE
-    // ================================================================
+    // ============ AUTH ============
     onAuthStateChanged(auth, async (user) => {
-        console.log('🔐 Auth state changed.');
-        if (!user) {
-            window.location.href = 'login.html';
-            return;
-        }
+        if (!user) { window.location.href = 'login.html'; return; }
         try {
-            const userDoc = await getDoc(doc(db, USERS_COLL, user.uid));
-            if (!userDoc.exists()) {
-                await signOut(auth);
-                window.location.href = 'login.html';
-                return;
-            }
-            const userData = userDoc.data();
-            if (!userData.approved) {
+            const snap = await getDoc(doc(db, USERS_COLL, user.uid));
+            if (!snap.exists()) { await signOut(auth); window.location.href = 'login.html'; return; }
+            const data = snap.data();
+            if (!data.approved) {
                 showToast('Your account is pending approval.', true);
                 await signOut(auth);
                 window.location.href = 'login.html';
                 return;
             }
-            currentUser = { id: user.uid, ...userData };
+            currentUser = { id: user.uid, ...data };
             userRole = currentUser.role || 'requester';
-            userNameDisplay.textContent = currentUser.name || 'User';
-            userRoleDisplay.textContent = currentUser.email || '';
-            roleTag.textContent = userRole;
+
+            document.getElementById('sidebarUserName').textContent = currentUser.name || 'User';
+            document.getElementById('sidebarUserRole').textContent = userRole;
+            document.getElementById('avatarInitial').textContent = (currentUser.name || 'U').charAt(0).toUpperCase();
 
             await fetchData();
             renderDashboard();
-        } catch (err) {
-            console.error(err);
-            showToast('Error loading profile: ' + err.message, true);
-        }
+        } catch (err) { showToast('Error: ' + err.message, true); }
     });
 </script>
 </body>

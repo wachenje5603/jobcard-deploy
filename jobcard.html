@@ -19,305 +19,860 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#f4f6f9; padding:20px; color:#1e2a3a; }
-        .container { max-width:1200px; margin:0 auto; background:white; padding:25px 30px; border-radius:12px; box-shadow:0 8px 30px rgba(0,0,0,0.12); }
-        .hospital-header { border-bottom:4px solid #C8102E; padding-bottom:12px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; }
-        .logo-area { display:flex; align-items:center; gap:15px; }
-        .logo-area .logo-icon { font-size:36px; background:#C8102E; color:white; width:60px; height:60px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; }
-        .logo-area h1 { font-size:24px; color:#C8102E; letter-spacing:1px; font-weight:700; }
-        .logo-area .sub { font-size:13px; color:#333; font-weight:500; }
-        .hospital-header .badge { background:#C8102E; color:white; padding:6px 16px; border-radius:30px; font-size:14px; font-weight:600; }
-        .card-title { display:flex; justify-content:space-between; align-items:center; background:#f8f9fc; padding:8px 16px; border-radius:8px; margin-bottom:18px; }
-        .card-title h2 { font-size:20px; color:#1e2a3a; font-weight:600; }
-        .card-title .status { font-size:13px; padding:4px 14px; border-radius:20px; font-weight:600; }
-        .status.pending { background:#ffc107; color:#1e2a3a; }
-        .status.completed { background:#28a745; color:white; }
-        .status.writtenoff { background:#dc3545; color:white; }
-        .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:14px 24px; }
+        :root {
+            --primary:#C8102E;
+            --primary-light:#e81a3f;
+            --primary-gradient:linear-gradient(135deg,#C8102E 0%,#e81a3f 100%);
+            --bg:#f4f6fb;
+            --card:#fff;
+            --border:#e8ebf1;
+            --border-soft:#f1f4f9;
+            --text:#0f172a;
+            --text-soft:#475569;
+            --text-muted:#94a3b8;
+            --success:#10b981;
+            --warning:#f59e0b;
+            --danger:#ef4444;
+            --info:#0ea5e9;
+            --radius:14px;
+            --radius-sm:10px;
+            --shadow-sm:0 1px 3px rgba(15,23,42,0.04);
+            --shadow:0 4px 14px rgba(15,23,42,0.06);
+            --shadow-lg:0 20px 60px rgba(15,23,42,0.1);
+            --transition:200ms cubic-bezier(0.4,0,0.2,1);
+        }
+        body {
+            font-family:'Plus Jakarta Sans','Inter',-apple-system,sans-serif;
+            background:var(--bg);
+            background-image:
+                radial-gradient(circle at 0% 0%, rgba(200,16,46,0.04) 0%, transparent 35%),
+                radial-gradient(circle at 100% 100%, rgba(99,102,241,0.04) 0%, transparent 35%);
+            background-attachment:fixed;
+            color:var(--text);
+            min-height:100vh;
+            -webkit-font-smoothing:antialiased;
+            -moz-osx-font-smoothing:grayscale;
+        }
+
+        /* ============ TOPBAR ============ */
+        .topbar {
+            background:white;
+            border-bottom:1px solid var(--border);
+            padding:14px 28px;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:16px;
+            position:sticky;
+            top:0;
+            z-index:50;
+            box-shadow:var(--shadow-sm);
+        }
+        .topbar-left { display:flex; align-items:center; gap:14px; min-width:0; }
+        .brand-mini {
+            width:40px; height:40px;
+            background:var(--primary-gradient);
+            border-radius:11px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            color:white;
+            font-weight:800;
+            font-size:18px;
+            box-shadow:0 4px 12px rgba(200,16,46,0.25);
+            flex-shrink:0;
+        }
+        .topbar-title h1 { font-size:16px; font-weight:800; letter-spacing:-0.3px; }
+        .topbar-title small { font-size:11.5px; color:var(--text-muted); font-weight:500; }
+        .topbar-actions { display:flex; gap:8px; align-items:center; flex-shrink:0; }
+
+        /* ============ BUTTONS ============ */
+        .btn {
+            padding:10px 18px;
+            border:none;
+            border-radius:10px;
+            font-weight:700;
+            font-size:13px;
+            cursor:pointer;
+            transition:var(--transition);
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+            font-family:inherit;
+            text-decoration:none;
+            white-space:nowrap;
+        }
+        .btn i { font-size:13px; }
+        .btn-primary { background:var(--primary-gradient); color:white; box-shadow:0 4px 14px rgba(200,16,46,0.28); }
+        .btn-primary:hover { transform:translateY(-2px); box-shadow:0 8px 22px rgba(200,16,46,0.36); }
+        .btn-success { background:linear-gradient(135deg,#10b981,#22c55e); color:white; box-shadow:0 4px 14px rgba(16,185,129,0.28); }
+        .btn-success:hover { transform:translateY(-2px); box-shadow:0 8px 22px rgba(16,185,129,0.36); }
+        .btn-outline { background:white; border:1.5px solid var(--border); color:var(--text-soft); }
+        .btn-outline:hover { border-color:var(--primary); color:var(--primary); background:#fff5f6; }
+        .btn-danger { background:linear-gradient(135deg,#ef4444,#dc2626); color:white; }
+        .btn-danger:hover { transform:translateY(-2px); box-shadow:0 8px 22px rgba(239,68,68,0.32); }
+        .btn-warning { background:linear-gradient(135deg,#f59e0b,#fbbf24); color:#1e293b; }
+        .btn-warning:hover { transform:translateY(-2px); }
+        .btn-info { background:linear-gradient(135deg,#0ea5e9,#22d3ee); color:white; }
+        .btn-info:hover { transform:translateY(-2px); }
+        .btn-sm { padding:8px 14px; font-size:12px; border-radius:9px; gap:6px; }
+        .btn:disabled { opacity:0.6; cursor:not-allowed; transform:none !important; }
+
+        /* ============ CONTAINER ============ */
+        .container {
+            max-width:1160px;
+            margin:26px auto;
+            padding:0 20px 40px;
+        }
+
+        /* ============ HOSPITAL HEADER ============ */
+        .hospital-header {
+            background:white;
+            border-radius:var(--radius);
+            padding:22px 26px;
+            border:1px solid var(--border);
+            box-shadow:var(--shadow);
+            margin-bottom:18px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:16px;
+            flex-wrap:wrap;
+        }
+        .hospital-brand { display:flex; align-items:center; gap:14px; }
+        .hospital-brand .logo-icon {
+            width:54px; height:54px;
+            background:var(--primary-gradient);
+            border-radius:14px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            color:white;
+            font-weight:800;
+            font-size:22px;
+            flex-shrink:0;
+            box-shadow:0 6px 16px rgba(200,16,46,0.25);
+        }
+        .hospital-brand h1 {
+            font-size:18px;
+            font-weight:800;
+            color:var(--primary);
+            letter-spacing:-0.3px;
+        }
+        .hospital-brand .sub {
+            font-size:11.5px;
+            color:var(--text-soft);
+            font-weight:500;
+            margin-top:2px;
+        }
+        .hospital-brand .county {
+            font-size:12px;
+            font-weight:700;
+            color:var(--primary);
+            margin-top:2px;
+        }
+        .hospital-badge {
+            background:var(--primary-gradient);
+            color:white;
+            padding:7px 16px;
+            border-radius:30px;
+            font-size:11.5px;
+            font-weight:700;
+            text-transform:uppercase;
+            letter-spacing:0.5px;
+        }
+
+        /* ============ FORM CARD ============ */
+        .form-card {
+            background:white;
+            border-radius:var(--radius);
+            border:1px solid var(--border);
+            box-shadow:var(--shadow);
+            overflow:hidden;
+        }
+        .form-card-header {
+            padding:18px 26px;
+            background:#fafbfd;
+            border-bottom:1px solid var(--border);
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:12px;
+            flex-wrap:wrap;
+        }
+        .form-card-header h2 {
+            font-size:17px;
+            font-weight:800;
+            display:flex;
+            align-items:center;
+            gap:10px;
+            color:var(--text);
+        }
+        .form-card-header h2 i { color:var(--primary); }
+        .status {
+            font-size:11px;
+            padding:6px 14px;
+            border-radius:20px;
+            font-weight:800;
+            text-transform:uppercase;
+            letter-spacing:0.4px;
+        }
+        .status.pending { background:#fef3c7; color:#b45309; }
+        .status.completed { background:#d1fae5; color:#047857; }
+        .status.writtenoff { background:#fee2e2; color:#b91c1c; }
+
+        .form-body { padding:24px 26px; }
+
+        /* ============ GRIDS ============ */
+        .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:14px 22px; }
         .grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px 20px; }
         .grid-4 { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px 16px; }
         .full-width { grid-column:1 / -1; }
+
+        /* ============ FIELDS ============ */
         .field-group { display:flex; flex-direction:column; margin-bottom:4px; }
-        .field-group label { font-size:12px; font-weight:600; color:#495057; margin-bottom:3px; text-transform:uppercase; letter-spacing:0.4px; }
-        .field-group input, .field-group select, .field-group textarea { padding:8px 12px; border:1px solid #ced4da; border-radius:6px; font-size:14px; background:white; transition:0.2s; font-family:inherit; }
-        .field-group input:focus, .field-group select:focus, .field-group textarea:focus { border-color:#C8102E; outline:0; box-shadow:0 0 0 3px rgba(200,16,46,0.15); }
-        .field-group input[readonly] { background:#e9ecef; cursor:default; }
-        textarea { resize:vertical; min-height:50px; }
-        .section-block { background:#fafbfc; border:1px solid #e9ecef; border-radius:10px; padding:18px 20px; margin-top:18px; }
-        .section-block h3 { font-size:16px; font-weight:600; color:#1e2a3a; margin-bottom:14px; border-left:4px solid #C8102E; padding-left:12px; }
-        .inline-group { display:flex; flex-wrap:wrap; gap:20px 30px; align-items:center; }
-        .inline-group label { display:flex; align-items:center; gap:6px; font-size:14px; font-weight:500; cursor:pointer; }
-        .inline-group input[type="radio"] { width:18px; height:18px; accent-color:#C8102E; cursor:pointer; }
-        .signature-area { border-top:2px dashed #dee2e6; padding-top:20px; margin-top:18px; }
-        .signature-grid { display:grid; grid-template-columns:1fr 1fr; gap:30px; }
-        .signature-box { background:#f8f9fa; padding:16px 18px; border-radius:8px; }
-        .signature-box h4 { font-size:14px; margin-bottom:12px; color:#C8102E; }
-        .sig-pad-wrapper { border:2px solid #ced4da; border-radius:6px; background:white; margin:6px 0 8px 0; touch-action:none; position:relative; }
-        .sig-pad-wrapper canvas { display:block; width:100%; height:auto; touch-action:none; cursor:crosshair; }
-        .sig-pad-wrapper .sig-placeholder { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:#adb5bd; font-size:14px; pointer-events:none; }
-        .sig-actions { display:flex; gap:8px; margin-top:6px; }
-        .sig-actions .btn-sm { padding:4px 14px; font-size:12px; border:none; border-radius:4px; cursor:pointer; font-weight:500; transition:0.2s; }
-        .sig-actions .btn-clear { background:#dc3545; color:white; }
-        .sig-actions .btn-undo { background:#ffc107; color:#1e2a3a; }
-        .sig-status { font-size:12px; color:#28a745; margin-top:4px; display:none; }
-        .sig-status.show { display:block; }
-        .sig-status.signed { color:#28a745; }
-        .sig-status.empty { color:#dc3545; }
-
-        .action-bar { display:flex; flex-wrap:wrap; gap:12px; margin:20px 0 12px 0; padding:16px 0; border-top:1px solid #e9ecef; border-bottom:1px solid #e9ecef; }
-        .btn { padding:10px 24px; border:none; border-radius:6px; font-weight:600; font-size:14px; cursor:pointer; transition:0.2s; display:inline-flex; align-items:center; gap:8px; }
-        .btn-primary { background:#C8102E; color:white; }
-        .btn-primary:hover { background:#a00d24; transform:translateY(-1px); box-shadow:0 4px 12px rgba(200,16,46,0.3); }
-        .btn-success { background:#28a745; color:white; }
-        .btn-success:hover { background:#1e7e34; }
-        .btn-outline { background:transparent; border:1.5px solid #6c757d; color:#6c757d; }
-        .btn-outline:hover { background:#6c757d; color:white; }
-        .btn-danger { background:#dc3545; color:white; }
-        .btn-danger:hover { background:#b02a37; }
-        .btn:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
-        .btn-sm { padding:4px 12px; font-size:12px; border-radius:4px; }
-
-        .toast { position:fixed; top:20px; right:20px; background:#1e2a3a; color:white; padding:14px 28px; border-radius:8px; box-shadow:0 6px 20px rgba(0,0,0,0.25); font-weight:500; z-index:999; transform:translateY(-20px); opacity:0; transition:0.3s ease; border-left:6px solid #C8102E; max-width:380px; }
-        .toast.show { transform:translateY(0); opacity:1; }
-        .loading-spinner { display:inline-block; width:16px; height:16px; border:3px solid rgba(255,255,255,0.3); border-radius:50%; border-top-color:#fff; animation:spin 0.8s linear infinite; }
-        @keyframes spin { to { transform:rotate(360deg); } }
-
-        /* ===== SAVING OVERLAY ===== */
-        .saving-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.55);
-            backdrop-filter: blur(4px);
-            z-index: 10000;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
+        .field-group label {
+            font-size:11.5px;
+            font-weight:700;
+            color:var(--text-soft);
+            margin-bottom:6px;
+            text-transform:uppercase;
+            letter-spacing:0.4px;
         }
-        .saving-overlay.show { display: flex; }
+        .field-group input,
+        .field-group select,
+        .field-group textarea {
+            padding:11px 14px;
+            border:1.5px solid var(--border);
+            border-radius:10px;
+            font-size:13.5px;
+            background:#fafbfd;
+            font-family:inherit;
+            color:var(--text);
+            font-weight:500;
+            transition:var(--transition);
+            outline:none;
+            width:100%;
+        }
+        .field-group input:focus,
+        .field-group select:focus,
+        .field-group textarea:focus {
+            border-color:var(--primary);
+            box-shadow:0 0 0 4px rgba(200,16,46,0.08);
+            background:white;
+        }
+        .field-group input[readonly] {
+            background:#f1f5f9;
+            color:var(--text-muted);
+            cursor:default;
+        }
+        textarea { resize:vertical; min-height:60px; font-family:inherit; }
+
+        /* ============ SECTION BLOCKS ============ */
+        .section-block {
+            background:#fafbfd;
+            border:1px solid var(--border);
+            border-radius:12px;
+            padding:18px 20px;
+            margin-top:18px;
+        }
+        .section-block h3 {
+            font-size:12.5px;
+            font-weight:800;
+            color:var(--text);
+            margin-bottom:14px;
+            padding-left:12px;
+            border-left:3px solid var(--primary);
+            text-transform:uppercase;
+            letter-spacing:0.4px;
+            display:flex;
+            align-items:center;
+            gap:8px;
+        }
+        .section-block h3 i { color:var(--primary); }
+
+        /* ============ INLINE RADIO GROUP ============ */
+        .inline-group {
+            display:flex;
+            flex-wrap:wrap;
+            gap:16px 24px;
+            align-items:center;
+        }
+        .inline-group label {
+            display:flex;
+            align-items:center;
+            gap:8px;
+            font-size:13px;
+            font-weight:600;
+            color:var(--text-soft);
+            cursor:pointer;
+            padding:8px 14px;
+            border-radius:9px;
+            background:white;
+            border:1.5px solid var(--border);
+            transition:var(--transition);
+        }
+        .inline-group label:hover {
+            border-color:var(--primary);
+            color:var(--primary);
+        }
+        .inline-group input[type="radio"],
+        .inline-group input[type="checkbox"] {
+            width:16px; height:16px;
+            accent-color:var(--primary);
+            cursor:pointer;
+        }
+
+        /* ============ SIGNATURES ============ */
+        .signature-area {
+            border-top:1px solid var(--border);
+            padding-top:22px;
+            margin-top:22px;
+        }
+        .signature-grid {
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:20px;
+        }
+        .signature-box {
+            background:#fafbfd;
+            padding:18px;
+            border-radius:12px;
+            border:1px solid var(--border);
+        }
+        .signature-box h4 {
+            font-size:12.5px;
+            margin-bottom:14px;
+            color:var(--primary);
+            font-weight:800;
+            text-transform:uppercase;
+            letter-spacing:0.4px;
+            display:flex;
+            align-items:center;
+            gap:8px;
+        }
+        .sig-pad-wrapper {
+            border:1.5px dashed var(--border);
+            border-radius:10px;
+            background:white;
+            margin:6px 0 10px 0;
+            position:relative;
+            overflow:hidden;
+        }
+        .sig-pad-wrapper canvas {
+            display:block;
+            width:100%;
+            height:auto;
+            cursor:crosshair;
+        }
+        .sig-placeholder {
+            position:absolute;
+            top:50%; left:50%;
+            transform:translate(-50%,-50%);
+            color:var(--text-muted);
+            font-size:13px;
+            pointer-events:none;
+            font-weight:600;
+        }
+        .sig-actions { display:flex; gap:8px; margin-top:6px; }
+        .sig-actions .btn-sm {
+            padding:6px 12px;
+            font-size:11.5px;
+            border:none;
+            border-radius:8px;
+            cursor:pointer;
+            font-weight:700;
+            transition:var(--transition);
+            font-family:inherit;
+            display:inline-flex;
+            align-items:center;
+            gap:5px;
+        }
+        .sig-actions .btn-clear { background:#fee2e2; color:#b91c1c; }
+        .sig-actions .btn-clear:hover { background:#dc2626; color:white; }
+        .sig-actions .btn-undo { background:#fef3c7; color:#b45309; }
+        .sig-actions .btn-undo:hover { background:#f59e0b; color:white; }
+        .sig-status {
+            font-size:11.5px;
+            margin-top:6px;
+            display:none;
+            font-weight:700;
+            padding:5px 10px;
+            border-radius:8px;
+            width:fit-content;
+        }
+        .sig-status.show { display:block; }
+        .sig-status.signed { background:#d1fae5; color:#047857; }
+        .sig-status.empty { background:#fee2e2; color:#b91c1c; }
+
+        /* ============ ACTION BAR ============ */
+        .action-bar {
+            display:flex;
+            flex-wrap:wrap;
+            gap:12px;
+            padding:20px 26px;
+            border-top:1px solid var(--border);
+            background:#fafbfd;
+        }
+
+        /* ============ SAVING OVERLAY ============ */
+        .saving-overlay {
+            display:none;
+            position:fixed;
+            inset:0;
+            background:rgba(15,23,42,0.55);
+            backdrop-filter:blur(8px);
+            -webkit-backdrop-filter:blur(8px);
+            z-index:10000;
+            align-items:center;
+            justify-content:center;
+            padding:20px;
+        }
+        .saving-overlay.show { display:flex; }
         .saving-card {
-            background: white;
-            border-radius: 14px;
-            padding: 36px 44px;
-            text-align: center;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            max-width: 440px;
-            width: 100%;
+            background:white;
+            border-radius:18px;
+            padding:38px 44px;
+            text-align:center;
+            box-shadow:0 30px 80px rgba(15,23,42,0.3);
+            max-width:440px;
+            width:100%;
+            animation:fadeUp 300ms ease;
+        }
+        @keyframes fadeUp {
+            from { opacity:0; transform:translateY(20px); }
+            to { opacity:1; transform:translateY(0); }
         }
         .saving-card .spinner {
-            width: 54px; height: 54px;
-            border: 5px solid #f1f3f5;
-            border-top-color: #C8102E;
-            border-radius: 50%;
-            animation: spin 0.9s linear infinite;
-            margin: 0 auto 18px;
+            width:56px; height:56px;
+            border:5px solid #f1f5f9;
+            border-top-color:var(--primary);
+            border-radius:50%;
+            animation:spin 0.9s linear infinite;
+            margin:0 auto 18px;
         }
-        .saving-card h2 { font-size: 20px; color:#C8102E; margin-bottom: 8px; }
-        .saving-card p { font-size: 14px; color:#495057; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+        .saving-card h2 {
+            font-size:19px;
+            color:var(--primary);
+            margin-bottom:8px;
+            font-weight:800;
+        }
+        .saving-card p {
+            font-size:13.5px;
+            color:var(--text-soft);
+            font-weight:500;
+        }
         .saving-card .redirect-note {
-            margin-top: 14px;
-            font-size: 13px;
-            color: #6c757d;
-            background: #f8f9fc;
-            padding: 10px 14px;
-            border-radius: 8px;
+            margin-top:14px;
+            font-size:13px;
+            color:#065f46;
+            background:#d1fae5;
+            padding:12px 16px;
+            border-radius:10px;
+            font-weight:700;
         }
 
-        @media print { .action-bar,.btn,.sig-actions,.no-print { display:none !important; } .sig-pad-wrapper canvas { border:1px solid #000; max-width:200px; } .field-group input,.field-group select,.field-group textarea { border:none; background:transparent !important; padding:2px 0; box-shadow:none; color:#000 !important; font-weight:500; } .field-group input[readonly] { background:transparent !important; } .field-group select { -webkit-appearance:none; appearance:none; border:none; background:transparent; color:#000; font-weight:500; } .section-block { border:1px solid #ccc; background:#fafafa; break-inside:avoid; } .sig-placeholder { display:none !important; } .sig-status { display:none !important; } .container { box-shadow:none; padding:15px; } .sig-pad-wrapper canvas { border:1px solid #ddd; background:white; } }
-        @media (max-width:768px) { .grid-2,.grid-3,.grid-4 { grid-template-columns:1fr; } .signature-grid { grid-template-columns:1fr; } .container { padding:15px; } .hospital-header { flex-direction:column; align-items:start; gap:6px; } .action-bar { flex-direction:column; } .action-bar .btn { justify-content:center; } }
+        /* ============ TOAST ============ */
+        .toast {
+            position:fixed;
+            bottom:24px; right:24px;
+            background:#0f172a;
+            color:white;
+            padding:14px 22px;
+            border-radius:12px;
+            font-weight:700;
+            z-index:9999;
+            transform:translateY(100px);
+            opacity:0;
+            transition:320ms cubic-bezier(0.4,0,0.2,1);
+            border-left:4px solid var(--primary);
+            max-width:360px;
+            box-shadow:0 16px 48px rgba(15,23,42,0.3);
+            font-size:13px;
+        }
+        .toast.show { transform:translateY(0); opacity:1; }
+
+        /* ============ PRINT ============ */
+        @media print {
+            .topbar, .action-bar, .btn, .sig-actions, .no-print { display:none !important; }
+            body { background:white; }
+            .container { margin:0; padding:10px; max-width:100%; }
+            .form-card, .hospital-header { box-shadow:none; border:1px solid #ddd; }
+            .field-group input, .field-group select, .field-group textarea {
+                border:none;
+                background:transparent !important;
+                padding:2px 0;
+                box-shadow:none;
+                color:#000 !important;
+            }
+            .sig-pad-wrapper canvas { border:1px solid #ddd; }
+            .sig-placeholder { display:none !important; }
+            .sig-status { display:none !important; }
+            .section-block { border:1px solid #ccc; background:#fafafa; break-inside:avoid; }
+        }
+
+        /* ============ RESPONSIVE ============ */
+        @media (max-width:900px) {
+            .grid-2, .grid-3 { grid-template-columns:1fr 1fr; }
+            .grid-4 { grid-template-columns:1fr 1fr; }
+        }
+        @media (max-width:768px) {
+            .topbar { padding:12px 16px; }
+            .topbar-title small { display:none; }
+            .topbar-actions .btn span { display:none; }
+            .container { margin:16px auto; padding:0 14px 40px; }
+            .grid-2, .grid-3, .grid-4 { grid-template-columns:1fr; }
+            .signature-grid { grid-template-columns:1fr; }
+            .hospital-header { flex-direction:column; align-items:flex-start; padding:18px; }
+            .form-card-header { padding:14px 18px; }
+            .form-body { padding:18px; }
+            .action-bar { padding:16px 18px; }
+            .action-bar .btn { flex:1; justify-content:center; }
+        }
     </style>
 </head>
 <body>
 
+    <!-- ============ TOPBAR ============ -->
+    <header class="topbar">
+        <div class="topbar-left">
+            <div class="brand-mini">M</div>
+            <div class="topbar-title">
+                <h1>Equipment Job Card</h1>
+                <small>Complete and submit the maintenance record</small>
+            </div>
+        </div>
+        <div class="topbar-actions">
+            <button class="btn btn-outline btn-sm" onclick="goToDashboard()">
+                <i class="fas fa-arrow-left"></i> <span>Dashboard</span>
+            </button>
+            <button class="btn btn-danger btn-sm" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+            </button>
+        </div>
+    </header>
+
     <div class="container">
-        <header class="hospital-header">
-            <div class="logo-area">
+
+        <!-- ============ HOSPITAL HEADER ============ -->
+        <div class="hospital-header">
+            <div class="hospital-brand">
                 <div class="logo-icon">M</div>
                 <div>
                     <h1>MOI VOI COUNTY REFERRAL HOSPITAL</h1>
-                    <div class="sub">P.O. BOX 18-80300 VOI | Email: biomedsmoivoi@gmail.com</div>
-                    <div style="font-size:14px; font-weight:600; color:#C8102E; margin-top:2px;">TAITA TAVETA COUNTY</div>
+                    <div class="sub">P.O. BOX 18-80300 VOI · biomedsmoivoi@gmail.com</div>
+                    <div class="county">TAITA TAVETA COUNTY</div>
                 </div>
             </div>
-            <span class="badge">DEPARTMENT OF HEALTH SERVICES</span>
-        </header>
-
-        <div class="card-title">
-            <h2>⚙️ EQUIPMENT MAINTENANCE JOB CARD</h2>
-            <span class="status pending" id="jobStatusBadge">● PENDING</span>
-            <button class="btn btn-danger btn-sm" onclick="logout()" style="margin-left:auto;">🚪 Logout</button>
+            <span class="hospital-badge">Department of Health Services</span>
         </div>
 
-        <form id="jobcardForm">
-            <div class="grid-2">
-                <div class="field-group"><label>Job Card No.</label><input type="text" id="jobNo" readonly /></div>
-                <div class="field-group">
-                    <label>Request No.</label>
-                    <select id="jobRequestNo" onchange="loadRequestData()"><option value="">-- Select Request --</option></select>
-                </div>
-                <div class="field-group"><label>Reporting Date / Time</label><input type="datetime-local" id="jobReportingDateTime" readonly /></div>
-                <div class="field-group"><label>Unit / Ward</label><input type="text" id="jobUnit" readonly /></div>
-                <div class="field-group"><label>Requester Name</label><input type="text" id="jobRequester" readonly /></div>
-                <div class="field-group"><label>Equipment Name</label><input type="text" id="jobEquipName" readonly /></div>
-                <div class="field-group"><label>Inventory / Asset No.</label><input type="text" id="jobInventory" readonly /></div>
-                <div class="field-group"><label>Serial No.</label><input type="text" id="jobSerial" readonly /></div>
-                <div class="field-group"><label>Model / Make</label><input type="text" id="jobModel" readonly /></div>
-                <div class="field-group full-width"><label>Complaint by User</label><textarea id="jobComplaint" readonly rows="2"></textarea></div>
-                <div class="field-group full-width"><label>🩺 Diagnosis by Maintenance Team</label><textarea id="jobDiagnosis" rows="2"></textarea></div>
+        <!-- ============ FORM CARD ============ -->
+        <div class="form-card">
+            <div class="form-card-header">
+                <h2><i class="fas fa-tools"></i> Equipment Maintenance Job Card</h2>
+                <span class="status pending" id="jobStatusBadge">● PENDING</span>
             </div>
 
-            <input type="hidden" id="jobRequesterId" />
+            <form id="jobcardForm">
+                <div class="form-body">
 
-            <div class="grid-3">
-                <div class="field-group"><label>Received from (Requester)</label><input type="text" id="jobReceivedFrom" readonly /></div>
-                <div class="field-group"><label>Date / Time Received</label><input type="datetime-local" id="jobReceivedDateTime" /></div>
-                <div class="field-group"><label>Received by (Technician)</label><input type="text" id="jobReceivedBy" readonly /></div>
-                <div class="field-group"><label>Handed back to (User)</label><select id="jobHandedTo"><option value="">-- Select --</option></select></div>
-                <div class="field-group"><label>Date / Time Handed</label><input type="datetime-local" id="jobHandedDateTime" /></div>
-                <div class="field-group"><label>Handed by (Technician)</label><input type="text" id="jobHandedBy" readonly /></div>
-            </div>
-
-            <section class="section-block">
-                <h3>🛠️ Service Type</h3>
-                <div class="inline-group">
-                    <label><input type="radio" name="serviceType" value="General Service/Overhaul" checked /> General Service/Overhaul</label>
-                    <label><input type="radio" name="serviceType" value="Repair" /> Repair</label>
-                    <label><input type="radio" name="serviceType" value="PPM (Planned Preventive)" /> PPM</label>
-                    <label><input type="radio" name="serviceType" value="Emergency Call" /> Emergency Call</label>
-                </div>
-            </section>
-
-            <section class="section-block">
-                <h3>⏱️ Technician Timeline & Effort</h3>
-                <div class="grid-3">
-                    <div class="field-group"><label>Job Started</label><input type="datetime-local" id="jobStartDateTime" /></div>
-                    <div class="field-group"><label>Job Completed</label><input type="datetime-local" id="jobEndDateTime" /></div>
-                    <div class="field-group"><label>Total Time (hh:mm)</label><input type="text" id="jobTotalTime" readonly /></div>
-                    <div class="field-group"><label>Response Time (hh:mm)</label><input type="text" id="jobResponseTime" readonly /></div>
-                    <div class="field-group"><label>Admin / Requisition Time</label><input type="text" id="jobAdminTime" placeholder="e.g. 00:30" /></div>
-                </div>
-            </section>
-
-            <section class="section-block">
-                <h3>📌 Job Status & Completion</h3>
-                <div class="field-group">
-                    <label>Status</label>
-                    <select id="jobStatus" onchange="toggleStatusFields()">
-                        <option value="Pending">Pending / Postponed</option>
-                        <option value="Completed">Completed</option>
-                        <option value="Written Off">Written Off</option>
-                    </select>
-                </div>
-
-                <div id="pendingFields" style="margin-top:12px;">
+                    <!-- ===== AUTO-FILLED FROM REQUEST ===== -->
                     <div class="grid-2">
-                        <div class="field-group"><label>Reason for Postponement</label>
-                            <select id="jobPostponeReason">
-                                <option value="Low priority">Low priority</option>
-                                <option value="Awaiting spare parts">Awaiting spare parts</option>
-                                <option value="Awaiting approval">Awaiting approval</option>
-                                <option value="Other">Other</option>
+                        <div class="field-group">
+                            <label>Job Card No.</label>
+                            <input type="text" id="jobNo" readonly placeholder="Auto-generated" />
+                        </div>
+                        <div class="field-group">
+                            <label>Request No.</label>
+                            <select id="jobRequestNo" onchange="loadRequestData()">
+                                <option value="">-- Select Request --</option>
                             </select>
                         </div>
-                        <div class="field-group"><label>Expected Completion Date</label><input type="datetime-local" id="jobExpectedDate" /></div>
-                        <div class="field-group full-width"><label>Additional Note</label><textarea id="jobPostponeNote" rows="2"></textarea></div>
-                    </div>
-                </div>
-
-                <div id="completedFields" style="display:none; margin-top:12px;">
-                    <div class="field-group"><label>🔧 Defects Found</label><textarea id="jobDefects" rows="2"></textarea></div>
-                    <div class="field-group"><label>🛠️ Action Taken</label><textarea id="jobActionTaken" rows="2"></textarea></div>
-                </div>
-
-                <div id="writtenOffFields" style="display:none; margin-top:12px;">
-                    <div class="field-group">
-                        <label>Reason for Write‑Off</label>
-                        <select id="jobWriteOffReason">
-                            <option value="Wear & Tear">Wear & Tear</option>
-                            <option value="Mainly unstable">Mainly unstable</option>
-                            <option value="Contamination water/oil">Contamination water/oil</option>
-                            <option value="User error">User error</option>
-                            <option value="Rough handling/operator fault">Rough handling/operator fault</option>
-                            <option value="Dirt">Dirt</option>
-                            <option value="Defective/wrong installation">Defective/wrong installation</option>
-                            <option value="Others">Others</option>
-                        </select>
-                    </div>
-                    <div class="field-group"><label>Additional Comments</label><textarea id="jobWriteOffNote" rows="2"></textarea></div>
-                </div>
-            </section>
-
-            <section class="grid-4">
-                <div class="field-group"><label>Current (A)</label><input type="text" id="jobMeasureCurrent" /></div>
-                <div class="field-group"><label>Voltage (V)</label><input type="text" id="jobMeasureVoltage" /></div>
-                <div class="field-group"><label>Insulation (MΩ)</label><input type="text" id="jobMeasureInsulation" /></div>
-                <div class="field-group"><label>Pressure (bar/mbar)</label><input type="text" id="jobMeasurePressure" /></div>
-            </section>
-
-            <section class="section-block">
-                <h3>✅ Final Verification</h3>
-                <div class="inline-group" style="margin-bottom:12px;">
-                    <label><input type="checkbox" id="jobFunctionOk" checked /> Function O.K.</label>
-                    <label><input type="checkbox" id="jobSafetyOk" checked /> Safety O.K.</label>
-                </div>
-                <div class="field-group"><label>Comments / Additional Notes</label><textarea id="jobComments" rows="2"></textarea></div>
-            </section>
-
-            <section class="signature-area">
-                <div class="signature-grid">
-                    <div class="signature-box">
-                        <h4>👨‍🔧 Technician Signature</h4>
-                        <div class="field-group"><label>Name</label><select id="jobTechName"><option value="">-- Select --</option></select></div>
                         <div class="field-group">
-                            <label>Draw Signature</label>
-                            <div class="sig-pad-wrapper" id="jobTechSigWrapper">
-                                <canvas id="jobTechSigCanvas" width="400" height="120"></canvas>
-                                <div class="sig-placeholder" id="jobTechSigPlaceholder">✍️ Sign here</div>
-                            </div>
-                            <div class="sig-actions">
-                                <button type="button" class="btn-sm btn-clear" onclick="clearSignature('jobTech')">🗑️ Clear</button>
-                                <button type="button" class="btn-sm btn-undo" onclick="undoSignature('jobTech')">↩️ Undo</button>
-                            </div>
-                            <div class="sig-status" id="jobTechSigStatus">✅ Signed</div>
+                            <label>Reporting Date / Time</label>
+                            <input type="datetime-local" id="jobReportingDateTime" readonly />
                         </div>
-                        <div class="field-group"><label>Date</label><input type="date" id="jobTechDate" /></div>
-                    </div>
-                    <div class="signature-box">
-                        <h4>✅ Supervisor Signature</h4>
-                        <div class="field-group"><label>Name</label><select id="jobCertName"><option value="">-- Select --</option></select></div>
                         <div class="field-group">
-                            <label>Draw Signature</label>
-                            <div class="sig-pad-wrapper" id="jobCertSigWrapper">
-                                <canvas id="jobCertSigCanvas" width="400" height="120"></canvas>
-                                <div class="sig-placeholder" id="jobCertSigPlaceholder">✍️ Sign here</div>
-                            </div>
-                            <div class="sig-actions">
-                                <button type="button" class="btn-sm btn-clear" onclick="clearSignature('jobCert')">🗑️ Clear</button>
-                                <button type="button" class="btn-sm btn-undo" onclick="undoSignature('jobCert')">↩️ Undo</button>
-                            </div>
-                            <div class="sig-status" id="jobCertSigStatus">✅ Signed</div>
+                            <label>Unit / Ward</label>
+                            <input type="text" id="jobUnit" readonly />
                         </div>
-                        <div class="field-group"><label>Date</label><input type="date" id="jobCertDate" /></div>
+                        <div class="field-group">
+                            <label>Requester Name</label>
+                            <input type="text" id="jobRequester" readonly />
+                        </div>
+                        <div class="field-group">
+                            <label>Equipment Name</label>
+                            <input type="text" id="jobEquipName" readonly />
+                        </div>
+                        <div class="field-group">
+                            <label>Inventory / Asset No.</label>
+                            <input type="text" id="jobInventory" readonly />
+                        </div>
+                        <div class="field-group">
+                            <label>Serial No.</label>
+                            <input type="text" id="jobSerial" readonly />
+                        </div>
+                        <div class="field-group">
+                            <label>Model / Make</label>
+                            <input type="text" id="jobModel" readonly />
+                        </div>
+                        <div class="field-group full-width">
+                            <label>Complaint by User</label>
+                            <textarea id="jobComplaint" readonly rows="2"></textarea>
+                        </div>
+                        <div class="field-group full-width">
+                            <label>🩺 Diagnosis by Maintenance Team</label>
+                            <textarea id="jobDiagnosis" rows="2" placeholder="Preliminary diagnosis..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- ===== HIDDEN REQUESTER ID ===== -->
+                    <input type="hidden" id="jobRequesterId" />
+
+                    <!-- ===== HANDOVER ===== -->
+                    <div class="section-block">
+                        <h3><i class="fas fa-exchange-alt"></i> Handover</h3>
+                        <div class="grid-3">
+                            <div class="field-group">
+                                <label>Received from (Requester)</label>
+                                <input type="text" id="jobReceivedFrom" readonly />
+                            </div>
+                            <div class="field-group">
+                                <label>Date / Time Received</label>
+                                <input type="datetime-local" id="jobReceivedDateTime" />
+                            </div>
+                            <div class="field-group">
+                                <label>Received by (Technician)</label>
+                                <input type="text" id="jobReceivedBy" readonly />
+                            </div>
+                            <div class="field-group">
+                                <label>Handed back to (User)</label>
+                                <select id="jobHandedTo">
+                                    <option value="">-- Select --</option>
+                                </select>
+                            </div>
+                            <div class="field-group">
+                                <label>Date / Time Handed</label>
+                                <input type="datetime-local" id="jobHandedDateTime" />
+                            </div>
+                            <div class="field-group">
+                                <label>Handed by (Technician)</label>
+                                <input type="text" id="jobHandedBy" readonly />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===== SERVICE TYPE ===== -->
+                    <div class="section-block">
+                        <h3><i class="fas fa-clipboard-check"></i> Service Type</h3>
+                        <div class="inline-group">
+                            <label><input type="radio" name="serviceType" value="General Service/Overhaul" checked /> General Service/Overhaul</label>
+                            <label><input type="radio" name="serviceType" value="Repair" /> Repair</label>
+                            <label><input type="radio" name="serviceType" value="PPM (Planned Preventive)" /> PPM (Planned Preventive)</label>
+                            <label><input type="radio" name="serviceType" value="Emergency Call" /> Emergency Call</label>
+                        </div>
+                    </div>
+
+                    <!-- ===== TIMELINE ===== -->
+                    <div class="section-block">
+                        <h3><i class="fas fa-clock"></i> Technician Timeline &amp; Effort</h3>
+                        <div class="grid-3">
+                            <div class="field-group">
+                                <label>Job Started</label>
+                                <input type="datetime-local" id="jobStartDateTime" />
+                            </div>
+                            <div class="field-group">
+                                <label>Job Completed</label>
+                                <input type="datetime-local" id="jobEndDateTime" />
+                            </div>
+                            <div class="field-group">
+                                <label>Total Time (hh:mm)</label>
+                                <input type="text" id="jobTotalTime" readonly placeholder="Auto-calc" />
+                            </div>
+                            <div class="field-group">
+                                <label>Response Time (hh:mm)</label>
+                                <input type="text" id="jobResponseTime" readonly placeholder="Auto-calc" />
+                            </div>
+                            <div class="field-group">
+                                <label>Admin / Requisition Time</label>
+                                <input type="text" id="jobAdminTime" placeholder="e.g. 00:30" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===== STATUS ===== -->
+                    <div class="section-block">
+                        <h3><i class="fas fa-info-circle"></i> Job Status &amp; Completion</h3>
+                        <div class="field-group">
+                            <label>Status</label>
+                            <select id="jobStatus" onchange="toggleStatusFields()">
+                                <option value="Pending">Pending / Postponed</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Written Off">Written Off</option>
+                            </select>
+                        </div>
+
+                        <div id="pendingFields" style="margin-top:14px;">
+                            <div class="grid-2">
+                                <div class="field-group">
+                                    <label>Reason for Postponement</label>
+                                    <select id="jobPostponeReason">
+                                        <option value="Low priority">Low priority</option>
+                                        <option value="Awaiting spare parts">Awaiting spare parts</option>
+                                        <option value="Awaiting approval">Awaiting approval</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="field-group">
+                                    <label>Expected Completion Date</label>
+                                    <input type="datetime-local" id="jobExpectedDate" />
+                                </div>
+                                <div class="field-group full-width">
+                                    <label>Additional Note</label>
+                                    <textarea id="jobPostponeNote" rows="2" placeholder="Details..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="completedFields" style="display:none; margin-top:14px;">
+                            <div class="field-group">
+                                <label>🔧 Defects Found</label>
+                                <textarea id="jobDefects" rows="2" placeholder="List defects..."></textarea>
+                            </div>
+                            <div class="field-group">
+                                <label>🛠️ Action Taken</label>
+                                <textarea id="jobActionTaken" rows="2" placeholder="Describe repairs..."></textarea>
+                            </div>
+                        </div>
+
+                        <div id="writtenOffFields" style="display:none; margin-top:14px;">
+                            <div class="field-group">
+                                <label>Reason for Write‑Off</label>
+                                <select id="jobWriteOffReason">
+                                    <option value="Wear & Tear">Wear &amp; Tear</option>
+                                    <option value="Mainly unstable">Mainly unstable</option>
+                                    <option value="Contamination water/oil">Contamination water/oil</option>
+                                    <option value="User error">User error</option>
+                                    <option value="Rough handling/operator fault">Rough handling / operator fault</option>
+                                    <option value="Dirt">Dirt</option>
+                                    <option value="Defective/wrong installation">Defective / wrong installation</option>
+                                    <option value="Others">Others</option>
+                                </select>
+                            </div>
+                            <div class="field-group">
+                                <label>Additional Comments</label>
+                                <textarea id="jobWriteOffNote" rows="2" placeholder="Details..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===== MEASUREMENTS ===== -->
+                    <div class="section-block">
+                        <h3><i class="fas fa-ruler-combined"></i> Measurements</h3>
+                        <div class="grid-4">
+                            <div class="field-group"><label>Current (A)</label><input type="text" id="jobMeasureCurrent" placeholder="N/A" /></div>
+                            <div class="field-group"><label>Voltage (V)</label><input type="text" id="jobMeasureVoltage" placeholder="N/A" /></div>
+                            <div class="field-group"><label>Insulation (MΩ)</label><input type="text" id="jobMeasureInsulation" placeholder="N/A" /></div>
+                            <div class="field-group"><label>Pressure (bar/mbar)</label><input type="text" id="jobMeasurePressure" placeholder="N/A" /></div>
+                        </div>
+                    </div>
+
+                    <!-- ===== FINAL VERIFICATION ===== -->
+                    <div class="section-block">
+                        <h3><i class="fas fa-check-circle"></i> Final Verification</h3>
+                        <div class="inline-group" style="margin-bottom:14px;">
+                            <label><input type="checkbox" id="jobFunctionOk" checked /> Function O.K.</label>
+                            <label><input type="checkbox" id="jobSafetyOk" checked /> Safety O.K.</label>
+                        </div>
+                        <div class="field-group">
+                            <label>Comments / Additional Notes</label>
+                            <textarea id="jobComments" rows="2" placeholder="Any extra observations..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- ===== SIGNATURES ===== -->
+                    <div class="signature-area">
+                        <div class="signature-grid">
+                            <div class="signature-box">
+                                <h4><i class="fas fa-user-cog"></i> Technician Signature</h4>
+                                <div class="field-group">
+                                    <label>Name</label>
+                                    <select id="jobTechName">
+                                        <option value="">-- Select --</option>
+                                    </select>
+                                </div>
+                                <div class="field-group">
+                                    <label>Draw Signature</label>
+                                    <div class="sig-pad-wrapper" id="jobTechSigWrapper">
+                                        <canvas id="jobTechSigCanvas" width="400" height="120"></canvas>
+                                        <div class="sig-placeholder" id="jobTechSigPlaceholder">✍️ Sign here</div>
+                                    </div>
+                                    <div class="sig-actions">
+                                        <button type="button" class="btn-sm btn-clear" onclick="clearSignature('jobTech')"><i class="fas fa-trash"></i> Clear</button>
+                                        <button type="button" class="btn-sm btn-undo" onclick="undoSignature('jobTech')"><i class="fas fa-undo"></i> Undo</button>
+                                    </div>
+                                    <div class="sig-status" id="jobTechSigStatus">✅ Signed</div>
+                                </div>
+                                <div class="field-group">
+                                    <label>Date</label>
+                                    <input type="date" id="jobTechDate" />
+                                </div>
+                            </div>
+                            <div class="signature-box">
+                                <h4><i class="fas fa-user-check"></i> Supervisor Signature</h4>
+                                <div class="field-group">
+                                    <label>Name</label>
+                                    <select id="jobCertName">
+                                        <option value="">-- Select --</option>
+                                    </select>
+                                </div>
+                                <div class="field-group">
+                                    <label>Draw Signature</label>
+                                    <div class="sig-pad-wrapper" id="jobCertSigWrapper">
+                                        <canvas id="jobCertSigCanvas" width="400" height="120"></canvas>
+                                        <div class="sig-placeholder" id="jobCertSigPlaceholder">✍️ Sign here</div>
+                                    </div>
+                                    <div class="sig-actions">
+                                        <button type="button" class="btn-sm btn-clear" onclick="clearSignature('jobCert')"><i class="fas fa-trash"></i> Clear</button>
+                                        <button type="button" class="btn-sm btn-undo" onclick="undoSignature('jobCert')"><i class="fas fa-undo"></i> Undo</button>
+                                    </div>
+                                    <div class="sig-status" id="jobCertSigStatus">✅ Signed</div>
+                                </div>
+                                <div class="field-group">
+                                    <label>Date</label>
+                                    <input type="date" id="jobCertDate" />
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </section>
 
-            <div class="action-bar no-print">
-                <button type="button" class="btn btn-success" id="saveJobBtn" onclick="saveJobCard()">💾 Save Job Card</button>
-                <button type="button" class="btn btn-outline" onclick="window.print()">📄 Print Job Card</button>
-                <button type="button" class="btn btn-outline" onclick="goToDashboard()">⬅️ Back to Dashboard</button>
-            </div>
-        </form>
-
-        <footer style="margin-top:22px;font-size:12px;color:#6c757d;text-align:center;border-top:1px solid #e9ecef;padding-top:14px;">
-            🔥 Firestore‑powered · ✍️ Drawable Signatures · MCRH Job Card v8.1
-        </footer>
+                <!-- ===== ACTION BAR ===== -->
+                <div class="action-bar no-print">
+                    <button type="button" class="btn btn-success" id="saveJobBtn" onclick="saveJobCard()">
+                        <i class="fas fa-save"></i> Save Job Card
+                    </button>
+                    <button type="button" class="btn btn-outline" onclick="window.print()">
+                        <i class="fas fa-print"></i> Print
+                    </button>
+                    <button type="button" class="btn btn-outline" onclick="resetJobCardForm()">
+                        <i class="fas fa-redo"></i> Reset
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <div id="toast" class="toast">Message</div>
-
+    <!-- ============ SAVING OVERLAY ============ -->
     <div class="saving-overlay" id="savingOverlay">
         <div class="saving-card">
             <div class="spinner"></div>
@@ -330,7 +885,12 @@
         </div>
     </div>
 
+    <div id="toast" class="toast">Message</div>
+
     <script type="module">
+        // ============================================================
+        // FIREBASE CONFIG
+        // ============================================================
         const firebaseConfig = {
             apiKey: "AIzaSyDnsz1s-VnewbUszXNJptcdMZ_h0QsNHYQ",
             authDomain: "moivoibiomed.firebaseapp.com",
@@ -364,6 +924,9 @@
         let allJobCards = [];
         let isSaving = false;
 
+        // ============================================================
+        // AUTH
+        // ============================================================
         onAuthStateChanged(auth, async (user) => {
             if (!user) { window.location.href = 'login.html'; return; }
             try {
@@ -381,16 +944,25 @@
                 }
                 currentUser = { id: user.uid, ...userData };
                 await initPage();
-            } catch (err) { console.error('Auth error:', err); window.location.href = 'login.html'; }
+            } catch (err) {
+                console.error('Auth error:', err);
+                window.location.href = 'login.html';
+            }
         });
 
+        // ============================================================
+        // NAV
+        // ============================================================
         window.logout = function() { signOut(auth).then(() => window.location.href = 'login.html'); };
         window.goToDashboard = function() { window.location.href = 'dashboard.html'; };
 
+        // ============================================================
+        // HELPERS
+        // ============================================================
         function showToast(msg, isError = false) {
             const t = document.getElementById('toast');
             t.textContent = msg;
-            t.style.borderLeftColor = isError ? '#dc3545' : '#C8102E';
+            t.style.borderLeftColor = isError ? '#ef4444' : '#C8102E';
             t.classList.add('show');
             clearTimeout(t._timer);
             t._timer = setTimeout(() => t.classList.remove('show'), 3500);
@@ -428,7 +1000,10 @@
                     const data = d.data();
                     if (data.jobNo) {
                         const m = data.jobNo.match(/MCRH(\d+)/);
-                        if (m) { const n = parseInt(m[1]); if (n > max) max = n; }
+                        if (m) {
+                            const n = parseInt(m[1]);
+                            if (n > max) max = n;
+                        }
                     }
                 });
                 return `MCRH${String(max + 1).padStart(3, '0')}`;
@@ -437,6 +1012,9 @@
             }
         }
 
+        // ============================================================
+        // SAVING OVERLAY
+        // ============================================================
         function showSavingOverlay(message, showRedirectNote = false) {
             const overlay = document.getElementById('savingOverlay');
             const title = document.getElementById('savingTitle');
@@ -455,6 +1033,9 @@
             overlay.classList.add('show');
         }
 
+        // ============================================================
+        // FETCH USERS
+        // ============================================================
         async function fetchUsers() {
             try {
                 const snap = await getDocs(collection(db, USERS_COLL));
@@ -463,6 +1044,9 @@
             } catch (err) { console.error('Error fetching users:', err); }
         }
 
+        // ============================================================
+        // POPULATE DROPDOWNS
+        // ============================================================
         function populateDropdowns() {
             const handedToSelect = document.getElementById('jobHandedTo');
             handedToSelect.innerHTML = '<option value="">-- Select --</option>';
@@ -472,6 +1056,7 @@
                 opt.textContent = u.name + ' (' + (u.department || '') + ')';
                 handedToSelect.appendChild(opt);
             });
+
             const techSelect = document.getElementById('jobTechName');
             techSelect.innerHTML = '<option value="">-- Select --</option>';
             allUsers.filter(u => u.role === 'maintenance' || u.role === 'admin').forEach(u => {
@@ -498,31 +1083,52 @@
             });
         }
 
+        // ============================================================
+        // SIGNATURE PADS
+        // ============================================================
         function initSignaturePads() {
             const techCanvas = document.getElementById('jobTechSigCanvas');
             const certCanvas = document.getElementById('jobCertSigCanvas');
 
             techSigPad = new SignaturePad(techCanvas, {
-                backgroundColor: 'rgb(255,255,255)', penColor: 'rgb(0,0,0)',
-                minWidth: 1.5, maxWidth: 3,
+                backgroundColor: 'rgb(255,255,255)',
+                penColor: 'rgb(0,0,0)',
+                minWidth: 1.5,
+                maxWidth: 3,
                 onEnd: () => {
                     const status = document.getElementById('jobTechSigStatus');
-                    if (techSigPad.isEmpty()) { status.textContent = '⚠️ No signature drawn'; status.className = 'sig-status show empty'; }
-                    else { status.textContent = '✅ Signed ✓'; status.className = 'sig-status show signed'; }
+                    if (techSigPad.isEmpty()) {
+                        status.textContent = '⚠️ No signature drawn';
+                        status.className = 'sig-status show empty';
+                    } else {
+                        status.textContent = '✅ Signed ✓';
+                        status.className = 'sig-status show signed';
+                    }
                 }
             });
             certSigPad = new SignaturePad(certCanvas, {
-                backgroundColor: 'rgb(255,255,255)', penColor: 'rgb(0,0,0)',
-                minWidth: 1.5, maxWidth: 3,
+                backgroundColor: 'rgb(255,255,255)',
+                penColor: 'rgb(0,0,0)',
+                minWidth: 1.5,
+                maxWidth: 3,
                 onEnd: () => {
                     const status = document.getElementById('jobCertSigStatus');
-                    if (certSigPad.isEmpty()) { status.textContent = '⚠️ No signature drawn'; status.className = 'sig-status show empty'; }
-                    else { status.textContent = '✅ Signed ✓'; status.className = 'sig-status show signed'; }
+                    if (certSigPad.isEmpty()) {
+                        status.textContent = '⚠️ No signature drawn';
+                        status.className = 'sig-status show empty';
+                    } else {
+                        status.textContent = '✅ Signed ✓';
+                        status.className = 'sig-status show signed';
+                    }
                 }
             });
 
-            techCanvas.addEventListener('pointerdown', () => { document.getElementById('jobTechSigPlaceholder').style.display = 'none'; });
-            certCanvas.addEventListener('pointerdown', () => { document.getElementById('jobCertSigPlaceholder').style.display = 'none'; });
+            techCanvas.addEventListener('pointerdown', () => {
+                document.getElementById('jobTechSigPlaceholder').style.display = 'none';
+            });
+            certCanvas.addEventListener('pointerdown', () => {
+                document.getElementById('jobCertSigPlaceholder').style.display = 'none';
+            });
 
             const origClearTech = techSigPad.clear.bind(techSigPad);
             techSigPad.clear = function() {
@@ -574,6 +1180,9 @@
         function getSigData(pad) { return (pad && !pad.isEmpty()) ? pad.toData() : null; }
         function loadSigData(pad, data) { if (pad && data) pad.fromData(data); }
 
+        // ============================================================
+        // REQUEST DROPDOWN
+        // ============================================================
         async function populateRequestDropdown() {
             const dropdown = document.getElementById('jobRequestNo');
             dropdown.innerHTML = '<option value="">-- Select Request --</option>';
@@ -613,6 +1222,9 @@
             } catch (err) { console.error(err); }
         }
 
+        // ============================================================
+        // LOAD REQUEST DATA
+        // ============================================================
         window.loadRequestData = async function() {
             const requestNo = document.getElementById('jobRequestNo').value;
             if (!requestNo) {
@@ -646,9 +1258,14 @@
                 }
                 populateSupervisorDropdown(r.unit);
                 showToast('✅ Request data loaded.');
-            } catch (err) { showToast('Error loading request: ' + err.message, true); }
+            } catch (err) {
+                showToast('Error loading request: ' + err.message, true);
+            }
         };
 
+        // ============================================================
+        // STATUS TOGGLE
+        // ============================================================
         window.toggleStatusFields = function() {
             const status = document.getElementById('jobStatus').value;
             const pendingDiv = document.getElementById('pendingFields');
@@ -675,6 +1292,9 @@
             }
         };
 
+        // ============================================================
+        // AUTO-CALCULATE TIME
+        // ============================================================
         function updateJobTimeFields() {
             const report = document.getElementById('jobReportingDateTime').value;
             const start = document.getElementById('jobStartDateTime').value;
@@ -687,7 +1307,7 @@
         document.getElementById('jobReportingDateTime').addEventListener('change', updateJobTimeFields);
 
         // ============================================================
-        // SAVE JOB CARD – redirect to dashboard no matter what
+        // SAVE JOB CARD – redirect to dashboard after save
         // ============================================================
         window.saveJobCard = async function() {
             if (isSaving) return;
@@ -701,7 +1321,7 @@
             isSaving = true;
             const btn = document.getElementById('saveJobBtn');
             btn.disabled = true;
-            btn.innerHTML = '<span class="loading-spinner"></span> Saving…';
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Saving…';
 
             showSavingOverlay('Saving job card details to the cloud…');
 
@@ -773,7 +1393,6 @@
                     technicianId: currentUser ? currentUser.id : null,
                 };
 
-                // Save or update jobcard
                 if (currentJobCardId) {
                     await updateDoc(doc(db, JOBCARDS_COLL, currentJobCardId), data);
                 } else {
@@ -783,7 +1402,6 @@
                 savedOk = true;
                 savedJobNo = data.jobNo;
 
-                // Update linked request (fire-and-forget, don't block redirect)
                 try {
                     const reqQuery = query(collection(db, REQUESTS_COLL), where('requestNo', '==', requestNo));
                     const reqSnap = await getDocs(reqQuery);
@@ -793,21 +1411,18 @@
                             jobNo: data.jobNo
                         });
                     }
-                } catch (err) {
-                    console.warn('Could not update request status:', err);
-                }
+                } catch (err) { console.warn('Could not update request:', err); }
 
             } catch (err) {
                 console.error('❌ Save error:', err);
                 showToast('❌ Error: ' + err.message, true);
                 document.getElementById('savingOverlay').classList.remove('show');
                 btn.disabled = false;
-                btn.innerHTML = '💾 Save Job Card';
+                btn.innerHTML = '<i class="fas fa-save"></i> Save Job Card';
                 isSaving = false;
-                return; // only skip redirect if jobcard save itself failed
+                return;
             }
 
-            // ✅ Always redirect to dashboard after a successful save
             showSavingOverlay('', true);
             showToast(`✅ Job card ${savedJobNo} saved. Redirecting…`);
 
@@ -816,6 +1431,9 @@
             }, 1500);
         };
 
+        // ============================================================
+        // LOAD JOB CARD (for editing)
+        // ============================================================
         window.loadJobCard = async function(id) {
             try {
                 const snap = await getDoc(doc(db, JOBCARDS_COLL, id));
@@ -872,9 +1490,47 @@
                 if (j.handedToId) document.getElementById('jobHandedTo').value = j.handedToId;
 
                 showToast('📂 Job card loaded for editing.');
-            } catch (err) { showToast('Error loading: ' + err.message, true); }
+            } catch (err) {
+                showToast('Error loading: ' + err.message, true);
+            }
         };
 
+        // ============================================================
+        // RESET FORM
+        // ============================================================
+        function resetJobCardForm() {
+            if (!confirm('Reset the form? Unsaved data will be lost.')) return;
+            document.querySelectorAll('#jobcardForm input, #jobcardForm textarea, #jobcardForm select').forEach(el => {
+                if (el.id !== 'jobReceivedBy' && el.id !== 'jobHandedBy' && el.id !== 'jobTechName' &&
+                    el.id !== 'jobCertName' && el.id !== 'jobRequestNo' && el.id !== 'jobHandedTo' &&
+                    el.id !== 'jobRequesterId') {
+                    if (el.type === 'checkbox') el.checked = (el.id === 'jobFunctionOk' || el.id === 'jobSafetyOk');
+                    else if (el.tagName !== 'SELECT') el.value = '';
+                }
+            });
+            document.getElementById('jobHandedTo').value = '';
+            document.getElementById('jobTechName').value = '';
+            document.getElementById('jobCertName').value = '';
+            document.getElementById('jobRequestNo').value = '';
+            document.getElementById('jobStatus').value = 'Pending';
+            document.getElementById('jobRequesterId').value = '';
+            techSigPad && techSigPad.clear();
+            certSigPad && certSigPad.clear();
+            document.getElementById('jobStatusBadge').textContent = '● PENDING';
+            document.getElementById('jobStatusBadge').className = 'status pending';
+            document.getElementById('jobNo').value = '';
+            currentJobCardId = null;
+            toggleStatusFields();
+            document.getElementById('jobCertName').innerHTML = '<option value="">-- Select --</option>';
+            populateRequestDropdown();
+            generateJobNumber().then(num => document.getElementById('jobNo').value = num);
+            showToast('🔄 Form reset.');
+        }
+        window.resetJobCardForm = resetJobCardForm;
+
+        // ============================================================
+        // INIT
+        // ============================================================
         async function initPage() {
             document.getElementById('jobReceivedBy').value = currentUser?.name || '';
             document.getElementById('jobHandedBy').value = currentUser?.name || '';

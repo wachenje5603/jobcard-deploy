@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MCRH - Request Slip</title>
 
-    <!-- Firebase v9 -->
     <script type="importmap">
         {
             "imports": {
@@ -16,198 +15,481 @@
         }
     </script>
 
-    <style>
-        /* ===== STYLES ===== */
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#f4f6f9; padding:20px; color:#1e2a3a; }
-        .container { max-width:1000px; margin:0 auto; background:white; padding:25px 30px; border-radius:12px; box-shadow:0 8px 30px rgba(0,0,0,0.12); }
-        .hospital-header { border-bottom:4px solid #C8102E; padding-bottom:12px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; }
-        .logo-area { display:flex; align-items:center; gap:15px; }
-        .logo-area .logo-icon { font-size:36px; background:#C8102E; color:white; width:60px; height:60px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; }
-        .logo-area h1 { font-size:24px; color:#C8102E; letter-spacing:1px; font-weight:700; }
-        .logo-area .sub { font-size:13px; color:#333; font-weight:500; }
-        .hospital-header .badge { background:#C8102E; color:white; padding:6px 16px; border-radius:30px; font-size:14px; font-weight:600; }
-        .card-title { display:flex; justify-content:space-between; align-items:center; background:#f8f9fc; padding:8px 16px; border-radius:8px; margin-bottom:18px; }
-        .card-title h2 { font-size:20px; color:#1e2a3a; font-weight:600; }
-        .card-title .status { font-size:13px; padding:4px 14px; border-radius:20px; font-weight:600; background:#28a745; color:white; }
-        .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:14px 24px; }
-        .full-width { grid-column:1 / -1; }
-        .field-group { display:flex; flex-direction:column; margin-bottom:4px; }
-        .field-group label { font-size:12px; font-weight:600; color:#495057; margin-bottom:3px; text-transform:uppercase; letter-spacing:0.4px; }
-        .field-group input, .field-group select, .field-group textarea { padding:8px 12px; border:1px solid #ced4da; border-radius:6px; font-size:14px; background:white; transition:0.2s; font-family:inherit; }
-        .field-group input:focus, .field-group select:focus, .field-group textarea:focus { border-color:#C8102E; outline:0; box-shadow:0 0 0 3px rgba(200,16,46,0.15); }
-        .field-group input[readonly] { background:#e9ecef; cursor:default; }
-        textarea { resize:vertical; min-height:50px; }
-        .action-bar { display:flex; flex-wrap:wrap; gap:12px; margin:20px 0 12px 0; padding:16px 0; border-top:1px solid #e9ecef; border-bottom:1px solid #e9ecef; }
-        .btn { padding:10px 24px; border:none; border-radius:6px; font-weight:600; font-size:14px; cursor:pointer; transition:0.2s; display:inline-flex; align-items:center; gap:8px; }
-        .btn-success { background:#28a745; color:white; }
-        .btn-success:hover { background:#1e7e34; }
-        .btn-outline { background:transparent; border:1.5px solid #6c757d; color:#6c757d; }
-        .btn-outline:hover { background:#6c757d; color:white; }
-        .btn-primary { background:#C8102E; color:white; }
-        .btn-primary:hover { background:#a00d24; }
-        .btn-danger { background:#dc3545; color:white; }
-        .btn-danger:hover { background:#b02a37; }
-        .btn-info { background:#17a2b8; color:white; }
-        .btn-info:hover { background:#138496; }
-        .btn-sm { padding:4px 12px; font-size:12px; border-radius:4px; }
-        .btn:disabled { opacity:0.6; cursor:not-allowed; }
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-        .toast { position:fixed; top:20px; right:20px; background:#1e2a3a; color:white; padding:14px 28px; border-radius:8px; box-shadow:0 6px 20px rgba(0,0,0,0.25); font-weight:500; z-index:999; transform:translateY(-20px); opacity:0; transition:0.3s ease; border-left:6px solid #C8102E; max-width:380px; }
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        :root {
+            --primary:#C8102E; --primary-light:#e81a3f;
+            --primary-gradient:linear-gradient(135deg,#C8102E 0%,#e81a3f 100%);
+            --bg:#f4f6fb; --card:#fff; --border:#e8ebf1; --border-soft:#f1f4f9;
+            --text:#0f172a; --text-soft:#475569; --text-muted:#94a3b8;
+            --radius:14px; --radius-sm:10px;
+            --shadow:0 4px 14px rgba(15,23,42,0.06);
+            --shadow-lg:0 20px 60px rgba(15,23,42,0.1);
+            --transition:200ms cubic-bezier(0.4,0,0.2,1);
+        }
+        body {
+            font-family:'Plus Jakarta Sans','Inter',sans-serif;
+            background:var(--bg);
+            background-image:
+                radial-gradient(circle at 0% 0%, rgba(200,16,46,0.04) 0%, transparent 35%),
+                radial-gradient(circle at 100% 100%, rgba(99,102,241,0.04) 0%, transparent 35%);
+            background-attachment:fixed;
+            color:var(--text);
+            min-height:100vh;
+            -webkit-font-smoothing:antialiased;
+        }
+
+        /* Topbar */
+        .topbar {
+            background:white;
+            border-bottom:1px solid var(--border);
+            padding:14px 28px;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:16px;
+            position:sticky;
+            top:0;
+            z-index:50;
+            box-shadow:0 1px 3px rgba(15,23,42,0.04);
+        }
+        .topbar-left { display:flex; align-items:center; gap:14px; }
+        .brand-mini {
+            width:40px; height:40px;
+            background:var(--primary-gradient);
+            border-radius:11px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            color:white;
+            font-weight:800;
+            font-size:18px;
+            box-shadow:0 4px 12px rgba(200,16,46,0.25);
+        }
+        .topbar-title h1 { font-size:16px; font-weight:800; letter-spacing:-0.3px; }
+        .topbar-title small { font-size:11.5px; color:var(--text-muted); font-weight:500; }
+        .topbar-actions { display:flex; gap:8px; align-items:center; }
+
+        /* Buttons */
+        .btn {
+            padding:10px 18px;
+            border:none;
+            border-radius:10px;
+            font-weight:700;
+            font-size:13px;
+            cursor:pointer;
+            transition:var(--transition);
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+            font-family:inherit;
+            text-decoration:none;
+            white-space:nowrap;
+        }
+        .btn i { font-size:13px; }
+        .btn-primary { background:var(--primary-gradient); color:white; box-shadow:0 4px 14px rgba(200,16,46,0.28); }
+        .btn-primary:hover { transform:translateY(-2px); box-shadow:0 8px 22px rgba(200,16,46,0.36); }
+        .btn-success { background:linear-gradient(135deg,#10b981,#22c55e); color:white; box-shadow:0 4px 14px rgba(16,185,129,0.28); }
+        .btn-success:hover { transform:translateY(-2px); box-shadow:0 8px 22px rgba(16,185,129,0.36); }
+        .btn-outline { background:white; border:1.5px solid var(--border); color:var(--text-soft); }
+        .btn-outline:hover { border-color:var(--primary); color:var(--primary); background:#fff5f6; }
+        .btn-danger { background:linear-gradient(135deg,#ef4444,#dc2626); color:white; }
+        .btn-danger:hover { transform:translateY(-2px); }
+        .btn-info { background:linear-gradient(135deg,#0ea5e9,#22d3ee); color:white; }
+        .btn-info:hover { transform:translateY(-2px); }
+        .btn-sm { padding:8px 14px; font-size:12px; border-radius:9px; }
+        .btn:disabled { opacity:0.6; cursor:not-allowed; transform:none !important; }
+
+        /* Container */
+        .container {
+            max-width:1000px;
+            margin:26px auto;
+            padding:0 20px 40px;
+        }
+
+        /* Header card */
+        .hospital-header {
+            background:white;
+            border-radius:var(--radius);
+            padding:22px 26px;
+            border:1px solid var(--border);
+            box-shadow:var(--shadow);
+            margin-bottom:18px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:16px;
+            flex-wrap:wrap;
+        }
+        .hospital-brand { display:flex; align-items:center; gap:14px; }
+        .hospital-brand .logo-icon {
+            width:54px; height:54px;
+            background:var(--primary-gradient);
+            border-radius:14px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            color:white;
+            font-weight:800;
+            font-size:22px;
+            flex-shrink:0;
+            box-shadow:0 6px 16px rgba(200,16,46,0.25);
+        }
+        .hospital-brand h1 {
+            font-size:18px;
+            font-weight:800;
+            color:var(--primary);
+            letter-spacing:-0.3px;
+        }
+        .hospital-brand .sub {
+            font-size:11.5px;
+            color:var(--text-soft);
+            font-weight:500;
+            margin-top:2px;
+        }
+        .hospital-brand .county {
+            font-size:12px;
+            font-weight:700;
+            color:var(--primary);
+            margin-top:2px;
+        }
+        .hospital-badge {
+            background:var(--primary-gradient);
+            color:white;
+            padding:7px 16px;
+            border-radius:30px;
+            font-size:11.5px;
+            font-weight:700;
+            text-transform:uppercase;
+            letter-spacing:0.5px;
+        }
+
+        /* Form card */
+        .form-card {
+            background:white;
+            border-radius:var(--radius);
+            border:1px solid var(--border);
+            box-shadow:var(--shadow);
+            overflow:hidden;
+        }
+        .form-card-header {
+            padding:18px 26px;
+            background:#fafbfd;
+            border-bottom:1px solid var(--border);
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:12px;
+            flex-wrap:wrap;
+        }
+        .form-card-header h2 {
+            font-size:17px;
+            font-weight:800;
+            display:flex;
+            align-items:center;
+            gap:10px;
+            color:var(--text);
+        }
+        .form-card-header h2 i { color:var(--primary); }
+        .status-pill {
+            background:#d1fae5;
+            color:#065f46;
+            padding:5px 12px;
+            border-radius:20px;
+            font-size:11px;
+            font-weight:800;
+            text-transform:uppercase;
+            letter-spacing:0.4px;
+        }
+
+        .form-body { padding:24px 26px; }
+
+        .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px 22px; }
+        .full-width { grid-column:1 / -1; }
+
+        .field-group { display:flex; flex-direction:column; margin-bottom:4px; }
+        .field-group label {
+            font-size:11.5px;
+            font-weight:700;
+            color:var(--text-soft);
+            margin-bottom:6px;
+            text-transform:uppercase;
+            letter-spacing:0.4px;
+        }
+        .field-group input,
+        .field-group select,
+        .field-group textarea {
+            padding:11px 14px;
+            border:1.5px solid var(--border);
+            border-radius:10px;
+            font-size:13.5px;
+            background:#fafbfd;
+            font-family:inherit;
+            color:var(--text);
+            font-weight:500;
+            transition:var(--transition);
+            outline:none;
+            width:100%;
+        }
+        .field-group input:focus,
+        .field-group select:focus,
+        .field-group textarea:focus {
+            border-color:var(--primary);
+            box-shadow:0 0 0 4px rgba(200,16,46,0.08);
+            background:white;
+        }
+        .field-group input[readonly] {
+            background:#f1f5f9;
+            color:var(--text-muted);
+            cursor:default;
+        }
+        textarea { resize:vertical; min-height:70px; font-family:inherit; }
+
+        .notification-block {
+            background:#f0f9ff;
+            border:1px solid #bae6fd;
+            border-radius:12px;
+            padding:16px 18px;
+            margin-top:18px;
+        }
+        .notification-block label {
+            display:block;
+            font-size:12px;
+            font-weight:700;
+            color:#0369a1;
+            margin-bottom:10px;
+            text-transform:uppercase;
+            letter-spacing:0.4px;
+        }
+        .notification-note {
+            font-size:12px;
+            color:var(--text-soft);
+            margin-top:10px;
+            font-weight:500;
+        }
+
+        .action-bar {
+            display:flex;
+            flex-wrap:wrap;
+            gap:12px;
+            padding:20px 26px;
+            border-top:1px solid var(--border);
+            background:#fafbfd;
+        }
+
+        /* Saving overlay */
+        .saving-overlay {
+            display:none;
+            position:fixed;
+            inset:0;
+            background:rgba(15,23,42,0.55);
+            backdrop-filter:blur(8px);
+            z-index:10000;
+            align-items:center;
+            justify-content:center;
+            padding:20px;
+        }
+        .saving-overlay.show { display:flex; }
+        .saving-card {
+            background:white;
+            border-radius:18px;
+            padding:38px 44px;
+            text-align:center;
+            box-shadow:0 30px 80px rgba(15,23,42,0.3);
+            max-width:420px;
+            width:100%;
+            animation:fadeUp 300ms ease;
+        }
+        @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+        .saving-card .spinner {
+            width:56px; height:56px;
+            border:5px solid #f1f5f9;
+            border-top-color:var(--primary);
+            border-radius:50%;
+            animation:spin 0.9s linear infinite;
+            margin:0 auto 18px;
+        }
+        @keyframes spin { to { transform:rotate(360deg); } }
+        .saving-card h2 { font-size:19px; color:var(--primary); margin-bottom:8px; font-weight:800; }
+        .saving-card p { font-size:13.5px; color:var(--text-soft); font-weight:500; }
+        .saving-card .redirect-note {
+            margin-top:14px;
+            font-size:13px;
+            color:#065f46;
+            background:#d1fae5;
+            padding:12px 16px;
+            border-radius:10px;
+            font-weight:600;
+        }
+
+        /* Toast */
+        .toast {
+            position:fixed;
+            bottom:24px; right:24px;
+            background:#0f172a;
+            color:white;
+            padding:14px 22px;
+            border-radius:12px;
+            font-weight:700;
+            z-index:9999;
+            transform:translateY(100px);
+            opacity:0;
+            transition:320ms cubic-bezier(0.4,0,0.2,1);
+            border-left:4px solid var(--primary);
+            max-width:360px;
+            box-shadow:0 16px 48px rgba(15,23,42,0.3);
+            font-size:13px;
+        }
         .toast.show { transform:translateY(0); opacity:1; }
 
-        .loading-spinner { display:inline-block; width:16px; height:16px; border:3px solid rgba(255,255,255,0.3); border-radius:50%; border-top-color:#fff; animation:spin 0.8s linear infinite; }
-        @keyframes spin { to { transform:rotate(360deg); } }
-
-        /* ===== SAVING OVERLAY ===== */
-        .saving-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.55);
-            backdrop-filter: blur(4px);
-            z-index: 10000;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
+        @media print {
+            .topbar, .action-bar, .btn, .no-print { display:none !important; }
+            body { background:white; }
+            .container { margin:0; padding:10px; }
+            .form-card, .hospital-header { box-shadow:none; border:1px solid #ddd; }
+            .field-group input, .field-group select, .field-group textarea {
+                border:none;
+                background:transparent !important;
+                padding:2px 0;
+            }
         }
-        .saving-overlay.show { display: flex; }
-        .saving-card {
-            background: white;
-            border-radius: 14px;
-            padding: 36px 44px;
-            text-align: center;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            max-width: 420px;
-            width: 100%;
+        @media (max-width:768px) {
+            .grid-2 { grid-template-columns:1fr; }
+            .topbar { padding:12px 16px; }
+            .topbar-title small { display:none; }
+            .topbar-actions .btn span { display:none; }
+            .hospital-header { flex-direction:column; align-items:flex-start; }
+            .form-card-header { padding:14px 18px; }
+            .form-body { padding:18px; }
+            .action-bar { padding:16px 18px; }
+            .action-bar .btn { flex:1; justify-content:center; }
         }
-        .saving-card .spinner {
-            width: 54px; height: 54px;
-            border: 5px solid #f1f3f5;
-            border-top-color: #C8102E;
-            border-radius: 50%;
-            animation: spin 0.9s linear infinite;
-            margin: 0 auto 18px;
-        }
-        .saving-card h2 { font-size: 20px; color:#C8102E; margin-bottom: 8px; }
-        .saving-card p { font-size: 14px; color:#495057; }
-        .saving-card .redirect-note {
-            margin-top: 14px;
-            font-size: 13px;
-            color: #6c757d;
-            background: #f8f9fc;
-            padding: 10px 14px;
-            border-radius: 8px;
-        }
-
-        @media print { .action-bar, .btn, .no-print { display:none !important; } .field-group input, .field-group select, .field-group textarea { border:none; background:transparent; padding:2px 0; box-shadow:none; } .container { box-shadow:none; padding:10px; } }
-        @media (max-width:768px) { .grid-2 { grid-template-columns:1fr; } .container { padding:15px; } .hospital-header { flex-direction:column; align-items:start; gap:6px; } .action-bar { flex-direction:column; } .action-bar .btn { justify-content:center; } }
     </style>
 </head>
 <body>
 
+    <!-- TOPBAR -->
+    <header class="topbar">
+        <div class="topbar-left">
+            <div class="brand-mini">M</div>
+            <div class="topbar-title">
+                <h1>New Service Request</h1>
+                <small>Fill in the details below</small>
+            </div>
+        </div>
+        <div class="topbar-actions">
+            <button class="btn btn-outline btn-sm" onclick="window.location.href='dashboard.html'">
+                <i class="fas fa-arrow-left"></i> <span>Dashboard</span>
+            </button>
+            <button class="btn btn-danger btn-sm" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+            </button>
+        </div>
+    </header>
+
     <div class="container">
-        <!-- HEADER -->
-        <header class="hospital-header">
-            <div class="logo-area">
+
+        <!-- HOSPITAL HEADER -->
+        <div class="hospital-header">
+            <div class="hospital-brand">
                 <div class="logo-icon">M</div>
                 <div>
                     <h1>MOI VOI COUNTY REFERRAL HOSPITAL</h1>
-                    <div class="sub">P.O. BOX 18-80300 VOI | Email: biomedsmoivoi@gmail.com</div>
-                    <div style="font-size:14px; font-weight:600; color:#C8102E; margin-top:2px;">TAITA TAVETA COUNTY</div>
+                    <div class="sub">P.O. BOX 18-80300 VOI · biomedsmoivoi@gmail.com</div>
+                    <div class="county">TAITA TAVETA COUNTY</div>
                 </div>
             </div>
-            <span class="badge">DEPARTMENT OF HEALTH SERVICES</span>
-        </header>
-
-        <div class="card-title">
-            <h2>📋 SERVICE REQUEST FORM</h2>
-            <span class="status" id="reqStatusBadge">● OPEN</span>
-            <button class="btn btn-danger btn-sm" onclick="logout()" style="margin-left:auto;">🚪 Logout</button>
+            <span class="hospital-badge">Department of Health Services</span>
         </div>
 
-        <!-- REQUEST FORM -->
-        <form id="requestForm">
-            <div class="grid-2">
-                <div class="field-group">
-                    <label>Request No.</label>
-                    <input type="text" id="reqNo" readonly placeholder="Will be assigned on save" />
-                </div>
-                <div class="field-group">
-                    <label>Date</label>
-                    <input type="datetime-local" id="reqDateTime" />
-                </div>
-                <div class="field-group">
-                    <label>Requester Name</label>
-                    <input type="text" id="reqRequester" readonly placeholder="Auto-filled from profile" />
-                </div>
-                <div class="field-group">
-                    <label>Department / Unit / Ward</label>
-                    <input type="text" id="reqUnit" readonly placeholder="Auto-filled from profile" />
-                </div>
-                <div class="field-group">
-                    <label>Equipment / Item Type</label>
-                    <select id="reqType">
-                        <option value="Equipment">Equipment</option>
-                        <option value="Other">Other (e.g., tap, electrical)</option>
-                    </select>
-                </div>
-                <div class="field-group">
-                    <label>Equipment Name / Description</label>
-                    <input type="text" id="reqEquipName" placeholder="e.g. Ventilator or 'Tap repair'" />
-                </div>
+        <!-- FORM CARD -->
+        <div class="form-card">
+            <div class="form-card-header">
+                <h2><i class="fas fa-clipboard-list"></i> Service Request Form</h2>
+                <span class="status-pill">● Open</span>
             </div>
 
-            <div id="reqEquipDetails" class="grid-2" style="display: none;">
-                <div class="field-group">
-                    <label>Inventory / Asset No. <span style="color:#6c757d; font-size:11px; font-weight:normal;">(Coming soon)</span></label>
-                    <input type="text" id="reqInventory" placeholder="Coming soon" readonly style="background:#f8f9fa; color:#6c757d;" />
-                </div>
-                <div class="field-group">
-                    <label>Serial No.</label>
-                    <input type="text" id="reqSerial" placeholder="e.g. SN-2024-8812" />
-                </div>
-                <div class="field-group">
-                    <label>Model / Make</label>
-                    <input type="text" id="reqModel" placeholder="e.g. DuraSink Pro-3000" />
-                </div>
-            </div>
+            <form id="requestForm">
+                <div class="form-body">
+                    <div class="grid-2">
+                        <div class="field-group">
+                            <label>Request No.</label>
+                            <input type="text" id="reqNo" readonly placeholder="Will be assigned on save" />
+                        </div>
+                        <div class="field-group">
+                            <label>Date & Time</label>
+                            <input type="datetime-local" id="reqDateTime" />
+                        </div>
+                        <div class="field-group">
+                            <label>Requester Name</label>
+                            <input type="text" id="reqRequester" readonly placeholder="Auto-filled" />
+                        </div>
+                        <div class="field-group">
+                            <label>Department / Unit / Ward</label>
+                            <input type="text" id="reqUnit" readonly placeholder="Auto-filled" />
+                        </div>
+                        <div class="field-group">
+                            <label>Equipment / Item Type</label>
+                            <select id="reqType">
+                                <option value="Equipment">Equipment</option>
+                                <option value="Other">Other (tap, electrical, etc.)</option>
+                            </select>
+                        </div>
+                        <div class="field-group">
+                            <label>Equipment Name / Description</label>
+                            <input type="text" id="reqEquipName" placeholder="e.g. Ventilator" />
+                        </div>
+                    </div>
 
-            <div class="field-group full-width">
-                <label>Description of Fault / Complaint</label>
-                <textarea id="reqComplaint" rows="3" placeholder="Describe the issue..."></textarea>
-            </div>
+                    <div id="reqEquipDetails" class="grid-2" style="display:none; margin-top:16px;">
+                        <div class="field-group">
+                            <label>Inventory / Asset No.</label>
+                            <input type="text" id="reqInventory" readonly style="background:#f1f5f9; color:var(--text-muted);" placeholder="Coming soon" />
+                        </div>
+                        <div class="field-group">
+                            <label>Serial No.</label>
+                            <input type="text" id="reqSerial" placeholder="e.g. SN-2024-8812" />
+                        </div>
+                        <div class="field-group">
+                            <label>Model / Make</label>
+                            <input type="text" id="reqModel" placeholder="e.g. DuraSink Pro-3000" />
+                        </div>
+                    </div>
 
-            <!-- ===== EMAIL NOTIFICATION ===== -->
-            <div class="field-group full-width">
-                <label>📧 Send Email Notification</label>
-                <button type="button" class="btn btn-info" onclick="sendEmailNotification()">
-                    📧 Send Email
-                </button>
-                <div style="font-size:13px; color:#6c757d; margin-top:4px;">
-                    Opens your default email client with the request details.
+                    <div class="field-group" style="margin-top:16px;">
+                        <label>Description of Fault / Complaint</label>
+                        <textarea id="reqComplaint" rows="3" placeholder="Describe the issue in detail…"></textarea>
+                    </div>
+
+                    <div class="notification-block">
+                        <label><i class="fas fa-envelope"></i> Email Notification</label>
+                        <button type="button" class="btn btn-info" onclick="sendEmailNotification()">
+                            <i class="fas fa-paper-plane"></i> Send Email
+                        </button>
+                        <div class="notification-note">
+                            Opens your default email client with the request details.
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            <div class="action-bar no-print">
-                <button type="button" class="btn btn-success" id="saveRequestBtn" onclick="saveRequest()">
-                    💾 Save Request
-                </button>
-                <button type="button" class="btn btn-outline" onclick="window.print()">
-                    📄 Print PDF
-                </button>
-                <button type="button" class="btn btn-outline" onclick="goToDashboard()">
-                    ⬅️ Back to Dashboard
-                </button>
-            </div>
-        </form>
-
-        <footer style="margin-top:22px;font-size:12px;color:#6c757d;text-align:center;border-top:1px solid #e9ecef;padding-top:14px;">
-            🔥 Firestore‑powered · 📧 Email Notifications · MCRH Request Slip v8.0
-        </footer>
+                <div class="action-bar no-print">
+                    <button type="button" class="btn btn-success" id="saveRequestBtn" onclick="saveRequest()">
+                        <i class="fas fa-save"></i> Save Request
+                    </button>
+                    <button type="button" class="btn btn-outline" onclick="window.print()">
+                        <i class="fas fa-print"></i> Print
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <!-- ===== SAVING OVERLAY ===== -->
+    <!-- SAVING OVERLAY -->
     <div class="saving-overlay" id="savingOverlay">
         <div class="saving-card">
             <div class="spinner"></div>
@@ -222,295 +504,177 @@
 
     <div id="toast" class="toast">Message</div>
 
-    <script type="module">
-        // ============================================================
-        // FIREBASE CONFIG
-        // ============================================================
-        const firebaseConfig = {
-            apiKey: "AIzaSyDnsz1s-VnewbUszXNJptcdMZ_h0QsNHYQ",
-            authDomain: "moivoibiomed.firebaseapp.com",
-            databaseURL: "https://moivoibiomed-default-rtdb.firebaseio.com",
-            projectId: "moivoibiomed",
-            storageBucket: "moivoibiomed.firebasestorage.app",
-            messagingSenderId: "996551978571",
-            appId: "1:996551978571:web:f44941649a58e020f5e7ce"
-        };
+<script type="module">
+    const firebaseConfig = {
+        apiKey: "AIzaSyDnsz1s-VnewbUszXNJptcdMZ_h0QsNHYQ",
+        authDomain: "moivoibiomed.firebaseapp.com",
+        databaseURL: "https://moivoibiomed-default-rtdb.firebaseio.com",
+        projectId: "moivoibiomed",
+        storageBucket: "moivoibiomed.firebasestorage.app",
+        messagingSenderId: "996551978571",
+        appId: "1:996551978571:web:f44941649a58e020f5e7ce"
+    };
 
-        import { initializeApp } from 'firebase/app';
-        import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
-        import {
-            getFirestore,
-            collection,
-            addDoc,
-            getDocs,
-            getDoc,
-            doc,
-            runTransaction,
-            serverTimestamp
-        } from 'firebase/firestore';
+    import { initializeApp } from 'firebase/app';
+    import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
+    import { getFirestore, collection, addDoc, getDoc, doc, runTransaction, serverTimestamp } from 'firebase/firestore';
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const REQUESTS_COLL = 'requests';
-        const USERS_COLL = 'users';
-        const COUNTERS_COLL = 'counters';
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const REQUESTS_COLL = 'requests';
+    const USERS_COLL = 'users';
+    const COUNTERS_COLL = 'counters';
 
-        // ============================================================
-        // GLOBALS
-        // ============================================================
-        let currentUser = null;
-        let isSaving = false;
+    let currentUser = null;
+    let isSaving = false;
 
-        // ============================================================
-        // AUTHENTICATION
-        // ============================================================
-        onAuthStateChanged(auth, async (user) => {
-            if (!user) {
-                window.location.href = 'login.html';
-                return;
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) { window.location.href = 'login.html'; return; }
+        try {
+            const userDoc = await getDoc(doc(db, USERS_COLL, user.uid));
+            if (!userDoc.exists()) { await signOut(auth); window.location.href = 'login.html'; return; }
+            const userData = userDoc.data();
+            if (!userData.approved) {
+                alert('Your account is pending approval.');
+                await signOut(auth); window.location.href = 'login.html'; return;
             }
-            try {
-                const userDoc = await getDoc(doc(db, USERS_COLL, user.uid));
-                if (!userDoc.exists()) {
-                    await signOut(auth);
-                    window.location.href = 'login.html';
-                    return;
-                }
-                const userData = userDoc.data();
-                if (!userData.approved) {
-                    alert('Your account is pending approval. Please contact admin.');
-                    await signOut(auth);
-                    window.location.href = 'login.html';
-                    return;
-                }
-                currentUser = { id: user.uid, ...userData };
-                document.getElementById('reqRequester').value = currentUser.name || '';
-                if (currentUser.role === 'requester' && currentUser.department) {
-                    document.getElementById('reqUnit').value = currentUser.department;
-                }
-                await init();
-            } catch (err) {
-                console.error('Auth error:', err);
-                window.location.href = 'login.html';
+            currentUser = { id: user.uid, ...userData };
+            document.getElementById('reqRequester').value = currentUser.name || '';
+            if (currentUser.role === 'requester' && currentUser.department) {
+                document.getElementById('reqUnit').value = currentUser.department;
             }
-        });
+            init();
+        } catch (err) { console.error(err); window.location.href = 'login.html'; }
+    });
 
-        // ============================================================
-        // LOGOUT
-        // ============================================================
-        window.logout = function() {
-            signOut(auth).then(() => {
-                window.location.href = 'login.html';
+    window.logout = function() { signOut(auth).then(() => window.location.href = 'login.html'); };
+
+    function showToast(msg, isError = false) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.style.borderLeftColor = isError ? '#ef4444' : '#C8102E';
+        t.classList.add('show');
+        clearTimeout(t._timer);
+        t._timer = setTimeout(() => t.classList.remove('show'), 3500);
+    }
+
+    async function getNextRequestNumber() {
+        const ref = doc(db, COUNTERS_COLL, 'requestCounter');
+        try {
+            return await runTransaction(db, async (transaction) => {
+                const snap = await transaction.get(ref);
+                let count = snap.exists() ? (snap.data().count || 3) : 3;
+                const next = count + 1;
+                if (snap.exists()) transaction.update(ref, { count: next });
+                else transaction.set(ref, { count: next });
+                return `REQ-${String(next).padStart(3, '0')}`;
             });
-        };
+        } catch {
+            return `REQ-${Date.now().toString().slice(-6)}`;
+        }
+    }
 
-        // ============================================================
-        // GO TO DASHBOARD
-        // ============================================================
-        window.goToDashboard = function() {
-            window.location.href = 'dashboard.html';
-        };
+    function toggleEquipFields() {
+        const type = document.getElementById('reqType').value;
+        document.getElementById('reqEquipDetails').style.display = (type === 'Equipment') ? 'grid' : 'none';
+    }
+    document.getElementById('reqType').addEventListener('change', toggleEquipFields);
 
-        // ============================================================
-        // TOAST
-        // ============================================================
-        function showToast(msg, isError = false) {
-            const t = document.getElementById('toast');
-            t.textContent = msg;
-            t.style.borderLeftColor = isError ? '#dc3545' : '#C8102E';
-            t.classList.add('show');
-            clearTimeout(t._timer);
-            t._timer = setTimeout(() => t.classList.remove('show'), 3500);
+    function showSavingOverlay(message, redirect = false) {
+        const overlay = document.getElementById('savingOverlay');
+        const title = document.getElementById('savingTitle');
+        const msg = document.getElementById('savingMessage');
+        const note = document.getElementById('redirectNote');
+        if (redirect) {
+            title.textContent = '✅ Request Saved!';
+            msg.style.display = 'none';
+            note.style.display = 'block';
+        } else {
+            title.textContent = 'Saving your request…';
+            msg.textContent = message || 'Please wait.';
+            msg.style.display = 'block';
+            note.style.display = 'none';
+        }
+        overlay.classList.add('show');
+    }
+
+    window.saveRequest = async function() {
+        if (isSaving) return;
+        const requester = document.getElementById('reqRequester').value.trim();
+        const unit = document.getElementById('reqUnit').value.trim();
+        const dateTime = document.getElementById('reqDateTime').value;
+        const type = document.getElementById('reqType').value;
+        const equipName = document.getElementById('reqEquipName').value.trim();
+        const inventory = document.getElementById('reqInventory').value.trim();
+        const serial = document.getElementById('reqSerial').value.trim();
+        const model = document.getElementById('reqModel').value.trim();
+        const complaint = document.getElementById('reqComplaint').value.trim();
+
+        if (!requester || !unit || !dateTime || !complaint) {
+            showToast('Please fill all required fields.', true);
+            return;
         }
 
-        // ============================================================
-        // SEQUENTIAL REQUEST NUMBER GENERATOR (increments only on save)
-        // ============================================================
-        async function getNextRequestNumber() {
-            const counterDocRef = doc(db, COUNTERS_COLL, 'requestCounter');
-            try {
-                const newNumber = await runTransaction(db, async (transaction) => {
-                    const docSnap = await transaction.get(counterDocRef);
-                    let currentCount;
-                    if (docSnap.exists()) {
-                        currentCount = docSnap.data().count || 3;
-                    } else {
-                        currentCount = 3;
-                        transaction.set(counterDocRef, { count: currentCount });
-                    }
-                    const next = currentCount + 1;
-                    transaction.update(counterDocRef, { count: next });
-                    return next;
-                });
-                return `REQ-${String(newNumber).padStart(3, '0')}`;
-            } catch (error) {
-                console.error('Error generating request number:', error);
-                const timestamp = Date.now().toString().slice(-6);
-                const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-                return `REQ-${timestamp}${random}`;
+        isSaving = true;
+        const btn = document.getElementById('saveRequestBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Saving…';
+        showSavingOverlay('Generating request number and saving to cloud…');
+
+        try {
+            const reqNo = await getNextRequestNumber();
+            const data = {
+                requestNo: reqNo,
+                requesterName: requester,
+                requesterId: currentUser.id,
+                unit, dateTime, type,
+                equipName: (type === 'Equipment') ? equipName : 'Other',
+                inventory: (type === 'Equipment') ? inventory : '',
+                serial: (type === 'Equipment') ? serial : '',
+                modelMake: (type === 'Equipment') ? model : '',
+                complaint, status: 'Open', received: false,
+                createdAt: serverTimestamp()
+            };
+            await addDoc(collection(db, REQUESTS_COLL), data);
+
+            showSavingOverlay('', true);
+            showToast(`✅ Request ${reqNo} saved. Redirecting…`);
+            setTimeout(() => window.location.href = 'dashboard.html', 1600);
+        } catch (err) {
+            showToast('❌ Error: ' + err.message, true);
+            document.getElementById('savingOverlay').classList.remove('show');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-save"></i> Save Request';
+            isSaving = false;
+        }
+    };
+
+    window.sendEmailNotification = function() {
+        const reqNo = document.getElementById('reqNo').value || 'New Request';
+        const requester = document.getElementById('reqRequester').value || 'N/A';
+        const unit = document.getElementById('reqUnit').value || 'N/A';
+        const equipName = document.getElementById('reqEquipName').value || 'N/A';
+        const complaint = document.getElementById('reqComplaint').value || 'N/A';
+        const date = document.getElementById('reqDateTime').value
+            ? new Date(document.getElementById('reqDateTime').value).toLocaleString() : 'N/A';
+        const subject = `Service Request ${reqNo} - ${equipName}`;
+        const body = `Request No.: ${reqNo}%0ADate: ${date}%0ARequester: ${requester}%0AUnit: ${unit}%0AEquipment: ${equipName}%0AComplaint: ${complaint}%0A%0APlease attend to this request.`;
+        window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`, '_blank');
+        showToast('📧 Opening email client…');
+    };
+
+    async function init() {
+        document.getElementById('reqDateTime').value = new Date().toISOString().slice(0, 16);
+        document.getElementById('reqNo').value = 'Will be assigned on save';
+        if (currentUser) {
+            document.getElementById('reqRequester').value = currentUser.name || '';
+            if (currentUser.role === 'requester' && currentUser.department) {
+                document.getElementById('reqUnit').value = currentUser.department;
             }
         }
-
-        // ============================================================
-        // TOGGLE EQUIPMENT DETAILS
-        // ============================================================
-        function toggleEquipFields() {
-            const type = document.getElementById('reqType').value;
-            const details = document.getElementById('reqEquipDetails');
-            details.style.display = (type === 'Equipment') ? 'grid' : 'none';
-        }
-        document.getElementById('reqType').addEventListener('change', toggleEquipFields);
-
-        // ============================================================
-        // SHOW SAVING OVERLAY
-        // ============================================================
-        function showSavingOverlay(message, showRedirectNote = false) {
-            const overlay = document.getElementById('savingOverlay');
-            const title = document.getElementById('savingTitle');
-            const msg = document.getElementById('savingMessage');
-            const note = document.getElementById('redirectNote');
-
-            if (showRedirectNote) {
-                title.textContent = '✅ Request Saved!';
-                msg.style.display = 'none';
-                note.style.display = 'block';
-            } else {
-                title.textContent = 'Saving your request…';
-                msg.textContent = message || 'Please wait.';
-                msg.style.display = 'block';
-                note.style.display = 'none';
-            }
-            overlay.classList.add('show');
-        }
-
-        // ============================================================
-        // SAVE REQUEST – Saves, then redirects to dashboard
-        // ============================================================
-        window.saveRequest = async function() {
-            if (isSaving) return;
-
-            const requester = document.getElementById('reqRequester').value.trim();
-            const unit = document.getElementById('reqUnit').value.trim();
-            const dateTime = document.getElementById('reqDateTime').value;
-            const type = document.getElementById('reqType').value;
-            const equipName = document.getElementById('reqEquipName').value.trim();
-            const inventory = document.getElementById('reqInventory').value.trim();
-            const serial = document.getElementById('reqSerial').value.trim();
-            const model = document.getElementById('reqModel').value.trim();
-            const complaint = document.getElementById('reqComplaint').value.trim();
-
-            // ===== VALIDATION =====
-            if (!requester || !unit || !dateTime || !complaint) {
-                showToast('Please fill all required fields before saving.', true);
-                return;
-            }
-
-            isSaving = true;
-            const saveBtn = document.getElementById('saveRequestBtn');
-            saveBtn.disabled = true;
-            saveBtn.innerHTML = '<span class="loading-spinner"></span> Saving…';
-
-            // Show the overlay right away
-            showSavingOverlay('Generating request number and saving to cloud…');
-
-            try {
-                // 1. Generate the request number
-                const reqNo = await getNextRequestNumber();
-
-                // 2. Build the data object
-                const data = {
-                    requestNo: reqNo,
-                    requesterName: requester,
-                    requesterId: currentUser.id,
-                    unit,
-                    dateTime,
-                    type,
-                    equipName: (type === 'Equipment') ? equipName : 'Other',
-                    inventory: (type === 'Equipment') ? inventory : '',
-                    serial: (type === 'Equipment') ? serial : '',
-                    modelMake: (type === 'Equipment') ? model : '',
-                    complaint,
-                    status: 'Open',
-                    received: false,           // <-- so the dashboard knows it’s pending receiving
-                    createdAt: serverTimestamp()
-                };
-
-                console.log('📝 Saving request:', data);
-
-                // 3. Save to Firestore
-                await addDoc(collection(db, REQUESTS_COLL), data);
-
-                // 4. Show success in the overlay
-                showSavingOverlay('', true);
-                showToast(`✅ Request ${reqNo} saved. Redirecting…`);
-
-                // 5. Redirect to dashboard after a short delay
-                setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 1800);
-
-            } catch (err) {
-                console.error('❌ Save error:', err);
-                showToast('❌ Error: ' + err.message, true);
-
-                // Hide the overlay and re-enable the button so the user can retry
-                document.getElementById('savingOverlay').classList.remove('show');
-                saveBtn.disabled = false;
-                saveBtn.innerHTML = '💾 Save Request';
-                isSaving = false;
-            }
-        };
-
-        // ============================================================
-        // EMAIL NOTIFICATION
-        // ============================================================
-        window.sendEmailNotification = function() {
-            const reqNo = document.getElementById('reqNo').value || 'New Request';
-            const requester = document.getElementById('reqRequester').value || 'N/A';
-            const unit = document.getElementById('reqUnit').value || 'N/A';
-            const equipName = document.getElementById('reqEquipName').value || 'N/A';
-            const complaint = document.getElementById('reqComplaint').value || 'N/A';
-            const date = document.getElementById('reqDateTime').value
-                ? new Date(document.getElementById('reqDateTime').value).toLocaleString()
-                : 'N/A';
-
-            const subject = `Service Request ${reqNo} - ${equipName}`;
-            const body =
-                `Request No.: ${reqNo}%0A` +
-                `Date: ${date}%0A` +
-                `Requester: ${requester}%0A` +
-                `Unit/Ward: ${unit}%0A` +
-                `Equipment: ${equipName}%0A` +
-                `Complaint: ${complaint}%0A%0A` +
-                `Please attend to this request.`;
-
-            const mailto = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-            window.open(mailto, '_blank');
-            showToast('📧 Opening email client…');
-        };
-
-        // ============================================================
-        // INIT
-        // ============================================================
-        async function init() {
-            document.getElementById('reqDateTime').value = new Date()
-                .toISOString().slice(0, 16);
-
-            // Show placeholder for the request number
-            document.getElementById('reqNo').value = 'Will be assigned on save';
-
-            if (currentUser) {
-                document.getElementById('reqRequester').value = currentUser.name || '';
-                if (currentUser.role === 'requester' && currentUser.department) {
-                    document.getElementById('reqUnit').value = currentUser.department;
-                }
-            }
-            toggleEquipFields();
-            console.log('✅ Request page ready.');
-        }
-
-        console.log('🚀 Request page loaded.');
-    </script>
+        toggleEquipFields();
+    }
+</script>
 </body>
 </html>
