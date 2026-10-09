@@ -106,7 +106,7 @@
 
         .app-shell { display:flex; min-height:100vh; }
 
-        /* ============ SIDEBAR ============ */
+        /* SIDEBAR */
         .sidebar {
             width:var(--sidebar-width);
             background:linear-gradient(180deg,#1a1a2e 0%,#0f172a 100%);
@@ -126,6 +126,18 @@
         .sidebar.collapsed .nav-section-title,
         .sidebar.collapsed .user-chip-info { display:none; }
         .sidebar.collapsed .nav-item { justify-content:center; padding:11px 8px; }
+        .sidebar.collapsed { cursor:pointer; }
+        .sidebar.collapsed .nav-item,
+        .sidebar.collapsed .user-chip,
+        .sidebar.collapsed .sidebar-logo {
+            transition:transform 200ms cubic-bezier(0.4,0,0.2,1), background 200ms ease;
+        }
+        .sidebar.collapsed .nav-item:hover,
+        .sidebar.collapsed .user-chip:hover {
+            transform:scale(1.06);
+            background:rgba(255,255,255,0.1);
+        }
+        .sidebar.collapsed .nav-item::after { display:none !important; }
         .sidebar.collapsed .user-chip { justify-content:center; padding:10px 6px; }
 
         .sidebar-header {
@@ -273,7 +285,7 @@
         .user-chip-info .name { font-size:12.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
         .user-chip-info .role { font-size:10px; color:rgba(255,255,255,0.55); text-transform:uppercase; letter-spacing:0.5px; font-weight:600; }
 
-        /* ============ MAIN ============ */
+        /* MAIN */
         .main-area {
             flex:1;
             margin-left:var(--sidebar-width);
@@ -329,7 +341,7 @@
         .theme-toggle i { transition:transform 400ms cubic-bezier(0.4,0,0.2,1); }
         [data-theme="dark"] .theme-toggle i.fa-moon { transform:rotate(360deg); }
 
-        /* ============ BREADCRUMBS ============ */
+        /* BREADCRUMBS */
         .breadcrumbs {
             display:flex;
             align-items:center;
@@ -356,7 +368,7 @@
         .breadcrumbs i.chevron { font-size:9px; opacity:0.5; }
         .breadcrumbs .current { color:var(--text); font-weight:700; }
 
-        /* ============ BUTTONS ============ */
+        /* BUTTONS */
         .btn {
             padding:9px 16px;
             border:none;
@@ -406,7 +418,7 @@
 
         .content { padding:20px 24px 40px; flex:1; }
 
-        /* ============ FILTERS ============ */
+        /* FILTERS */
         .filter-card {
             background:var(--card);
             border-radius:var(--radius);
@@ -443,7 +455,7 @@
         }
         .filter-field input:focus { border-color:var(--primary); box-shadow:0 0 0 4px rgba(200,16,46,0.08); background:var(--card); }
 
-        /* ============ KPI STRIP ============ */
+        /* KPI STRIP */
         .kpi-strip {
             display:grid;
             grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));
@@ -522,7 +534,7 @@
         .kpi-card.rate::before { background:var(--purple); }
         .kpi-card.rate .kpi-icon { background:var(--purple-soft); color:var(--purple-text); }
 
-        /* ============ CHARTS GRID ============ */
+        /* CHARTS GRID */
         .charts-grid {
             display:grid;
             grid-template-columns:repeat(2,1fr);
@@ -562,7 +574,7 @@
         }
         .chart-card canvas { max-height:230px; width:100% !important; }
 
-        /* ============ SKELETON ============ */
+        /* SKELETON */
         .skeleton {
             background:linear-gradient(90deg, var(--border-soft) 25%, var(--border) 50%, var(--border-soft) 75%);
             background-size:200% 100%;
@@ -577,7 +589,7 @@
         .skeleton-kpi { height:70px; border-radius:var(--radius); }
         .skeleton-chart { height:280px; border-radius:var(--radius); }
 
-        /* ============ TOOLTIP ============ */
+        /* TOOLTIP */
         [data-tooltip]:not(.nav-item) { position:relative; }
         [data-tooltip]:not(.nav-item)::after {
             content:attr(data-tooltip);
@@ -605,7 +617,7 @@
             transform:translateX(-50%) translateY(-10px);
         }
 
-        /* ============ TOAST ============ */
+        /* TOAST */
         .toast {
             position:fixed;
             bottom:24px; right:24px;
@@ -667,7 +679,7 @@
         .toast.info { border-left-color:var(--info); }
         .toast.info .toast-icon { background:var(--info-soft); color:var(--info); }
 
-        /* ============ EMPTY STATE ============ */
+        /* EMPTY STATE */
         .empty-state {
             text-align:center;
             padding:60px 20px;
@@ -678,7 +690,7 @@
         .empty-state h3 { font-size:16px; font-weight:800; color:var(--text); margin-bottom:6px; }
         .empty-state p { font-size:13px; font-weight:500; max-width:380px; margin:0 auto; }
 
-        /* ============ BACKDROP ============ */
+        /* BACKDROP */
         .sidebar-backdrop {
             display:none;
             position:fixed;
@@ -689,11 +701,13 @@
             transition:opacity var(--transition);
         }
 
-        /* ============ RESPONSIVE ============ */
+        /* RESPONSIVE */
         @media (max-width:1024px) {
             .sidebar { transform:translateX(-100%); transition:transform var(--transition); }
             .sidebar.open { transform:translateX(0); }
-            .sidebar.collapsed { width:var(--sidebar-width); }
+            .sidebar.collapsed { width:var(--sidebar-width); cursor:default; }
+            .sidebar.collapsed .nav-item:hover,
+            .sidebar.collapsed .user-chip:hover { transform:none; }
             .main-area, .sidebar.collapsed ~ .main-area { margin-left:0; }
             .sidebar-collapse-btn { display:none; }
             .menu-toggle { display:flex; align-items:center; justify-content:center; }
@@ -818,7 +832,6 @@
 </div>
 
 <script type="module">
-    // PAGE TRANSITION
     window.addEventListener('DOMContentLoaded', () => {
         requestAnimationFrame(() => document.body.classList.add('page-ready'));
     });
@@ -856,7 +869,7 @@
     let allJobCards = [];
     let chartInstances = {};
 
-    // ============ THEME ============
+    // THEME
     const themeToggle = document.getElementById('themeToggle');
     function applyTheme(theme) {
         document.documentElement.setAttribute('data-theme', theme);
@@ -878,7 +891,7 @@
         applyTheme(localStorage.getItem('mcrh-theme') || 'light');
     })();
 
-    // ============ SIDEBAR ============
+    // SIDEBAR
     window.toggleSidebarCollapse = function() {
         const sidebar = document.getElementById('sidebar');
         sidebar.classList.toggle('collapsed');
@@ -889,6 +902,17 @@
             document.getElementById('sidebar').classList.add('collapsed');
         }
     })();
+
+    // AUTO-EXPAND SIDEBAR ON CLICK
+    document.getElementById('sidebar').addEventListener('click', function(e) {
+        if (!this.classList.contains('collapsed')) return;
+        if (e.target.closest('.sidebar-collapse-btn')) return;
+        this.classList.remove('collapsed');
+        localStorage.setItem('mcrh-sidebar-collapsed', '0');
+        e.stopPropagation();
+        e.preventDefault();
+    }, true);
+
     window.toggleSidebar = function() {
         document.getElementById('sidebar').classList.toggle('open');
         document.getElementById('sidebarBackdrop').classList.toggle('show');
@@ -898,7 +922,7 @@
         document.getElementById('sidebarBackdrop').classList.remove('show');
     };
 
-    // ============ RIPPLE ============
+    // RIPPLE
     document.addEventListener('click', (e) => {
         const btn = e.target.closest('.btn');
         if (!btn || btn.disabled) return;
@@ -915,7 +939,7 @@
         setTimeout(() => ripple.remove(), 650);
     });
 
-    // ============ ANIMATED COUNTERS ============
+    // ANIMATED COUNTERS
     function animateNumber(el, target, duration = 900, suffix = '') {
         const startTime = performance.now();
         function tick(now) {
@@ -955,7 +979,7 @@
         animateKPIs();
     }
 
-    // ============ TOAST ============
+    // TOAST
     let toastTimer = null;
     window.showToast = function(message, type = 'success', title = null) {
         const toast = document.getElementById('toast');
@@ -981,7 +1005,7 @@
         signOut(auth).then(() => navigateTo('login.html'));
     };
 
-    // ============ DATA ============
+    // DATA
     async function fetchJobCards() {
         try {
             const snap = await getDocs(query(collection(db, 'jobcards'), orderBy('updatedAt', 'desc')));
@@ -999,7 +1023,7 @@
         });
     }
 
-    // ============ CHARTS ============
+    // CHARTS
     function renderCharts(data) {
         Object.values(chartInstances).forEach(c => c.destroy());
         chartInstances = {};
@@ -1012,7 +1036,6 @@
 
         updateKPIs(data);
 
-        // Monthly bar
         const months = {};
         data.forEach(j => {
             const d = j.updatedAt ? new Date(j.updatedAt) : new Date(j.createdAt);
@@ -1038,7 +1061,6 @@
             }
         });
 
-        // Failure pie
         const failures = {};
         data.forEach(j => { if (j.writeOffReason) failures[j.writeOffReason] = (failures[j.writeOffReason] || 0) + 1; });
         chartInstances.failure = new Chart(document.getElementById('failureChart'), {
@@ -1054,7 +1076,6 @@
             }
         });
 
-        // Status doughnut
         const statusCounts = { Pending:0, Completed:0, 'Written Off':0 };
         data.forEach(j => {
             const s = j.status || 'Pending';
@@ -1073,7 +1094,6 @@
             }
         });
 
-        // Time line
         const timeData = {};
         data.forEach(j => {
             if (j.startDateTime && j.endDateTime) {
@@ -1108,7 +1128,6 @@
         });
     }
 
-    // ============ FILTERS ============
     window.applyDateFilter = function() {
         const from = document.getElementById('fromDate').value;
         const to = document.getElementById('toDate').value;
@@ -1124,7 +1143,6 @@
         applyDateFilter();
     };
 
-    // ============ EXPORT PDF ============
     window.exportPDF = function() {
         showToast('Generating PDF…', 'info', 'Please wait');
         const el = document.querySelector('.content');
@@ -1143,7 +1161,6 @@
         }).catch(err => showToast('Error: ' + err.message, 'error'));
     };
 
-    // ============ AUTH ============
     onAuthStateChanged(auth, async (user) => {
         if (!user) { window.location.href = 'login.html'; return; }
         try {
@@ -1170,7 +1187,6 @@
         } catch (err) { console.error(err); }
     });
 
-    // ============ SHORTCUTS ============
     document.addEventListener('keydown', (e) => {
         const tag = e.target.tagName;
         const isTyping = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';

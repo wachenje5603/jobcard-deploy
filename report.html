@@ -109,6 +109,17 @@
         .sidebar.collapsed .nav-section-title,
         .sidebar.collapsed .user-chip-info { display:none; }
         .sidebar.collapsed .nav-item { justify-content:center; padding:11px 8px; }
+        .sidebar.collapsed { cursor:pointer; }
+        .sidebar.collapsed .nav-item,
+        .sidebar.collapsed .user-chip,
+        .sidebar.collapsed .sidebar-logo {
+            transition:transform 200ms cubic-bezier(0.4,0,0.2,1), background 200ms ease;
+        }
+        .sidebar.collapsed .nav-item:hover,
+        .sidebar.collapsed .user-chip:hover {
+            transform:scale(1.06);
+            background:rgba(255,255,255,0.1);
+        }
         .sidebar.collapsed .user-chip { justify-content:center; padding:10px 6px; }
 
         .sidebar-header {
@@ -533,12 +544,14 @@
         @media (max-width:1024px) {
             .sidebar { transform:translateX(-100%); transition:transform var(--transition); }
             .sidebar.open { transform:translateX(0); }
-            .sidebar.collapsed { width:var(--sidebar-width); }
+            .sidebar.collapsed { width:var(--sidebar-width); cursor:default; }
             .sidebar.collapsed .sidebar-title,
             .sidebar.collapsed .nav-item span,
             .sidebar.collapsed .nav-section-title,
             .sidebar.collapsed .user-chip-info { display:block; }
             .sidebar.collapsed .nav-item { justify-content:flex-start; padding:11px 14px; }
+            .sidebar.collapsed .nav-item:hover,
+            .sidebar.collapsed .user-chip:hover { transform:none; }
             .main-area, .sidebar.collapsed ~ .main-area { margin-left:0; }
             .sidebar-collapse-btn { display:none; }
             .menu-toggle { display:flex; align-items:center; justify-content:center; }
@@ -647,7 +660,7 @@
 </div>
 
 <script type="module">
-    // ============ PAGE TRANSITION ============
+    // PAGE TRANSITION
     window.addEventListener('DOMContentLoaded', () => {
         requestAnimationFrame(() => document.body.classList.add('page-ready'));
     });
@@ -664,7 +677,7 @@
         }
     });
 
-    // ============ THEME ============
+    // THEME
     function applyTheme(theme) {
         document.documentElement.setAttribute('data-theme', theme);
         const toggle = document.getElementById('themeToggle');
@@ -682,7 +695,7 @@
         applyTheme(current === 'dark' ? 'light' : 'dark');
     });
 
-    // ============ SIDEBAR ============
+    // SIDEBAR
     window.toggleSidebarCollapse = function() {
         const sidebar = document.getElementById('sidebar');
         sidebar.classList.toggle('collapsed');
@@ -693,6 +706,17 @@
             document.getElementById('sidebar').classList.add('collapsed');
         }
     })();
+
+    // AUTO-EXPAND SIDEBAR ON CLICK
+    document.getElementById('sidebar').addEventListener('click', function(e) {
+        if (!this.classList.contains('collapsed')) return;
+        if (e.target.closest('.sidebar-collapse-btn')) return;
+        this.classList.remove('collapsed');
+        localStorage.setItem('mcrh-sidebar-collapsed', '0');
+        e.stopPropagation();
+        e.preventDefault();
+    }, true);
+
     window.toggleSidebar = function() {
         document.getElementById('sidebar').classList.toggle('open');
         document.getElementById('sidebarBackdrop').classList.toggle('show');
@@ -702,7 +726,7 @@
         document.getElementById('sidebarBackdrop').classList.remove('show');
     };
 
-    // ============ RIPPLE ============
+    // RIPPLE
     document.addEventListener('click', (e) => {
         const btn = e.target.closest('.btn');
         if (!btn || btn.disabled) return;
@@ -719,7 +743,7 @@
         setTimeout(() => ripple.remove(), 650);
     });
 
-    // ============ FIREBASE ============
+    // FIREBASE
     const firebaseConfig = {
         apiKey: "AIzaSyDnsz1s-VnewbUszXNJptcdMZ_h0QsNHYQ",
         authDomain: "moivoibiomed.firebaseapp.com",
@@ -741,7 +765,7 @@
     const DEEPSEEK_API_KEY = 'sk-12991bbf6fae4d2a865398f29b8f9381';
     let currentJobCards = [];
 
-    // ============ TOAST ============
+    // TOAST
     let toastTimer = null;
     window.showToast = function(message, type = 'success', title = null) {
         const toast = document.getElementById('toast');
@@ -765,12 +789,10 @@
 
     window.logout = function() { signOut(auth).then(() => navigateTo('login.html')); };
 
-    // ============ GENERATE REPORT ============
     window.generateReport = async function() {
         const month = document.getElementById('reportMonth').value;
         if (!month) { showToast('Please select a month.', 'warning'); return; }
 
-        // Skeleton
         document.getElementById('summaryStats').innerHTML =
             Array(5).fill('<div class="stat-tile skeleton-tile skeleton"></div>').join('');
         document.getElementById('jobCardsList').innerHTML =
@@ -837,7 +859,6 @@
         document.getElementById('jobCardsList').innerHTML = html;
     }
 
-    // ============ AI REPORT ============
     window.generateAIReport = async function() {
         const container = document.getElementById('aiReportContainer');
         container.classList.remove('hidden');
@@ -870,7 +891,6 @@
         }
     };
 
-    // ============ EXPORT PDF ============
     window.exportPDF = function() {
         showToast('Generating PDF…', 'info', 'Please wait');
         const el = document.getElementById('reportContent');
@@ -889,7 +909,6 @@
         }).catch(err => showToast('Error: ' + err.message, 'error'));
     };
 
-    // ============ AUTH ============
     onAuthStateChanged(auth, async (user) => {
         if (!user) { window.location.href = 'login.html'; return; }
         try {
@@ -913,7 +932,6 @@
         } catch (err) { console.error(err); }
     });
 
-    // ============ SHORTCUTS ============
     document.addEventListener('keydown', (e) => {
         const tag = e.target.tagName;
         const isTyping = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';

@@ -109,16 +109,12 @@
             overflow-x:hidden;
         }
 
-        /* ============================================================
-           PAGE TRANSITION (Option 4)
-           ============================================================ */
+        /* PAGE TRANSITION */
         body { opacity:0; transition: opacity 320ms ease; }
         body.page-ready { opacity:1; }
         body.page-leaving { opacity:0; }
 
-        /* ============================================================
-           BREADCRUMBS (Option 4)
-           ============================================================ */
+        /* BREADCRUMBS */
         .breadcrumbs {
             display:flex;
             align-items:center;
@@ -148,14 +144,10 @@
             font-weight:700;
         }
 
-        /* ============================================================
-           APP LAYOUT
-           ============================================================ */
+        /* APP LAYOUT */
         .app-shell { display:flex; min-height:100vh; }
 
-        /* ============================================================
-           SIDEBAR
-           ============================================================ */
+        /* SIDEBAR */
         .sidebar {
             width:var(--sidebar-width);
             background:linear-gradient(180deg,#1a1a2e 0%,#0f172a 100%);
@@ -175,6 +167,18 @@
         .sidebar.collapsed .nav-section-title,
         .sidebar.collapsed .user-chip-info { display:none; }
         .sidebar.collapsed .nav-item { justify-content:center; padding:11px 8px; }
+        .sidebar.collapsed { cursor:pointer; }
+        .sidebar.collapsed .nav-item,
+        .sidebar.collapsed .user-chip,
+        .sidebar.collapsed .sidebar-logo {
+            transition:transform 200ms cubic-bezier(0.4,0,0.2,1), background 200ms ease;
+        }
+        .sidebar.collapsed .nav-item:hover,
+        .sidebar.collapsed .user-chip:hover {
+            transform:scale(1.06);
+            background:rgba(255,255,255,0.1);
+        }
+        .sidebar.collapsed .nav-item::after { display:none !important; }
         .sidebar.collapsed .nav-item .badge-count {
             position:absolute;
             top:4px; right:4px;
@@ -333,9 +337,7 @@
         .user-chip-info .name { font-size:12.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
         .user-chip-info .role { font-size:10px; color:rgba(255,255,255,0.55); text-transform:uppercase; letter-spacing:0.5px; font-weight:600; }
 
-        /* ============================================================
-           MAIN
-           ============================================================ */
+        /* MAIN */
         .main-area {
             flex:1;
             margin-left:var(--sidebar-width);
@@ -374,7 +376,6 @@
         .page-title small { display:block; font-size:12px; font-weight:500; color:var(--text-muted); margin-top:1px; }
         .topbar-actions { display:flex; gap:8px; align-items:center; flex-shrink:0; }
 
-        /* Command palette trigger button */
         .command-trigger {
             display:flex;
             align-items:center;
@@ -419,9 +420,7 @@
         .theme-toggle i { transition:transform 400ms cubic-bezier(0.4,0,0.2,1); }
         [data-theme="dark"] .theme-toggle i.fa-moon { transform:rotate(360deg); }
 
-        /* ============================================================
-           BUTTONS — with Ripple (Tier 2)
-           ============================================================ */
+        /* BUTTONS */
         .btn {
             padding:9px 16px;
             border:none;
@@ -452,7 +451,6 @@
         }
         .btn:hover:not(:disabled)::before { transform:translateX(100%); }
 
-        /* Ripple circle */
         .ripple {
             position:absolute;
             border-radius:50%;
@@ -481,9 +479,7 @@
         .btn-icon { width:34px; height:34px; padding:0; justify-content:center; border-radius:8px; }
         .btn:disabled { opacity:0.6; cursor:not-allowed; transform:none !important; }
 
-        /* ============================================================
-           CONTENT
-           ============================================================ */
+        /* CONTENT */
         .content { padding:20px 24px 40px; flex:1; }
 
         /* KPI STRIP */
@@ -732,9 +728,7 @@
         }
         .filter-chip:not(.active) .chip-count { background:var(--border-soft); color:var(--text-muted); }
 
-        /* ============================================================
-           TABLE
-           ============================================================ */
+        /* TABLE */
         .table-scroll { max-height:62vh; overflow-y:auto; overflow-x:auto; }
         table { width:100%; border-collapse:separate; border-spacing:0; font-size:13px; }
         table thead th {
@@ -850,9 +844,7 @@
         .empty-state p { font-size:13px; font-weight:500; max-width:380px; margin:0 auto 16px; }
         .empty-state .btn { margin-top:6px; }
 
-        /* ============================================================
-           MODALS
-           ============================================================ */
+        /* MODALS */
         .modal-overlay {
             display:none;
             position:fixed;
@@ -953,9 +945,7 @@
             display:none;
         }
 
-        /* ============================================================
-           COMMAND PALETTE (Tier 2)
-           ============================================================ */
+        /* COMMAND PALETTE */
         .command-overlay {
             display:none;
             position:fixed;
@@ -1062,9 +1052,7 @@
             color:white;
         }
 
-        /* ============================================================
-           SHORTCUTS OVERLAY (Option 4)
-           ============================================================ */
+        /* SHORTCUTS OVERLAY */
         .shortcuts-grid {
             display:grid;
             grid-template-columns:1fr 1fr;
@@ -1097,9 +1085,7 @@
             text-align:center;
         }
 
-        /* ============================================================
-           CONFIRM MODAL
-           ============================================================ */
+        /* CONFIRM MODAL */
         .confirm-modal { max-width:420px; padding:28px; text-align:center; }
         .confirm-icon {
             width:64px; height:64px;
@@ -1193,9 +1179,7 @@
         .pending-user-item .user-info { font-size:13px; flex:1; min-width:180px; }
         .pending-user-item .user-info small { color:var(--text-muted); font-size:11.5px; display:block; margin-top:2px; }
 
-        /* ============================================================
-           TOAST
-           ============================================================ */
+        /* TOAST */
         .toast {
             position:fixed;
             bottom:24px;
@@ -1274,9 +1258,7 @@
         }
         .toast-undo-btn:hover { background:var(--primary-soft); }
 
-        /* ============================================================
-           TOOLTIP SYSTEM (Option 4)
-           ============================================================ */
+        /* TOOLTIP */
         [data-tooltip]:not(.nav-item) { position:relative; }
         [data-tooltip]:not(.nav-item)::after {
             content:attr(data-tooltip);
@@ -1304,9 +1286,7 @@
             transform:translateX(-50%) translateY(-10px);
         }
 
-        /* ============================================================
-           PDF HIDDEN TEMPLATES
-           ============================================================ */
+        /* PDF TEMPLATES */
         #pdfTemplate, #requestPdfTemplate {
             position:fixed;
             left:-9999px;
@@ -1324,9 +1304,7 @@
             box-sizing:border-box;
         }
 
-        /* ============================================================
-           MOBILE
-           ============================================================ */
+        /* MOBILE */
         .sidebar-backdrop {
             display:none;
             position:fixed;
@@ -1340,7 +1318,9 @@
         @media (max-width:1024px) {
             .sidebar { transform:translateX(-100%); transition:transform var(--transition); }
             .sidebar.open { transform:translateX(0); }
-            .sidebar.collapsed { width:var(--sidebar-width); }
+            .sidebar.collapsed { width:var(--sidebar-width); cursor:default; }
+            .sidebar.collapsed .nav-item:hover,
+            .sidebar.collapsed .user-chip:hover { transform:none; }
             .main-area, .sidebar.collapsed ~ .main-area { margin-left:0; }
             .sidebar-collapse-btn { display:none; }
             .menu-toggle { display:flex; align-items:center; justify-content:center; }
@@ -1467,7 +1447,6 @@
             </div>
         </div>
 
-        <!-- BREADCRUMBS -->
         <div class="breadcrumbs">
             <a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a>
             <i class="fas fa-chevron-right chevron"></i>
@@ -1761,7 +1740,7 @@
 
 <script type="module">
     // ============================================================
-    // PAGE TRANSITION (Option 4)
+    // PAGE TRANSITION
     // ============================================================
     window.addEventListener('DOMContentLoaded', () => {
         requestAnimationFrame(() => document.body.classList.add('page-ready'));
@@ -1771,7 +1750,6 @@
         document.body.classList.add('page-leaving');
         setTimeout(() => window.location.href = url, 220);
     };
-    // Intercept all internal links
     document.addEventListener('click', (e) => {
         const a = e.target.closest('a[href$=".html"]');
         if (a && !a.target && !a.href.startsWith('mailto:') && !a.hasAttribute('data-no-transition')) {
@@ -1815,7 +1793,7 @@
     let currentSort = { column: 'requestNo', direction: 'desc' };
     let statusChartInstance = null;
     let trendChartInstance = null;
-    let lastDeleted = null; // For undo
+    let lastDeleted = null;
 
     const statsContainer = document.getElementById('statsContainer');
     const tableBody = document.getElementById('tableBody');
@@ -1827,7 +1805,7 @@
     const breadcrumbCurrent = document.getElementById('breadcrumbCurrent');
 
     // ============================================================
-    // RIPPLE EFFECT (Tier 2)
+    // RIPPLE EFFECT
     // ============================================================
     document.addEventListener('click', (e) => {
         const btn = e.target.closest('.btn');
@@ -1846,7 +1824,7 @@
     });
 
     // ============================================================
-    // ANIMATED NUMBER COUNTER (Tier 2)
+    // ANIMATED NUMBER COUNTER
     // ============================================================
     function animateNumber(el, target, duration = 800) {
         const start = 0;
@@ -1901,6 +1879,19 @@
             document.getElementById('sidebar').classList.add('collapsed');
         }
     })();
+
+    // ============================================================
+    // AUTO-EXPAND SIDEBAR ON CLICK (when collapsed)
+    // ============================================================
+    document.getElementById('sidebar').addEventListener('click', function(e) {
+        if (!this.classList.contains('collapsed')) return;
+        if (e.target.closest('.sidebar-collapse-btn')) return;
+        this.classList.remove('collapsed');
+        localStorage.setItem('mcrh-sidebar-collapsed', '0');
+        e.stopPropagation();
+        e.preventDefault();
+    }, true);
+
     window.toggleSidebar = function() {
         document.getElementById('sidebar').classList.toggle('open');
         document.getElementById('sidebarBackdrop').classList.toggle('show');
@@ -1985,7 +1976,7 @@
     document.getElementById('confirmModal').addEventListener('click', function(e) { if (e.target === this) closeConfirm(); });
 
     // ============================================================
-    // COMMAND PALETTE (Tier 2)
+    // COMMAND PALETTE
     // ============================================================
     let commandItems = [];
     let commandActiveIndex = 0;
@@ -2047,8 +2038,6 @@
             `;
         });
         results.innerHTML = html;
-
-        // Store filtered globally for execution
         window._filteredCommands = filtered;
     }
 
@@ -2097,7 +2086,7 @@
     }
 
     // ============================================================
-    // SHORTCUTS OVERLAY (Option 4)
+    // SHORTCUTS
     // ============================================================
     window.openShortcuts = function() {
         document.getElementById('shortcutsModal').classList.add('show');
@@ -2671,7 +2660,7 @@
     }
 
     // ============================================================
-    // PDF FUNCTIONS (unchanged logic)
+    // PDF HELPERS — Premium
     // ============================================================
     function signatureToDataURL(signatureData, width = 250, height = 70) {
         if (!signatureData || !Array.isArray(signatureData) || signatureData.length === 0) return null;
@@ -2682,35 +2671,162 @@
         ctx.strokeStyle = 'black'; ctx.lineWidth = 1.8; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
         signatureData.forEach(stroke => {
             let points = stroke;
-            if (!Array.isArray(points)) { if (points.points) points = points.points; else if (points.data) points = points.data; else return; }
+            if (!Array.isArray(points)) {
+                if (points.points) points = points.points;
+                else if (points.data) points = points.data;
+                else return;
+            }
             if (!Array.isArray(points) || points.length === 0) return;
             ctx.beginPath();
             let first = true;
             points.forEach(p => {
                 let x, y;
-                if (typeof p === 'object' && p !== null) { x = p.x; y = p.y; if (x === undefined && p[0] !== undefined) { x = p[0]; y = p[1]; } }
-                else if (Array.isArray(p) && p.length >= 2) { x = p[0]; y = p[1]; } else return;
+                if (typeof p === 'object' && p !== null) {
+                    x = p.x; y = p.y;
+                    if (x === undefined && p[0] !== undefined) { x = p[0]; y = p[1]; }
+                } else if (Array.isArray(p) && p.length >= 2) {
+                    x = p[0]; y = p[1];
+                } else return;
                 if (x === undefined || y === undefined) return;
-                if (first) { ctx.moveTo(x, y); first = false; } else ctx.lineTo(x, y);
+                if (first) { ctx.moveTo(x, y); first = false; }
+                else ctx.lineTo(x, y);
             });
             ctx.stroke();
         });
         const d = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
         let hasInk = false;
-        for (let i = 0; i < d.length; i += 4) { if (d[i] < 255 || d[i+1] < 255 || d[i+2] < 255) { hasInk = true; break; } }
+        for (let i = 0; i < d.length; i += 4) {
+            if (d[i] < 255 || d[i+1] < 255 || d[i+2] < 255) { hasInk = true; break; }
+        }
         if (!hasInk) return null;
         return canvas.toDataURL('image/png');
     }
 
-    function formatDateForPDF(dateString) {
-        if (!dateString) return 'N/A';
-        try { const d = new Date(dateString); if (isNaN(d)) return dateString; return d.toLocaleString('en-US', { month:'numeric', day:'numeric', year:'numeric', hour:'numeric', minute:'2-digit', hour12:true }); } catch { return dateString; }
+    function pdfFmtDate(v, withTime = true) {
+        if (!v) return '';
+        try {
+            const d = new Date(v);
+            if (isNaN(d)) return v;
+            const opts = { day:'2-digit', month:'short', year:'numeric' };
+            if (withTime) { opts.hour='2-digit'; opts.minute='2-digit'; opts.hour12=true; }
+            return d.toLocaleString('en-GB', opts);
+        } catch { return v; }
     }
 
-    function getHeaderHTML() {
-        return `<div style="display:flex;align-items:center;gap:12px;border-bottom:3px solid #C8102E;padding-bottom:8px;margin-bottom:12px;"><div style="background:#C8102E;color:white;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;">M</div><div style="flex:1;"><h1 style="font-size:18px;color:#C8102E;font-weight:700;margin:0;">MOI VOI COUNTY REFERRAL HOSPITAL</h1><div style="font-size:10px;color:#333;">P.O. BOX 18-80300 VOI | biomedsmoivoi@gmail.com</div><div style="font-size:11px;font-weight:700;color:#C8102E;">TAITA TAVETA COUNTY</div><div style="font-size:9px;font-weight:600;color:#C8102E;">DEPARTMENT OF HEALTH SERVICES</div></div></div>`;
+    function pdfStatusStyle(status) {
+        const map = {
+            'Pending':    { bg:'#fef3c7', text:'#b45309', border:'#f59e0b' },
+            'Postponed':  { bg:'#fef3c7', text:'#b45309', border:'#f59e0b' },
+            'Completed':  { bg:'#d1fae5', text:'#047857', border:'#10b981' },
+            'Written Off':{ bg:'#fee2e2', text:'#b91c1c', border:'#ef4444' },
+            'No Job':     { bg:'#e0f2fe', text:'#0369a1', border:'#0ea5e9' },
+            'Open':       { bg:'#e0f2fe', text:'#0369a1', border:'#0ea5e9' }
+        };
+        return map[status] || map['Open'];
     }
 
+    function pdfHeader() {
+        return `
+            <div style="background:linear-gradient(135deg,#C8102E 0%,#e81a3f 100%);color:white;padding:22px 30px;display:flex;align-items:center;gap:18px;">
+                <div style="width:62px;height:62px;background:rgba(255,255,255,0.18);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:800;border:2px solid rgba(255,255,255,0.35);flex-shrink:0;">M</div>
+                <div style="flex:1;">
+                    <div style="font-size:19px;font-weight:800;letter-spacing:-0.2px;line-height:1.2;">MOI VOI COUNTY REFERRAL HOSPITAL</div>
+                    <div style="font-size:10.5px;opacity:0.92;margin-top:4px;font-weight:500;">P.O. BOX 18-80300 VOI &nbsp;·&nbsp; biomedsmoivoi@gmail.com</div>
+                    <div style="font-size:10px;font-weight:700;margin-top:3px;letter-spacing:0.5px;">TAITA TAVETA COUNTY &nbsp;·&nbsp; DEPARTMENT OF HEALTH SERVICES</div>
+                </div>
+            </div>
+        `;
+    }
+
+    function pdfFooter(docId) {
+        const now = new Date().toLocaleString('en-GB', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit', hour12:true });
+        return `
+            <div style="background:#0f172a;color:#cbd5e1;padding:12px 30px;display:flex;justify-content:space-between;align-items:center;font-size:9px;">
+                <div>
+                    <div style="font-weight:700;color:white;margin-bottom:2px;">MCRH Equipment Maintenance System</div>
+                    <div style="opacity:0.7;">Generated on ${now}</div>
+                </div>
+                <div style="text-align:right;">
+                    <div style="font-weight:700;color:white;margin-bottom:2px;">Document ID</div>
+                    <div style="opacity:0.75;font-family:'Courier New',monospace;">${docId} &nbsp;·&nbsp; v1.0</div>
+                </div>
+            </div>
+        `;
+    }
+
+    function pdfSectionTitle(text) {
+        return `<div style="font-size:10.5px;font-weight:800;color:#C8102E;text-transform:uppercase;letter-spacing:1px;padding-bottom:6px;border-bottom:2px solid #C8102E;margin-bottom:12px;">${text}</div>`;
+    }
+
+    function pdfField(label, value) {
+        const isEmpty = !value || (typeof value === 'string' && !value.trim());
+        const display = isEmpty ? '<span style="color:#94a3b8;font-style:italic;font-weight:500;">Not provided</span>' : value;
+        return `
+            <div>
+                <div style="font-size:8.5px;color:#64748b;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">${label}</div>
+                <div style="font-size:11px;color:#0f172a;font-weight:600;line-height:1.4;word-break:break-word;">${display}</div>
+            </div>
+        `;
+    }
+
+    function pdfSigBlock(label, name, date, sigDataURL, color = '#C8102E') {
+        return `
+            <div style="flex:1;border:1.5px solid #e2e8f0;border-radius:10px;overflow:hidden;background:white;display:flex;flex-direction:column;">
+                <div style="background:${color}15;padding:8px 14px;border-bottom:2px solid ${color};">
+                    <div style="font-size:9.5px;font-weight:800;color:${color};text-transform:uppercase;letter-spacing:0.8px;">${label}</div>
+                </div>
+                <div style="padding:12px 14px;flex:1;display:flex;flex-direction:column;">
+                    <div style="font-size:8.5px;color:#64748b;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Name</div>
+                    <div style="font-size:11.5px;color:#0f172a;font-weight:700;margin-bottom:10px;">${name || '—'}</div>
+                    <div style="font-size:8.5px;color:#64748b;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Signature</div>
+                    <div style="min-height:52px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid #94a3b8;margin-bottom:8px;padding-bottom:4px;">
+                        ${sigDataURL
+                            ? `<img src="${sigDataURL}" style="max-width:100%;max-height:50px;" />`
+                            : '<span style="color:#94a3b8;font-size:9.5px;font-style:italic;">Not signed</span>'}
+                    </div>
+                    <div style="font-size:8.5px;color:#64748b;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Date Signed</div>
+                    <div style="font-size:10.5px;color:#0f172a;font-weight:600;">${date || '—'}</div>
+                </div>
+            </div>
+        `;
+    }
+
+    async function renderElementToPDF(el, filename) {
+        const canvas = await html2canvas(el, {
+            scale: 2.5,
+            useCORS: true,
+            backgroundColor: '#ffffff',
+            logging: false,
+            windowWidth: 794
+        });
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p','mm','a4');
+        const pageW = 210;
+        const pageH = 297;
+        const imgW = pageW;
+        const imgH = canvas.height * imgW / canvas.width;
+        const imgData = canvas.toDataURL('image/png');
+
+        if (imgH <= pageH) {
+            pdf.addImage(imgData, 'PNG', 0, 0, imgW, imgH);
+        } else {
+            let heightLeft = imgH;
+            let position = 0;
+            pdf.addImage(imgData, 'PNG', 0, position, imgW, imgH);
+            heightLeft -= pageH;
+            while (heightLeft > 0) {
+                position = heightLeft - imgH;
+                pdf.addPage();
+                pdf.addImage(imgData, 'PNG', 0, position, imgW, imgH);
+                heightLeft -= pageH;
+            }
+        }
+        pdf.save(filename);
+    }
+
+    // ============================================================
+    // REQUEST SLIP PDF — Premium
+    // ============================================================
     window.downloadRequestPDF = async function(requestId) {
         if (!requestId) { showToast('Invalid request ID.', 'error'); return; }
         showToast('Generating PDF…', 'info', 'Please wait');
@@ -2718,32 +2834,104 @@
             const snap = await getDoc(doc(db, REQUESTS_COLL, requestId));
             if (!snap.exists()) { showToast('Request not found.', 'error'); return; }
             const req = snap.data();
+
+            const status = req.jobStatus || req.status || 'Open';
+            const sc = pdfStatusStyle(status);
+            const received = req.received === true;
+
             const temp = document.createElement('div');
-            temp.style.cssText = 'position:fixed;left:-9999px;top:0;width:800px;padding:15px 20px;background:white;font-family:Segoe UI,sans-serif;color:#1e2a3a;font-size:12px;';
+            temp.style.cssText = 'position:fixed;left:-9999px;top:0;width:794px;background:white;font-family:Arial,Helvetica,sans-serif;color:#1e293b;';
             temp.innerHTML = `
-                ${getHeaderHTML()}
-                <div style="background:#f8f9fc;padding:4px 12px;border-radius:6px;margin-bottom:10px;"><h2 style="font-size:16px;font-weight:600;margin:0;">📋 SERVICE REQUEST FORM</h2></div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;">
-                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Request No.</label><div>${req.requestNo || 'N/A'}</div></div>
-                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Date</label><div>${formatDateForPDF(req.dateTime)}</div></div>
-                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Requester</label><div>${req.requesterName || 'N/A'}</div></div>
-                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Unit/Ward</label><div>${req.unit || 'N/A'}</div></div>
-                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Equipment Type</label><div>${req.type || 'N/A'}</div></div>
-                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Equipment Name</label><div>${req.equipName || 'N/A'}</div></div>
-                    <div style="grid-column:1/-1;"><label style="font-size:9px;font-weight:600;color:#495057;">Complaint</label><div>${req.complaint || 'N/A'}</div></div>
-                </div>`;
+                <div style="width:794px;background:white;">
+                    ${pdfHeader()}
+
+                    <div style="padding:16px 30px;background:white;border-bottom:3px solid #C8102E;display:flex;justify-content:space-between;align-items:center;">
+                        <div>
+                            <div style="font-size:17px;font-weight:800;color:#0f172a;letter-spacing:0.4px;">SERVICE REQUEST SLIP</div>
+                            <div style="font-size:10px;color:#64748b;margin-top:2px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">Official Maintenance Request Document</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div style="font-size:9px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;">Reference No.</div>
+                            <div style="font-size:22px;font-weight:800;color:#C8102E;letter-spacing:0.8px;font-family:'Courier New',monospace;margin-top:1px;">${req.requestNo || 'N/A'}</div>
+                        </div>
+                    </div>
+
+                    <div style="padding:12px 30px;background:#f8fafc;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;">
+                        <div style="display:flex;gap:10px;align-items:center;">
+                            <div style="font-size:9.5px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">Job Status</div>
+                            <div style="display:inline-block;padding:4px 14px;border-radius:20px;background:${sc.bg};color:${sc.text};font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;border:1.5px solid ${sc.border};">● ${status}</div>
+                        </div>
+                        <div style="display:flex;gap:10px;align-items:center;">
+                            <div style="font-size:9.5px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">Received</div>
+                            <div style="display:inline-block;padding:4px 14px;border-radius:20px;background:${received ? '#d1fae5' : '#fee2e2'};color:${received ? '#047857' : '#b91c1c'};font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;">${received ? '✓ Yes' : '✗ No'}</div>
+                        </div>
+                    </div>
+
+                    <div style="padding:22px 30px;">
+
+                        <div style="margin-bottom:18px;">
+                            ${pdfSectionTitle('Requester Information')}
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 28px;">
+                                ${pdfField('Requester Name', req.requesterName)}
+                                ${pdfField('Department / Unit', req.unit)}
+                                ${pdfField('Date &amp; Time Reported', pdfFmtDate(req.dateTime))}
+                                ${pdfField('Request Created', pdfFmtDate(req.createdAt))}
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom:18px;">
+                            ${pdfSectionTitle('Equipment Details')}
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 28px;">
+                                ${pdfField('Item Type', req.type)}
+                                ${pdfField('Equipment Name', req.equipName)}
+                                ${pdfField('Serial No.', req.serial)}
+                                ${pdfField('Model / Make', req.modelMake)}
+                                ${pdfField('Inventory / Asset No.', req.inventory)}
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom:18px;">
+                            ${pdfSectionTitle('Complaint Description')}
+                            <div style="padding:12px 14px;background:#f8fafc;border:1px solid #e2e8f0;border-left:4px solid #C8102E;border-radius:4px;font-size:11px;color:#1e293b;line-height:1.65;min-height:55px;font-weight:500;">
+                                ${req.complaint || '<span style="color:#94a3b8;font-style:italic;">No complaint description provided.</span>'}
+                            </div>
+                        </div>
+
+                        ${received ? `
+                        <div style="margin-bottom:18px;">
+                            ${pdfSectionTitle('Receiving Information')}
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 28px;">
+                                ${pdfField('Received By', req.receivedByName || 'Technician')}
+                                ${pdfField('Received At', pdfFmtDate(req.receivedAt))}
+                            </div>
+                        </div>
+                        ` : ''}
+
+                    </div>
+
+                    <div style="padding:0 30px 22px;">
+                        <div style="display:flex;gap:20px;">
+                            ${pdfSigBlock('Requester Signature', req.requesterName, pdfFmtDate(req.dateTime, false), null, '#0ea5e9')}
+                            ${pdfSigBlock('Received By (Technician)', req.receivedByName || '', pdfFmtDate(req.receivedAt, false), null, '#10b981')}
+                        </div>
+                    </div>
+
+                    ${pdfFooter(`REQ-${req.requestNo || 'N/A'}`)}
+                </div>
+            `;
             document.body.appendChild(temp);
-            const canvas = await html2canvas(temp, { scale:2, useCORS:true });
+            await renderElementToPDF(temp, `RequestSlip_${req.requestNo || 'export'}.pdf`);
             document.body.removeChild(temp);
-            const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF('p','mm','a4');
-            const iw = 210, ih = (canvas.height * iw) / canvas.width;
-            pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, iw, ih);
-            pdf.save(`RequestSlip_${req.requestNo || 'export'}.pdf`);
             showToast('PDF downloaded successfully', 'success', 'Done');
-        } catch (err) { showToast(err.message, 'error'); }
+        } catch (err) {
+            console.error('PDF error:', err);
+            showToast('PDF error: ' + err.message, 'error');
+        }
     };
 
+    // ============================================================
+    // JOB CARD PDF — Premium
+    // ============================================================
     window.downloadJobcardPDF = async function(jobcardId) {
         if (!jobcardId) { showToast('Invalid jobcard ID.', 'error'); return; }
         showToast('Generating PDF…', 'info', 'Please wait');
@@ -2751,49 +2939,188 @@
             const snap = await getDoc(doc(db, JOBCARDS_COLL, jobcardId));
             if (!snap.exists()) { showToast('Job card not found.', 'error'); return; }
             const job = snap.data();
+
             const techSig = signatureToDataURL(job.techSignature);
             const certSig = signatureToDataURL(job.certSignature);
-            let statusColor = '#ffc107';
-            if (job.status === 'Completed') statusColor = '#28a745';
-            else if (job.status === 'Written Off') statusColor = '#dc3545';
+            const status = job.status || 'Pending';
+            const sc = pdfStatusStyle(status);
+
             const temp = document.createElement('div');
-            temp.style.cssText = 'position:fixed;left:-9999px;top:0;width:800px;padding:12px 18px;background:white;font-family:Segoe UI,sans-serif;color:#1e2a3a;font-size:12px;';
+            temp.style.cssText = 'position:fixed;left:-9999px;top:0;width:794px;background:white;font-family:Arial,Helvetica,sans-serif;color:#1e293b;';
             temp.innerHTML = `
-                ${getHeaderHTML()}
-                <div style="display:flex;justify-content:space-between;background:#f8f9fc;padding:4px 12px;border-radius:6px;margin-bottom:8px;"><h2 style="font-size:16px;font-weight:600;margin:0;">⚙️ JOB CARD</h2><span style="background:${statusColor};color:${job.status === 'Pending' ? '#1e2a3a' : 'white'};padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;">● ${job.status || 'PENDING'}</span></div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;">
-                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Job No.</label><div>${job.jobNo || 'N/A'}</div></div>
-                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Request No.</label><div>${job.requestNo || 'N/A'}</div></div>
-                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Reporting</label><div>${formatDateForPDF(job.reportingDateTime)}</div></div>
-                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Unit/Ward</label><div>${job.unit || 'N/A'}</div></div>
-                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Requester</label><div>${job.requester || 'N/A'}</div></div>
-                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Equipment</label><div>${job.equipName || 'N/A'}</div></div>
-                    <div style="grid-column:1/-1;"><label style="font-size:9px;font-weight:600;color:#495057;">Complaint</label><div>${job.complaint || 'N/A'}</div></div>
-                    <div style="grid-column:1/-1;"><label style="font-size:9px;font-weight:600;color:#495057;">Diagnosis</label><div>${job.diagnosis || 'N/A'}</div></div>
+                <div style="width:794px;background:white;">
+                    ${pdfHeader()}
+
+                    <div style="padding:14px 30px;background:white;border-bottom:3px solid #C8102E;display:flex;justify-content:space-between;align-items:center;">
+                        <div>
+                            <div style="font-size:17px;font-weight:800;color:#0f172a;letter-spacing:0.4px;">EQUIPMENT JOB CARD</div>
+                            <div style="font-size:10px;color:#64748b;margin-top:2px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">Maintenance Record Document</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div style="font-size:9px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;">Job Card No.</div>
+                            <div style="font-size:22px;font-weight:800;color:#C8102E;letter-spacing:0.8px;font-family:'Courier New',monospace;margin-top:1px;">${job.jobNo || 'N/A'}</div>
+                        </div>
+                    </div>
+
+                    <div style="padding:10px 30px;background:#f8fafc;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+                        <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:center;">
+                            <div style="display:flex;gap:8px;align-items:center;">
+                                <div style="font-size:9.5px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">Status</div>
+                                <div style="display:inline-block;padding:3px 12px;border-radius:20px;background:${sc.bg};color:${sc.text};font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;border:1.5px solid ${sc.border};">● ${status}</div>
+                            </div>
+                            <div style="display:flex;gap:8px;align-items:center;">
+                                <div style="font-size:9.5px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">Request</div>
+                                <div style="font-size:11px;font-weight:800;color:#0f172a;font-family:'Courier New',monospace;">${job.requestNo || 'N/A'}</div>
+                            </div>
+                        </div>
+                        <div style="font-size:9px;color:#64748b;font-weight:600;">Last updated: ${pdfFmtDate(job.updatedAt)}</div>
+                    </div>
+
+                    <div style="padding:18px 30px;">
+
+                        <div style="margin-bottom:14px;">
+                            ${pdfSectionTitle('Job & Requester Information')}
+                            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px 20px;">
+                                ${pdfField('Reporting Date', pdfFmtDate(job.reportingDateTime))}
+                                ${pdfField('Requester', job.requester)}
+                                ${pdfField('Unit / Ward', job.unit)}
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom:14px;">
+                            ${pdfSectionTitle('Equipment Details')}
+                            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px 20px;">
+                                ${pdfField('Equipment Name', job.equipName)}
+                                ${pdfField('Serial No.', job.serial)}
+                                ${pdfField('Model / Make', job.modelMake)}
+                                ${pdfField('Inventory No.', job.inventory)}
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom:14px;">
+                            ${pdfSectionTitle('Complaint & Diagnosis')}
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 20px;">
+                                <div>
+                                    <div style="font-size:8.5px;color:#64748b;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Complaint by User</div>
+                                    <div style="padding:8px 12px;background:#f8fafc;border:1px solid #e2e8f0;border-left:3px solid #0ea5e9;border-radius:4px;font-size:10.5px;color:#1e293b;line-height:1.5;min-height:44px;font-weight:500;">
+                                        ${job.complaint || '<span style="color:#94a3b8;font-style:italic;">Not provided</span>'}
+                                    </div>
+                                </div>
+                                <div>
+                                    <div style="font-size:8.5px;color:#64748b;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Diagnosis</div>
+                                    <div style="padding:8px 12px;background:#f8fafc;border:1px solid #e2e8f0;border-left:3px solid #C8102E;border-radius:4px;font-size:10.5px;color:#1e293b;line-height:1.5;min-height:44px;font-weight:500;">
+                                        ${job.diagnosis || '<span style="color:#94a3b8;font-style:italic;">Not provided</span>'}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom:14px;">
+                            ${pdfSectionTitle('Handover')}
+                            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px 20px;">
+                                ${pdfField('Received From', job.receivedFrom)}
+                                ${pdfField('Received By', job.receivedBy)}
+                                ${pdfField('Received At', pdfFmtDate(job.receivedDateTime))}
+                                ${pdfField('Handed To', job.handedTo)}
+                                ${pdfField('Handed By', job.handedBy)}
+                                ${pdfField('Handed At', pdfFmtDate(job.handedDateTime))}
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom:14px;">
+                            ${pdfSectionTitle('Service Type & Timeline')}
+                            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px 20px;">
+                                ${pdfField('Service Type', job.serviceType)}
+                                ${pdfField('Job Started', pdfFmtDate(job.startDateTime))}
+                                ${pdfField('Job Completed', pdfFmtDate(job.endDateTime))}
+                                ${pdfField('Total Time', job.totalTime)}
+                                ${pdfField('Response Time', job.responseTime)}
+                                ${pdfField('Admin Time', job.adminTime)}
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom:14px;">
+                            ${pdfSectionTitle('Status & Resolution')}
+                            ${status === 'Completed' ? `
+                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 20px;">
+                                    <div>
+                                        <div style="font-size:8.5px;color:#64748b;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Defects Found</div>
+                                        <div style="padding:8px 12px;background:#fef3c7;border:1px solid #fcd34d;border-radius:4px;font-size:10.5px;color:#78350f;line-height:1.5;min-height:44px;font-weight:500;">
+                                            ${job.defects || '<span style="color:#a16207;font-style:italic;">Not provided</span>'}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div style="font-size:8.5px;color:#64748b;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Action Taken</div>
+                                        <div style="padding:8px 12px;background:#d1fae5;border:1px solid #6ee7b7;border-radius:4px;font-size:10.5px;color:#065f46;line-height:1.5;min-height:44px;font-weight:500;">
+                                            ${job.actionTaken || '<span style="color:#047857;font-style:italic;">Not provided</span>'}
+                                        </div>
+                                    </div>
+                                </div>
+                            ` : ''}
+                            ${status === 'Pending' ? `
+                                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px 20px;">
+                                    ${pdfField('Postpone Reason', job.postponeReason)}
+                                    ${pdfField('Expected Date', pdfFmtDate(job.expectedDate))}
+                                    ${pdfField('Postpone Note', job.postponeNote)}
+                                </div>
+                            ` : ''}
+                            ${status === 'Written Off' ? `
+                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 20px;">
+                                    ${pdfField('Write-Off Reason', job.writeOffReason)}
+                                    ${pdfField('Write-Off Note', job.writeOffNote)}
+                                </div>
+                            ` : ''}
+                            ${job.comments ? `
+                                <div style="margin-top:10px;">
+                                    <div style="font-size:8.5px;color:#64748b;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Additional Comments</div>
+                                    <div style="padding:8px 12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:4px;font-size:10.5px;color:#1e293b;line-height:1.5;font-weight:500;">
+                                        ${job.comments}
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+
+                        <div style="margin-bottom:14px;">
+                            ${pdfSectionTitle('Measurements & Verification')}
+                            <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px 20px;">
+                                ${pdfField('Current (A)', job.measureCurrent)}
+                                ${pdfField('Voltage (V)', job.measureVoltage)}
+                                ${pdfField('Insulation (MΩ)', job.measureInsulation)}
+                                ${pdfField('Pressure', job.measurePressure)}
+                            </div>
+                            <div style="display:flex;gap:24px;margin-top:12px;">
+                                <div style="display:flex;align-items:center;gap:8px;font-size:10.5px;font-weight:700;color:#0f172a;">
+                                    <span style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border:1.5px solid #10b981;border-radius:3px;background:${job.functionOk ? '#10b981' : 'white'};color:white;font-size:10px;font-weight:900;">${job.functionOk ? '✓' : ''}</span>
+                                    Function O.K.
+                                </div>
+                                <div style="display:flex;align-items:center;gap:8px;font-size:10.5px;font-weight:700;color:#0f172a;">
+                                    <span style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border:1.5px solid #10b981;border-radius:3px;background:${job.safetyOk ? '#10b981' : 'white'};color:white;font-size:10px;font-weight:900;">${job.safetyOk ? '✓' : ''}</span>
+                                    Safety O.K.
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div style="padding:0 30px 20px;">
+                        <div style="font-size:11px;font-weight:800;color:#C8102E;text-transform:uppercase;letter-spacing:1px;padding-bottom:6px;border-bottom:2px solid #C8102E;margin-bottom:14px;">Signatures &amp; Authorisation</div>
+                        <div style="display:flex;gap:20px;">
+                            ${pdfSigBlock('Technician Signature', job.techName, pdfFmtDate(job.techDate, false), techSig, '#0ea5e9')}
+                            ${pdfSigBlock('Supervisor Signature', job.certName, pdfFmtDate(job.certDate, false), certSig, '#C8102E')}
+                        </div>
+                    </div>
+
+                    ${pdfFooter(`JC-${job.jobNo || 'N/A'}`)}
                 </div>
-                <div style="border-top:1px solid #e9ecef;margin:8px 0 6px;"></div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px;">
-                    <div style="border:1px solid #e9ecef;border-radius:6px;padding:8px 12px;background:#f8f9fa;">
-                        <h4 style="font-size:12px;color:#C8102E;margin:0 0 4px;">👨‍🔧 Technician</h4>
-                        <div><label style="font-size:9px;font-weight:600;color:#495057;">Name</label><div>${job.techName || 'N/A'}</div></div>
-                        <div><label style="font-size:9px;font-weight:600;color:#495057;">Signature</label><div>${techSig ? `<img src="${techSig}" style="max-width:180px;max-height:60px;border:1px solid #ddd;" />` : 'Not signed'}</div></div>
-                    </div>
-                    <div style="border:1px solid #e9ecef;border-radius:6px;padding:8px 12px;background:#f8f9fa;">
-                        <h4 style="font-size:12px;color:#C8102E;margin:0 0 4px;">✅ Supervisor</h4>
-                        <div><label style="font-size:9px;font-weight:600;color:#495057;">Name</label><div>${job.certName || 'N/A'}</div></div>
-                        <div><label style="font-size:9px;font-weight:600;color:#495057;">Signature</label><div>${certSig ? `<img src="${certSig}" style="max-width:180px;max-height:60px;border:1px solid #ddd;" />` : 'Not signed'}</div></div>
-                    </div>
-                </div>`;
+            `;
             document.body.appendChild(temp);
-            const canvas = await html2canvas(temp, { scale:2, useCORS:true });
+            await renderElementToPDF(temp, `JobCard_${job.jobNo || 'export'}.pdf`);
             document.body.removeChild(temp);
-            const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF('p','mm','a4');
-            const iw = 210, ih = (canvas.height * iw) / canvas.width;
-            pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, iw, ih);
-            pdf.save(`JobCard_${job.jobNo || 'export'}.pdf`);
             showToast('PDF downloaded successfully', 'success', 'Done');
-        } catch (err) { showToast(err.message, 'error'); }
+        } catch (err) {
+            console.error('PDF error:', err);
+            showToast('PDF error: ' + err.message, 'error');
+        }
     };
 
     // ============================================================
@@ -2959,7 +3286,6 @@
         } catch (err) { showToast(err.message, 'error'); }
     };
 
-    // ---- UNDO INTEGRATION (Tier 2) ----
     window.deleteUser = function(userId) {
         const user = allUsers.find(u => u.id === userId);
         showConfirm({
@@ -2969,12 +3295,10 @@
             okText: 'Delete User',
             onConfirm: async () => {
                 try {
-                    // Backup before delete for undo
                     const backup = { ...user };
                     await deleteDoc(doc(db, USERS_COLL, userId));
                     await fetchData(); renderUserList(); renderDashboard();
                     showToast(`${user?.name || 'User'} deleted`, 'success', 'Deleted', async () => {
-                        // UNDO: restore the user document
                         try {
                             const { id, ...data } = backup;
                             await setDoc(doc(db, USERS_COLL, id), data);
@@ -3052,7 +3376,6 @@
         const tag = e.target.tagName;
         const isTyping = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
 
-        // Ctrl+K or Cmd+K always opens palette
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
             e.preventDefault();
             openCommandPalette();
