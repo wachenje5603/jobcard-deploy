@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MCRH - Job Card</title>
 
-    <!-- Firebase v9 -->
     <script type="importmap">
         {
             "imports": {
@@ -16,11 +15,7 @@
         }
     </script>
 
-    <!-- Signature Pad -->
-    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js">
-    </script>
-
-    <!-- html2canvas & jsPDF for PDF Export -->
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
@@ -137,7 +132,6 @@
 <body>
 
     <div class="container">
-        <!-- HEADER -->
         <header class="hospital-header">
             <div class="logo-area">
                 <div class="logo-icon">M</div>
@@ -157,128 +151,55 @@
         </div>
 
         <form id="jobcardForm">
-            <!-- AUTO-FILLED FROM REQUEST -->
             <div class="grid-2">
-                <div class="field-group">
-                    <label>Job Card No.</label>
-                    <input type="text" id="jobNo" readonly placeholder="Auto-generated" />
-                </div>
+                <div class="field-group"><label>Job Card No.</label><input type="text" id="jobNo" readonly /></div>
                 <div class="field-group">
                     <label>Request No.</label>
-                    <select id="jobRequestNo" onchange="loadRequestData()">
-                        <option value="">-- Select Request --</option>
-                    </select>
+                    <select id="jobRequestNo" onchange="loadRequestData()"><option value="">-- Select Request --</option></select>
                 </div>
-                <div class="field-group">
-                    <label>Reporting Date / Time</label>
-                    <input type="datetime-local" id="jobReportingDateTime" readonly />
-                </div>
-                <div class="field-group">
-                    <label>Unit / Ward</label>
-                    <input type="text" id="jobUnit" readonly />
-                </div>
-                <div class="field-group">
-                    <label>Requester Name</label>
-                    <input type="text" id="jobRequester" readonly />
-                </div>
-                <div class="field-group">
-                    <label>Equipment Name</label>
-                    <input type="text" id="jobEquipName" readonly />
-                </div>
-                <div class="field-group">
-                    <label>Inventory / Asset No.</label>
-                    <input type="text" id="jobInventory" readonly />
-                </div>
-                <div class="field-group">
-                    <label>Serial No.</label>
-                    <input type="text" id="jobSerial" readonly />
-                </div>
-                <div class="field-group">
-                    <label>Model / Make</label>
-                    <input type="text" id="jobModel" readonly />
-                </div>
-                <div class="field-group full-width">
-                    <label>Complaint by User (from request)</label>
-                    <textarea id="jobComplaint" readonly rows="2"></textarea>
-                </div>
-                <div class="field-group full-width">
-                    <label>🩺 Diagnosis by Maintenance Team</label>
-                    <textarea id="jobDiagnosis" rows="2" placeholder="Preliminary diagnosis..."></textarea>
-                </div>
+                <div class="field-group"><label>Reporting Date / Time</label><input type="datetime-local" id="jobReportingDateTime" readonly /></div>
+                <div class="field-group"><label>Unit / Ward</label><input type="text" id="jobUnit" readonly /></div>
+                <div class="field-group"><label>Requester Name</label><input type="text" id="jobRequester" readonly /></div>
+                <div class="field-group"><label>Equipment Name</label><input type="text" id="jobEquipName" readonly /></div>
+                <div class="field-group"><label>Inventory / Asset No.</label><input type="text" id="jobInventory" readonly /></div>
+                <div class="field-group"><label>Serial No.</label><input type="text" id="jobSerial" readonly /></div>
+                <div class="field-group"><label>Model / Make</label><input type="text" id="jobModel" readonly /></div>
+                <div class="field-group full-width"><label>Complaint by User</label><textarea id="jobComplaint" readonly rows="2"></textarea></div>
+                <div class="field-group full-width"><label>🩺 Diagnosis by Maintenance Team</label><textarea id="jobDiagnosis" rows="2"></textarea></div>
             </div>
 
-            <!-- ===== HIDDEN REQUESTER ID ===== -->
             <input type="hidden" id="jobRequesterId" />
 
-            <!-- HANDOVER -->
             <div class="grid-3">
-                <div class="field-group">
-                    <label>Received from (Requester)</label>
-                    <input type="text" id="jobReceivedFrom" readonly />
-                </div>
-                <div class="field-group">
-                    <label>Date / Time Received</label>
-                    <input type="datetime-local" id="jobReceivedDateTime" />
-                </div>
-                <div class="field-group">
-                    <label>Received by (Technician)</label>
-                    <input type="text" id="jobReceivedBy" readonly />
-                </div>
-                <div class="field-group">
-                    <label>Handed back to (User)</label>
-                    <select id="jobHandedTo">
-                        <option value="">-- Select --</option>
-                    </select>
-                </div>
-                <div class="field-group">
-                    <label>Date / Time Handed</label>
-                    <input type="datetime-local" id="jobHandedDateTime" />
-                </div>
-                <div class="field-group">
-                    <label>Handed by (Technician)</label>
-                    <input type="text" id="jobHandedBy" readonly />
-                </div>
+                <div class="field-group"><label>Received from (Requester)</label><input type="text" id="jobReceivedFrom" readonly /></div>
+                <div class="field-group"><label>Date / Time Received</label><input type="datetime-local" id="jobReceivedDateTime" /></div>
+                <div class="field-group"><label>Received by (Technician)</label><input type="text" id="jobReceivedBy" readonly /></div>
+                <div class="field-group"><label>Handed back to (User)</label><select id="jobHandedTo"><option value="">-- Select --</option></select></div>
+                <div class="field-group"><label>Date / Time Handed</label><input type="datetime-local" id="jobHandedDateTime" /></div>
+                <div class="field-group"><label>Handed by (Technician)</label><input type="text" id="jobHandedBy" readonly /></div>
             </div>
 
-            <!-- SERVICE TYPE -->
             <section class="section-block">
                 <h3>🛠️ Service Type</h3>
                 <div class="inline-group">
                     <label><input type="radio" name="serviceType" value="General Service/Overhaul" checked /> General Service/Overhaul</label>
                     <label><input type="radio" name="serviceType" value="Repair" /> Repair</label>
-                    <label><input type="radio" name="serviceType" value="PPM (Planned Preventive)" /> PPM (Planned Preventive)</label>
+                    <label><input type="radio" name="serviceType" value="PPM (Planned Preventive)" /> PPM</label>
                     <label><input type="radio" name="serviceType" value="Emergency Call" /> Emergency Call</label>
                 </div>
             </section>
 
-            <!-- TIMELINE -->
             <section class="section-block">
                 <h3>⏱️ Technician Timeline & Effort</h3>
                 <div class="grid-3">
-                    <div class="field-group">
-                        <label>Job Started</label>
-                        <input type="datetime-local" id="jobStartDateTime" />
-                    </div>
-                    <div class="field-group">
-                        <label>Job Completed</label>
-                        <input type="datetime-local" id="jobEndDateTime" />
-                    </div>
-                    <div class="field-group">
-                        <label>Total Time (hh:mm)</label>
-                        <input type="text" id="jobTotalTime" readonly placeholder="Auto-calc" />
-                    </div>
-                    <div class="field-group">
-                        <label>Response Time (hh:mm)</label>
-                        <input type="text" id="jobResponseTime" readonly placeholder="Auto-calc" />
-                    </div>
-                    <div class="field-group">
-                        <label>Admin / Requisition Time (hh:mm)</label>
-                        <input type="text" id="jobAdminTime" placeholder="e.g. 00:30" />
-                    </div>
+                    <div class="field-group"><label>Job Started</label><input type="datetime-local" id="jobStartDateTime" /></div>
+                    <div class="field-group"><label>Job Completed</label><input type="datetime-local" id="jobEndDateTime" /></div>
+                    <div class="field-group"><label>Total Time (hh:mm)</label><input type="text" id="jobTotalTime" readonly /></div>
+                    <div class="field-group"><label>Response Time (hh:mm)</label><input type="text" id="jobResponseTime" readonly /></div>
+                    <div class="field-group"><label>Admin / Requisition Time</label><input type="text" id="jobAdminTime" placeholder="e.g. 00:30" /></div>
                 </div>
             </section>
 
-            <!-- STATUS & COMPLETION -->
             <section class="section-block">
                 <h3>📌 Job Status & Completion</h3>
                 <div class="field-group">
@@ -292,8 +213,7 @@
 
                 <div id="pendingFields" style="margin-top:12px;">
                     <div class="grid-2">
-                        <div class="field-group">
-                            <label>Reason for Postponement</label>
+                        <div class="field-group"><label>Reason for Postponement</label>
                             <select id="jobPostponeReason">
                                 <option value="Low priority">Low priority</option>
                                 <option value="Awaiting spare parts">Awaiting spare parts</option>
@@ -301,26 +221,14 @@
                                 <option value="Other">Other</option>
                             </select>
                         </div>
-                        <div class="field-group">
-                            <label>Expected Completion Date</label>
-                            <input type="datetime-local" id="jobExpectedDate" />
-                        </div>
-                        <div class="field-group full-width">
-                            <label>Additional Note</label>
-                            <textarea id="jobPostponeNote" rows="2" placeholder="Details..."></textarea>
-                        </div>
+                        <div class="field-group"><label>Expected Completion Date</label><input type="datetime-local" id="jobExpectedDate" /></div>
+                        <div class="field-group full-width"><label>Additional Note</label><textarea id="jobPostponeNote" rows="2"></textarea></div>
                     </div>
                 </div>
 
                 <div id="completedFields" style="display:none; margin-top:12px;">
-                    <div class="field-group">
-                        <label>🔧 Defects Found</label>
-                        <textarea id="jobDefects" rows="2" placeholder="List defects..."></textarea>
-                    </div>
-                    <div class="field-group">
-                        <label>🛠️ Action Taken</label>
-                        <textarea id="jobActionTaken" rows="2" placeholder="Describe repairs..."></textarea>
-                    </div>
+                    <div class="field-group"><label>🔧 Defects Found</label><textarea id="jobDefects" rows="2"></textarea></div>
+                    <div class="field-group"><label>🛠️ Action Taken</label><textarea id="jobActionTaken" rows="2"></textarea></div>
                 </div>
 
                 <div id="writtenOffFields" style="display:none; margin-top:12px;">
@@ -337,45 +245,31 @@
                             <option value="Others">Others</option>
                         </select>
                     </div>
-                    <div class="field-group">
-                        <label>Additional Comments</label>
-                        <textarea id="jobWriteOffNote" rows="2" placeholder="Details..."></textarea>
-                    </div>
+                    <div class="field-group"><label>Additional Comments</label><textarea id="jobWriteOffNote" rows="2"></textarea></div>
                 </div>
             </section>
 
-            <!-- MEASUREMENTS -->
             <section class="grid-4">
-                <div class="field-group"><label>Current (A)</label><input type="text" id="jobMeasureCurrent" placeholder="N/A" /></div>
-                <div class="field-group"><label>Voltage (V)</label><input type="text" id="jobMeasureVoltage" placeholder="N/A" /></div>
-                <div class="field-group"><label>Insulation (MΩ)</label><input type="text" id="jobMeasureInsulation" placeholder="N/A" /></div>
-                <div class="field-group"><label>Pressure (bar/mbar)</label><input type="text" id="jobMeasurePressure" placeholder="N/A" /></div>
+                <div class="field-group"><label>Current (A)</label><input type="text" id="jobMeasureCurrent" /></div>
+                <div class="field-group"><label>Voltage (V)</label><input type="text" id="jobMeasureVoltage" /></div>
+                <div class="field-group"><label>Insulation (MΩ)</label><input type="text" id="jobMeasureInsulation" /></div>
+                <div class="field-group"><label>Pressure (bar/mbar)</label><input type="text" id="jobMeasurePressure" /></div>
             </section>
 
-            <!-- FINAL CHECKS -->
             <section class="section-block">
                 <h3>✅ Final Verification</h3>
                 <div class="inline-group" style="margin-bottom:12px;">
                     <label><input type="checkbox" id="jobFunctionOk" checked /> Function O.K.</label>
                     <label><input type="checkbox" id="jobSafetyOk" checked /> Safety O.K.</label>
                 </div>
-                <div class="field-group">
-                    <label>Comments / Additional Notes</label>
-                    <textarea id="jobComments" rows="2" placeholder="Any extra observations..."></textarea>
-                </div>
+                <div class="field-group"><label>Comments / Additional Notes</label><textarea id="jobComments" rows="2"></textarea></div>
             </section>
 
-            <!-- SIGNATURES -->
             <section class="signature-area">
                 <div class="signature-grid">
                     <div class="signature-box">
                         <h4>👨‍🔧 Technician Signature</h4>
-                        <div class="field-group">
-                            <label>Name</label>
-                            <select id="jobTechName">
-                                <option value="">-- Select --</option>
-                            </select>
-                        </div>
+                        <div class="field-group"><label>Name</label><select id="jobTechName"><option value="">-- Select --</option></select></div>
                         <div class="field-group">
                             <label>Draw Signature</label>
                             <div class="sig-pad-wrapper" id="jobTechSigWrapper">
@@ -388,19 +282,11 @@
                             </div>
                             <div class="sig-status" id="jobTechSigStatus">✅ Signed</div>
                         </div>
-                        <div class="field-group">
-                            <label>Date</label>
-                            <input type="date" id="jobTechDate" />
-                        </div>
+                        <div class="field-group"><label>Date</label><input type="date" id="jobTechDate" /></div>
                     </div>
                     <div class="signature-box">
                         <h4>✅ Supervisor Signature</h4>
-                        <div class="field-group">
-                            <label>Name</label>
-                            <select id="jobCertName">
-                                <option value="">-- Select --</option>
-                            </select>
-                        </div>
+                        <div class="field-group"><label>Name</label><select id="jobCertName"><option value="">-- Select --</option></select></div>
                         <div class="field-group">
                             <label>Draw Signature</label>
                             <div class="sig-pad-wrapper" id="jobCertSigWrapper">
@@ -413,15 +299,11 @@
                             </div>
                             <div class="sig-status" id="jobCertSigStatus">✅ Signed</div>
                         </div>
-                        <div class="field-group">
-                            <label>Date</label>
-                            <input type="date" id="jobCertDate" />
-                        </div>
+                        <div class="field-group"><label>Date</label><input type="date" id="jobCertDate" /></div>
                     </div>
                 </div>
             </section>
 
-            <!-- ACTION BAR -->
             <div class="action-bar no-print">
                 <button type="button" class="btn btn-success" id="saveJobBtn" onclick="saveJobCard()">💾 Save Job Card</button>
                 <button type="button" class="btn btn-outline" onclick="window.print()">📄 Print Job Card</button>
@@ -430,13 +312,12 @@
         </form>
 
         <footer style="margin-top:22px;font-size:12px;color:#6c757d;text-align:center;border-top:1px solid #e9ecef;padding-top:14px;">
-            🔥 Firestore‑powered · ✍️ Drawable Signatures · MCRH Job Card v8.0
+            🔥 Firestore‑powered · ✍️ Drawable Signatures · MCRH Job Card v8.1
         </footer>
     </div>
 
     <div id="toast" class="toast">Message</div>
 
-    <!-- ===== SAVING OVERLAY ===== -->
     <div class="saving-overlay" id="savingOverlay">
         <div class="saving-card">
             <div class="spinner"></div>
@@ -450,9 +331,6 @@
     </div>
 
     <script type="module">
-        // ============================================================
-        // FIREBASE CONFIG
-        // ============================================================
         const firebaseConfig = {
             apiKey: "AIzaSyDnsz1s-VnewbUszXNJptcdMZ_h0QsNHYQ",
             authDomain: "moivoibiomed.firebaseapp.com",
@@ -466,17 +344,8 @@
         import { initializeApp } from 'firebase/app';
         import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
         import {
-            getFirestore,
-            collection,
-            addDoc,
-            getDocs,
-            getDoc,
-            doc,
-            updateDoc,
-            query,
-            orderBy,
-            where,
-            serverTimestamp
+            getFirestore, collection, addDoc, getDocs, getDoc, doc,
+            updateDoc, query, orderBy, where, serverTimestamp
         } from 'firebase/firestore';
 
         const app = initializeApp(firebaseConfig);
@@ -486,9 +355,6 @@
         const JOBCARDS_COLL = 'jobcards';
         const USERS_COLL = 'users';
 
-        // ============================================================
-        // GLOBALS
-        // ============================================================
         let currentUser = null;
         let currentJobCardId = null;
         let techSigPad = null;
@@ -498,59 +364,29 @@
         let allJobCards = [];
         let isSaving = false;
 
-        // ============================================================
-        // AUTH
-        // ============================================================
         onAuthStateChanged(auth, async (user) => {
-            if (!user) {
-                window.location.href = 'login.html';
-                return;
-            }
+            if (!user) { window.location.href = 'login.html'; return; }
             try {
                 const userDoc = await getDoc(doc(db, USERS_COLL, user.uid));
-                if (!userDoc.exists()) {
-                    await signOut(auth);
-                    window.location.href = 'login.html';
-                    return;
-                }
+                if (!userDoc.exists()) { await signOut(auth); window.location.href = 'login.html'; return; }
                 const userData = userDoc.data();
                 if (!userData.approved) {
                     alert('Your account is pending approval. Please contact admin.');
-                    await signOut(auth);
-                    window.location.href = 'login.html';
-                    return;
+                    await signOut(auth); window.location.href = 'login.html'; return;
                 }
                 const role = userData.role || 'requester';
                 if (role !== 'maintenance' && role !== 'admin') {
                     alert('You do not have permission to access this page.');
-                    window.location.href = 'dashboard.html';
-                    return;
+                    window.location.href = 'dashboard.html'; return;
                 }
                 currentUser = { id: user.uid, ...userData };
                 await initPage();
-            } catch (err) {
-                console.error('Auth error:', err);
-                window.location.href = 'login.html';
-            }
+            } catch (err) { console.error('Auth error:', err); window.location.href = 'login.html'; }
         });
 
-        // ============================================================
-        // LOGOUT
-        // ============================================================
-        window.logout = function() {
-            signOut(auth).then(() => window.location.href = 'login.html');
-        };
+        window.logout = function() { signOut(auth).then(() => window.location.href = 'login.html'); };
+        window.goToDashboard = function() { window.location.href = 'dashboard.html'; };
 
-        // ============================================================
-        // GO TO DASHBOARD
-        // ============================================================
-        window.goToDashboard = function() {
-            window.location.href = 'dashboard.html';
-        };
-
-        // ============================================================
-        // HELPERS
-        // ============================================================
         function showToast(msg, isError = false) {
             const t = document.getElementById('toast');
             t.textContent = msg;
@@ -563,8 +399,7 @@
         function calcTimeDiff(start, end) {
             if (!start || !end) return '--:--';
             try {
-                const s = new Date(start);
-                const e = new Date(end);
+                const s = new Date(start), e = new Date(end);
                 if (isNaN(s) || isNaN(e) || e < s) return '--:--';
                 const diffMs = e - s;
                 const hrs = Math.floor(diffMs / 3600000);
@@ -576,8 +411,7 @@
         function calcResponseTime(reportDt, startDt) {
             if (!reportDt || !startDt) return '--:--';
             try {
-                const r = new Date(reportDt);
-                const s = new Date(startDt);
+                const r = new Date(reportDt), s = new Date(startDt);
                 if (isNaN(r) || isNaN(s) || s < r) return '--:--';
                 const diffMs = s - r;
                 const hrs = Math.floor(diffMs / 3600000);
@@ -588,35 +422,26 @@
 
         async function generateJobNumber() {
             try {
-                const q = query(collection(db, JOBCARDS_COLL));
-                const snap = await getDocs(q);
+                const snap = await getDocs(collection(db, JOBCARDS_COLL));
                 let max = 0;
-                snap.forEach(doc => {
-                    const data = doc.data();
+                snap.forEach(d => {
+                    const data = d.data();
                     if (data.jobNo) {
-                        const match = data.jobNo.match(/MCRH(\d+)/);
-                        if (match) {
-                            const num = parseInt(match[1]);
-                            if (num > max) max = num;
-                        }
+                        const m = data.jobNo.match(/MCRH(\d+)/);
+                        if (m) { const n = parseInt(m[1]); if (n > max) max = n; }
                     }
                 });
-                const next = max + 1;
-                return `MCRH${String(next).padStart(3, '0')}`;
+                return `MCRH${String(max + 1).padStart(3, '0')}`;
             } catch {
                 return `MCRH${Date.now().toString().slice(-6)}`;
             }
         }
 
-        // ============================================================
-        // SAVING OVERLAY
-        // ============================================================
         function showSavingOverlay(message, showRedirectNote = false) {
             const overlay = document.getElementById('savingOverlay');
             const title = document.getElementById('savingTitle');
             const msg = document.getElementById('savingMessage');
             const note = document.getElementById('redirectNote');
-
             if (showRedirectNote) {
                 title.textContent = '✅ Job Card Saved!';
                 msg.style.display = 'none';
@@ -630,35 +455,26 @@
             overlay.classList.add('show');
         }
 
-        // ============================================================
-        // FETCH USERS
-        // ============================================================
         async function fetchUsers() {
             try {
                 const snap = await getDocs(collection(db, USERS_COLL));
                 allUsers = [];
-                snap.forEach(doc => { allUsers.push({ id: doc.id, ...doc.data() }); });
+                snap.forEach(d => { allUsers.push({ id: d.id, ...d.data() }); });
             } catch (err) { console.error('Error fetching users:', err); }
         }
 
-        // ============================================================
-        // POPULATE DROPDOWNS
-        // ============================================================
         function populateDropdowns() {
             const handedToSelect = document.getElementById('jobHandedTo');
             handedToSelect.innerHTML = '<option value="">-- Select --</option>';
-            const requesters = allUsers.filter(u => u.role === 'requester');
-            requesters.forEach(u => {
+            allUsers.filter(u => u.role === 'requester').forEach(u => {
                 const opt = document.createElement('option');
                 opt.value = u.id;
                 opt.textContent = u.name + ' (' + (u.department || '') + ')';
                 handedToSelect.appendChild(opt);
             });
-
             const techSelect = document.getElementById('jobTechName');
             techSelect.innerHTML = '<option value="">-- Select --</option>';
-            const techUsers = allUsers.filter(u => u.role === 'maintenance' || u.role === 'admin');
-            techUsers.forEach(u => {
+            allUsers.filter(u => u.role === 'maintenance' || u.role === 'admin').forEach(u => {
                 const opt = document.createElement('option');
                 opt.value = u.id;
                 opt.textContent = u.name + ' (' + u.role + ')';
@@ -669,81 +485,44 @@
         function populateSupervisorDropdown(department) {
             const certSelect = document.getElementById('jobCertName');
             certSelect.innerHTML = '<option value="">-- Select --</option>';
-            if (!department) {
-                const requesters = allUsers.filter(u => u.role === 'requester');
-                requesters.forEach(u => {
-                    const opt = document.createElement('option');
-                    opt.value = u.id;
-                    opt.textContent = u.name + ' (' + (u.department || '') + ')';
-                    certSelect.appendChild(opt);
-                });
-                return;
+            let reqs = allUsers.filter(u => u.role === 'requester');
+            if (department) {
+                const deptReqs = reqs.filter(u => u.department === department);
+                if (deptReqs.length > 0) reqs = deptReqs;
             }
-            const deptRequesters = allUsers.filter(u => u.role === 'requester' && u.department === department);
-            if (deptRequesters.length === 0) {
-                const allReq = allUsers.filter(u => u.role === 'requester');
-                allReq.forEach(u => {
-                    const opt = document.createElement('option');
-                    opt.value = u.id;
-                    opt.textContent = u.name + ' (' + (u.department || '') + ')';
-                    certSelect.appendChild(opt);
-                });
-            } else {
-                deptRequesters.forEach(u => {
-                    const opt = document.createElement('option');
-                    opt.value = u.id;
-                    opt.textContent = u.name + ' (' + u.department + ')';
-                    certSelect.appendChild(opt);
-                });
-            }
+            reqs.forEach(u => {
+                const opt = document.createElement('option');
+                opt.value = u.id;
+                opt.textContent = u.name + ' (' + (u.department || '') + ')';
+                certSelect.appendChild(opt);
+            });
         }
 
-        // ============================================================
-        // SIGNATURE PAD SETUP
-        // ============================================================
         function initSignaturePads() {
             const techCanvas = document.getElementById('jobTechSigCanvas');
             const certCanvas = document.getElementById('jobCertSigCanvas');
 
             techSigPad = new SignaturePad(techCanvas, {
-                backgroundColor: 'rgb(255,255,255)',
-                penColor: 'rgb(0,0,0)',
-                minWidth: 1.5,
-                maxWidth: 3,
+                backgroundColor: 'rgb(255,255,255)', penColor: 'rgb(0,0,0)',
+                minWidth: 1.5, maxWidth: 3,
                 onEnd: () => {
                     const status = document.getElementById('jobTechSigStatus');
-                    if (techSigPad.isEmpty()) {
-                        status.textContent = '⚠️ No signature drawn';
-                        status.className = 'sig-status show empty';
-                    } else {
-                        status.textContent = '✅ Signed ✓';
-                        status.className = 'sig-status show signed';
-                    }
+                    if (techSigPad.isEmpty()) { status.textContent = '⚠️ No signature drawn'; status.className = 'sig-status show empty'; }
+                    else { status.textContent = '✅ Signed ✓'; status.className = 'sig-status show signed'; }
                 }
             });
             certSigPad = new SignaturePad(certCanvas, {
-                backgroundColor: 'rgb(255,255,255)',
-                penColor: 'rgb(0,0,0)',
-                minWidth: 1.5,
-                maxWidth: 3,
+                backgroundColor: 'rgb(255,255,255)', penColor: 'rgb(0,0,0)',
+                minWidth: 1.5, maxWidth: 3,
                 onEnd: () => {
                     const status = document.getElementById('jobCertSigStatus');
-                    if (certSigPad.isEmpty()) {
-                        status.textContent = '⚠️ No signature drawn';
-                        status.className = 'sig-status show empty';
-                    } else {
-                        status.textContent = '✅ Signed ✓';
-                        status.className = 'sig-status show signed';
-                    }
+                    if (certSigPad.isEmpty()) { status.textContent = '⚠️ No signature drawn'; status.className = 'sig-status show empty'; }
+                    else { status.textContent = '✅ Signed ✓'; status.className = 'sig-status show signed'; }
                 }
             });
 
-            techCanvas.addEventListener('pointerdown', () => {
-                document.getElementById('jobTechSigPlaceholder').style.display = 'none';
-            });
-            certCanvas.addEventListener('pointerdown', () => {
-                document.getElementById('jobCertSigPlaceholder').style.display = 'none';
-            });
+            techCanvas.addEventListener('pointerdown', () => { document.getElementById('jobTechSigPlaceholder').style.display = 'none'; });
+            certCanvas.addEventListener('pointerdown', () => { document.getElementById('jobCertSigPlaceholder').style.display = 'none'; });
 
             const origClearTech = techSigPad.clear.bind(techSigPad);
             techSigPad.clear = function() {
@@ -795,27 +574,24 @@
         function getSigData(pad) { return (pad && !pad.isEmpty()) ? pad.toData() : null; }
         function loadSigData(pad, data) { if (pad && data) pad.fromData(data); }
 
-        // ============================================================
-        // REQUEST DROPDOWN
-        // ============================================================
         async function populateRequestDropdown() {
             const dropdown = document.getElementById('jobRequestNo');
             dropdown.innerHTML = '<option value="">-- Select Request --</option>';
             try {
                 const reqSnap = await getDocs(query(collection(db, REQUESTS_COLL), orderBy('createdAt', 'desc')));
                 allRequests = [];
-                reqSnap.forEach(doc => { const data = doc.data(); data.id = doc.id; allRequests.push(data); });
+                reqSnap.forEach(d => { const data = d.data(); data.id = d.id; allRequests.push(data); });
 
                 const jobSnap = await getDocs(collection(db, JOBCARDS_COLL));
                 allJobCards = [];
-                jobSnap.forEach(doc => { const data = doc.data(); data.id = doc.id; allJobCards.push(data); });
+                jobSnap.forEach(d => { const data = d.data(); data.id = d.id; allJobCards.push(data); });
 
                 const jobMap = new Map();
                 allJobCards.forEach(j => { if (j.requestNo) jobMap.set(j.requestNo, j.status); });
 
                 const availableRequests = allRequests.filter(r => {
-                    const jobStatus = jobMap.get(r.requestNo);
-                    return jobStatus !== 'Completed' && jobStatus !== 'Written Off';
+                    const s = jobMap.get(r.requestNo);
+                    return s !== 'Completed' && s !== 'Written Off';
                 });
 
                 availableRequests.forEach(r => {
@@ -837,14 +613,10 @@
             } catch (err) { console.error(err); }
         }
 
-        // ============================================================
-        // LOAD REQUEST DATA
-        // ============================================================
         window.loadRequestData = async function() {
             const requestNo = document.getElementById('jobRequestNo').value;
             if (!requestNo) {
-                ['jobRequester', 'jobUnit', 'jobEquipName', 'jobInventory', 'jobSerial', 'jobModel', 'jobComplaint']
-                .forEach(id => document.getElementById(id).value = '');
+                ['jobRequester','jobUnit','jobEquipName','jobInventory','jobSerial','jobModel','jobComplaint'].forEach(id => document.getElementById(id).value = '');
                 document.getElementById('jobReportingDateTime').value = '';
                 document.getElementById('jobReceivedFrom').value = '';
                 document.getElementById('jobCertName').innerHTML = '<option value="">-- Select --</option>';
@@ -855,7 +627,7 @@
                 const q = query(collection(db, REQUESTS_COLL), where('requestNo', '==', requestNo));
                 const snap = await getDocs(q);
                 let r = null;
-                snap.forEach(doc => { r = doc.data(); });
+                snap.forEach(d => { r = d.data(); });
                 if (!r) return;
 
                 document.getElementById('jobRequester').value = r.requesterName || '';
@@ -874,14 +646,9 @@
                 }
                 populateSupervisorDropdown(r.unit);
                 showToast('✅ Request data loaded.');
-            } catch (err) {
-                showToast('Error loading request: ' + err.message, true);
-            }
+            } catch (err) { showToast('Error loading request: ' + err.message, true); }
         };
 
-        // ============================================================
-        // STATUS TOGGLE
-        // ============================================================
         window.toggleStatusFields = function() {
             const status = document.getElementById('jobStatus').value;
             const pendingDiv = document.getElementById('pendingFields');
@@ -908,9 +675,6 @@
             }
         };
 
-        // ============================================================
-        // AUTO-CALCULATE TIMES
-        // ============================================================
         function updateJobTimeFields() {
             const report = document.getElementById('jobReportingDateTime').value;
             const start = document.getElementById('jobStartDateTime').value;
@@ -923,7 +687,7 @@
         document.getElementById('jobReportingDateTime').addEventListener('change', updateJobTimeFields);
 
         // ============================================================
-        // SAVE JOB CARD – with overlay + redirect to dashboard
+        // SAVE JOB CARD – redirect to dashboard no matter what
         // ============================================================
         window.saveJobCard = async function() {
             if (isSaving) return;
@@ -939,18 +703,19 @@
             btn.disabled = true;
             btn.innerHTML = '<span class="loading-spinner"></span> Saving…';
 
-            // Show the overlay
             showSavingOverlay('Saving job card details to the cloud…');
+
+            let savedOk = false;
+            let savedJobNo = '';
 
             try {
                 const jobNo = document.getElementById('jobNo').value;
                 const handedToId = document.getElementById('jobHandedTo').value;
-                const handedToName = handedToId ? allUsers.find(u => u.id === handedToId)?.name || '' : '';
+                const handedToName = handedToId ? (allUsers.find(u => u.id === handedToId)?.name || '') : '';
                 const techId = document.getElementById('jobTechName').value;
-                const techName = techId ? allUsers.find(u => u.id === techId)?.name || '' : '';
+                const techName = techId ? (allUsers.find(u => u.id === techId)?.name || '') : '';
                 const certId = document.getElementById('jobCertName').value;
-                const certName = certId ? allUsers.find(u => u.id === certId)?.name || '' : '';
-
+                const certName = certId ? (allUsers.find(u => u.id === certId)?.name || '') : '';
                 const receivedBy = currentUser?.name || '';
                 const handedBy = currentUser?.name || '';
                 const requesterId = document.getElementById('jobRequesterId').value;
@@ -1008,48 +773,49 @@
                     technicianId: currentUser ? currentUser.id : null,
                 };
 
-                // 1. Save or update the job card
+                // Save or update jobcard
                 if (currentJobCardId) {
                     await updateDoc(doc(db, JOBCARDS_COLL, currentJobCardId), data);
                 } else {
                     const docRef = await addDoc(collection(db, JOBCARDS_COLL), data);
                     currentJobCardId = docRef.id;
                 }
+                savedOk = true;
+                savedJobNo = data.jobNo;
 
-                // 2. Update the linked request
+                // Update linked request (fire-and-forget, don't block redirect)
                 try {
                     const reqQuery = query(collection(db, REQUESTS_COLL), where('requestNo', '==', requestNo));
                     const reqSnap = await getDocs(reqQuery);
-                    const updates = reqSnap.docs.map(d => updateDoc(d.ref, {
-                        jobStatus: data.status,
-                        jobNo: data.jobNo
-                    }));
-                    await Promise.all(updates);
+                    for (const reqDoc of reqSnap.docs) {
+                        await updateDoc(reqDoc.ref, {
+                            jobStatus: data.status,
+                            jobNo: data.jobNo
+                        });
+                    }
                 } catch (err) {
                     console.warn('Could not update request status:', err);
                 }
 
-                // 3. Show success and redirect
-                showSavingOverlay('', true);
-                showToast(`✅ Job card ${data.jobNo} saved. Redirecting…`);
-
-                setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 1800);
-
             } catch (err) {
-                console.error(err);
+                console.error('❌ Save error:', err);
                 showToast('❌ Error: ' + err.message, true);
                 document.getElementById('savingOverlay').classList.remove('show');
                 btn.disabled = false;
                 btn.innerHTML = '💾 Save Job Card';
                 isSaving = false;
+                return; // only skip redirect if jobcard save itself failed
             }
+
+            // ✅ Always redirect to dashboard after a successful save
+            showSavingOverlay('', true);
+            showToast(`✅ Job card ${savedJobNo} saved. Redirecting…`);
+
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 1500);
         };
 
-        // ============================================================
-        // LOAD JOB CARD FOR EDITING
-        // ============================================================
         window.loadJobCard = async function(id) {
             try {
                 const snap = await getDoc(doc(db, JOBCARDS_COLL, id));
@@ -1073,7 +839,7 @@
                     functionOk: j.functionOk !== undefined ? j.functionOk : true,
                     safetyOk: j.safetyOk !== undefined ? j.safetyOk : true,
                     comments: j.comments || '', techName: j.techName || '', techDate: j.techDate || '',
-                    certName: j.certName || '', certDate: j.certDate || '', requesterId: j.requesterId || '',
+                    certName: j.certName || '', certDate: j.certDate || '', requesterId: j.requesterId || ''
                 };
                 for (const [key, val] of Object.entries(fields)) {
                     const el = document.getElementById('job' + key.charAt(0).toUpperCase() + key.slice(1));
@@ -1106,47 +872,9 @@
                 if (j.handedToId) document.getElementById('jobHandedTo').value = j.handedToId;
 
                 showToast('📂 Job card loaded for editing.');
-            } catch (err) {
-                showToast('Error loading: ' + err.message, true);
-            }
+            } catch (err) { showToast('Error loading: ' + err.message, true); }
         };
 
-        // ============================================================
-        // RESET FORM
-        // ============================================================
-        function resetJobCardForm() {
-            if (!confirm('Reset the form? Unsaved data will be lost.')) return;
-            document.querySelectorAll('#jobcardForm input, #jobcardForm textarea, #jobcardForm select').forEach(el => {
-                if (el.id !== 'jobReceivedBy' && el.id !== 'jobHandedBy' && el.id !== 'jobTechName' &&
-                    el.id !== 'jobCertName' && el.id !== 'jobRequestNo' && el.id !== 'jobHandedTo' &&
-                    el.id !== 'jobRequesterId') {
-                    if (el.type === 'checkbox') el.checked = (el.id === 'jobFunctionOk' || el.id === 'jobSafetyOk');
-                    else if (el.tagName !== 'SELECT') el.value = '';
-                }
-            });
-            document.getElementById('jobHandedTo').value = '';
-            document.getElementById('jobTechName').value = '';
-            document.getElementById('jobCertName').value = '';
-            document.getElementById('jobRequestNo').value = '';
-            document.getElementById('jobStatus').value = 'Pending';
-            document.getElementById('jobRequesterId').value = '';
-            techSigPad && techSigPad.clear();
-            certSigPad && certSigPad.clear();
-            document.getElementById('jobStatusBadge').textContent = '● PENDING';
-            document.getElementById('jobStatusBadge').className = 'status pending';
-            document.getElementById('jobNo').value = '';
-            currentJobCardId = null;
-            toggleStatusFields();
-            document.getElementById('jobCertName').innerHTML = '<option value="">-- Select --</option>';
-            populateRequestDropdown();
-            generateJobNumber().then(num => document.getElementById('jobNo').value = num);
-            showToast('🔄 Form reset.');
-        }
-        window.resetJobCardForm = resetJobCardForm;
-
-        // ============================================================
-        // INIT PAGE
-        // ============================================================
         async function initPage() {
             document.getElementById('jobReceivedBy').value = currentUser?.name || '';
             document.getElementById('jobHandedBy').value = currentUser?.name || '';
@@ -1174,11 +902,6 @@
 
             console.log('🚀 Job Card system ready.');
         }
-
-        window.saveJobCard = saveJobCard;
-        window.toggleStatusFields = toggleStatusFields;
-        window.loadJobCard = loadJobCard;
-        window.resetJobCardForm = resetJobCardForm;
     </script>
 </body>
 </html>
