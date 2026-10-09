@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MCRH - Request Slip</title>
+    <title>MCRH - New Request</title>
 
     <script type="importmap">
         {
@@ -22,31 +22,79 @@
 
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
+
         :root {
-            --primary:#C8102E; --primary-light:#e81a3f;
+            --primary:#C8102E;
+            --primary-light:#e81a3f;
             --primary-gradient:linear-gradient(135deg,#C8102E 0%,#e81a3f 100%);
-            --bg:#f4f6fb; --card:#fff; --border:#e8ebf1; --border-soft:#f1f4f9;
-            --text:#0f172a; --text-soft:#475569; --text-muted:#94a3b8;
-            --radius:14px; --radius-sm:10px;
+            --primary-soft:rgba(200,16,46,0.08);
+            --bg:#f4f6fb;
+            --card:#ffffff;
+            --card-alt:#fafbfd;
+            --border:#e8ebf1;
+            --border-soft:#f1f4f9;
+            --text:#0f172a;
+            --text-soft:#475569;
+            --text-muted:#94a3b8;
+            --success:#10b981;
+            --success-soft:#d1fae5;
+            --success-text:#047857;
+            --warning:#f59e0b;
+            --warning-soft:#fef3c7;
+            --warning-text:#b45309;
+            --danger:#ef4444;
+            --danger-soft:#fee2e2;
+            --danger-text:#b91c1c;
+            --info:#0ea5e9;
+            --info-soft:#e0f2fe;
+            --info-text:#0369a1;
+            --radius:12px;
+            --radius-lg:16px;
+            --shadow-sm:0 1px 3px rgba(15,23,42,0.04);
             --shadow:0 4px 14px rgba(15,23,42,0.06);
-            --shadow-lg:0 20px 60px rgba(15,23,42,0.1);
+            --shadow-lg:0 24px 70px rgba(15,23,42,0.15);
             --transition:200ms cubic-bezier(0.4,0,0.2,1);
-        }
-        body {
-            font-family:'Plus Jakarta Sans','Inter',sans-serif;
-            background:var(--bg);
-            background-image:
-                radial-gradient(circle at 0% 0%, rgba(200,16,46,0.04) 0%, transparent 35%),
-                radial-gradient(circle at 100% 100%, rgba(99,102,241,0.04) 0%, transparent 35%);
-            background-attachment:fixed;
-            color:var(--text);
-            min-height:100vh;
-            -webkit-font-smoothing:antialiased;
+            --transition-slow:320ms cubic-bezier(0.4,0,0.2,1);
         }
 
-        /* Topbar */
+        [data-theme="dark"] {
+            --bg:#0b1220;
+            --card:#131c30;
+            --card-alt:#1a2540;
+            --border:rgba(255,255,255,0.08);
+            --border-soft:rgba(255,255,255,0.04);
+            --text:#f1f5f9;
+            --text-soft:#cbd5e1;
+            --text-muted:#94a3b8;
+            --success-soft:rgba(16,185,129,0.15);
+            --success-text:#6ee7b7;
+            --warning-soft:rgba(245,158,11,0.15);
+            --warning-text:#fcd34d;
+            --danger-soft:rgba(239,68,68,0.15);
+            --danger-text:#fca5a5;
+            --info-soft:rgba(14,165,233,0.15);
+            --info-text:#7dd3fc;
+            --shadow-lg:0 24px 70px rgba(0,0,0,0.6);
+        }
+
+        html, body { transition: background-color var(--transition-slow), color var(--transition-slow); }
+        body {
+            font-family:'Plus Jakarta Sans','Inter',-apple-system,sans-serif;
+            background:var(--bg);
+            color:var(--text);
+            -webkit-font-smoothing:antialiased;
+            min-height:100vh;
+            opacity:0;
+            transition: opacity 320ms ease;
+        }
+        body.page-ready { opacity:1; }
+        body.page-leaving { opacity:0; }
+
+        /* ============================================================
+           TOPBAR
+           ============================================================ */
         .topbar {
-            background:white;
+            background:var(--card);
             border-bottom:1px solid var(--border);
             padding:14px 28px;
             display:flex;
@@ -56,9 +104,9 @@
             position:sticky;
             top:0;
             z-index:50;
-            box-shadow:0 1px 3px rgba(15,23,42,0.04);
+            box-shadow:var(--shadow-sm);
         }
-        .topbar-left { display:flex; align-items:center; gap:14px; }
+        .topbar-left { display:flex; align-items:center; gap:14px; min-width:0; }
         .brand-mini {
             width:40px; height:40px;
             background:var(--primary-gradient);
@@ -70,12 +118,41 @@
             font-weight:800;
             font-size:18px;
             box-shadow:0 4px 12px rgba(200,16,46,0.25);
+            flex-shrink:0;
         }
-        .topbar-title h1 { font-size:16px; font-weight:800; letter-spacing:-0.3px; }
+        .topbar-title h1 { font-size:16px; font-weight:800; letter-spacing:-0.3px; color:var(--text); }
         .topbar-title small { font-size:11.5px; color:var(--text-muted); font-weight:500; }
-        .topbar-actions { display:flex; gap:8px; align-items:center; }
+        .topbar-actions { display:flex; gap:8px; align-items:center; flex-shrink:0; }
 
-        /* Buttons */
+        /* ============================================================
+           BREADCRUMBS
+           ============================================================ */
+        .breadcrumbs {
+            display:flex;
+            align-items:center;
+            gap:8px;
+            font-size:12px;
+            font-weight:600;
+            color:var(--text-muted);
+            padding:0 28px;
+            margin-top:14px;
+        }
+        .breadcrumbs a {
+            color:var(--text-muted);
+            text-decoration:none;
+            transition:var(--transition);
+            display:flex;
+            align-items:center;
+            gap:6px;
+            cursor:pointer;
+        }
+        .breadcrumbs a:hover { color:var(--primary); }
+        .breadcrumbs i.chevron { font-size:9px; opacity:0.5; }
+        .breadcrumbs .current { color:var(--text); font-weight:700; }
+
+        /* ============================================================
+           BUTTONS
+           ============================================================ */
         .btn {
             padding:10px 18px;
             border:none;
@@ -88,35 +165,58 @@
             align-items:center;
             gap:8px;
             font-family:inherit;
-            text-decoration:none;
             white-space:nowrap;
+            position:relative;
+            overflow:hidden;
         }
-        .btn i { font-size:13px; }
+        .btn i { font-size:13px; z-index:1; position:relative; }
+        .btn > * { z-index:1; position:relative; }
+        .btn::before {
+            content:'';
+            position:absolute;
+            inset:0;
+            background:linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.28), transparent 70%);
+            transform:translateX(-100%);
+            transition:600ms ease;
+            pointer-events:none;
+        }
+        .btn:hover:not(:disabled)::before { transform:translateX(100%); }
+        .ripple {
+            position:absolute;
+            border-radius:50%;
+            background:rgba(255,255,255,0.55);
+            transform:scale(0);
+            animation:rippleExpand 620ms cubic-bezier(0.4,0,0.2,1);
+            pointer-events:none;
+        }
+        @keyframes rippleExpand { to { transform:scale(3); opacity:0; } }
         .btn-primary { background:var(--primary-gradient); color:white; box-shadow:0 4px 14px rgba(200,16,46,0.28); }
-        .btn-primary:hover { transform:translateY(-2px); box-shadow:0 8px 22px rgba(200,16,46,0.36); }
+        .btn-primary:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 8px 22px rgba(200,16,46,0.36); }
         .btn-success { background:linear-gradient(135deg,#10b981,#22c55e); color:white; box-shadow:0 4px 14px rgba(16,185,129,0.28); }
-        .btn-success:hover { transform:translateY(-2px); box-shadow:0 8px 22px rgba(16,185,129,0.36); }
-        .btn-outline { background:white; border:1.5px solid var(--border); color:var(--text-soft); }
-        .btn-outline:hover { border-color:var(--primary); color:var(--primary); background:#fff5f6; }
+        .btn-success:hover:not(:disabled) { transform:translateY(-2px); }
+        .btn-outline { background:var(--card); border:1.5px solid var(--border); color:var(--text-soft); }
+        .btn-outline:hover:not(:disabled) { border-color:var(--primary); color:var(--primary); background:var(--primary-soft); }
         .btn-danger { background:linear-gradient(135deg,#ef4444,#dc2626); color:white; }
-        .btn-danger:hover { transform:translateY(-2px); }
         .btn-info { background:linear-gradient(135deg,#0ea5e9,#22d3ee); color:white; }
-        .btn-info:hover { transform:translateY(-2px); }
         .btn-sm { padding:8px 14px; font-size:12px; border-radius:9px; }
         .btn:disabled { opacity:0.6; cursor:not-allowed; transform:none !important; }
 
-        /* Container */
+        /* ============================================================
+           CONTAINER
+           ============================================================ */
         .container {
-            max-width:1000px;
-            margin:26px auto;
-            padding:0 20px 40px;
+            max-width:920px;
+            margin:20px auto;
+            padding:0 20px 60px;
         }
 
-        /* Header card */
+        /* ============================================================
+           HOSPITAL HEADER
+           ============================================================ */
         .hospital-header {
-            background:white;
-            border-radius:var(--radius);
-            padding:22px 26px;
+            background:var(--card);
+            border-radius:var(--radius-lg);
+            padding:20px 24px;
             border:1px solid var(--border);
             box-shadow:var(--shadow);
             margin-bottom:18px;
@@ -128,7 +228,7 @@
         }
         .hospital-brand { display:flex; align-items:center; gap:14px; }
         .hospital-brand .logo-icon {
-            width:54px; height:54px;
+            width:52px; height:52px;
             background:var(--primary-gradient);
             border-radius:14px;
             display:flex;
@@ -140,46 +240,122 @@
             flex-shrink:0;
             box-shadow:0 6px 16px rgba(200,16,46,0.25);
         }
-        .hospital-brand h1 {
-            font-size:18px;
-            font-weight:800;
-            color:var(--primary);
-            letter-spacing:-0.3px;
-        }
-        .hospital-brand .sub {
-            font-size:11.5px;
-            color:var(--text-soft);
-            font-weight:500;
-            margin-top:2px;
-        }
-        .hospital-brand .county {
-            font-size:12px;
-            font-weight:700;
-            color:var(--primary);
-            margin-top:2px;
-        }
+        .hospital-brand h1 { font-size:17px; font-weight:800; color:var(--primary); letter-spacing:-0.3px; }
+        .hospital-brand .sub { font-size:11.5px; color:var(--text-soft); font-weight:500; margin-top:2px; }
+        .hospital-brand .county { font-size:12px; font-weight:700; color:var(--primary); margin-top:2px; }
         .hospital-badge {
             background:var(--primary-gradient);
             color:white;
-            padding:7px 16px;
+            padding:7px 14px;
             border-radius:30px;
-            font-size:11.5px;
+            font-size:11px;
             font-weight:700;
             text-transform:uppercase;
             letter-spacing:0.5px;
         }
 
-        /* Form card */
+        /* ============================================================
+           STEP PROGRESS BAR
+           ============================================================ */
+        .step-progress {
+            background:var(--card);
+            border-radius:var(--radius-lg);
+            padding:22px 26px;
+            border:1px solid var(--border);
+            box-shadow:var(--shadow);
+            margin-bottom:18px;
+        }
+        .steps-track {
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:8px;
+            position:relative;
+        }
+        .step-item {
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            gap:8px;
+            flex:1;
+            position:relative;
+            z-index:2;
+        }
+        .step-circle {
+            width:40px; height:40px;
+            border-radius:50%;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-weight:800;
+            font-size:14px;
+            background:var(--border-soft);
+            color:var(--text-muted);
+            border:2px solid var(--border);
+            transition:var(--transition);
+            position:relative;
+        }
+        .step-circle.done {
+            background:linear-gradient(135deg,#10b981,#22c55e);
+            color:white;
+            border-color:transparent;
+            box-shadow:0 4px 12px rgba(16,185,129,0.3);
+        }
+        .step-circle.active {
+            background:var(--primary-gradient);
+            color:white;
+            border-color:transparent;
+            box-shadow:0 4px 14px rgba(200,16,46,0.35);
+            transform:scale(1.08);
+        }
+        .step-label {
+            font-size:11.5px;
+            font-weight:700;
+            color:var(--text-muted);
+            text-transform:uppercase;
+            letter-spacing:0.4px;
+            text-align:center;
+        }
+        .step-item.active .step-label { color:var(--primary); }
+        .step-item.done .step-label { color:var(--success-text); }
+        .step-connector {
+            flex:1;
+            height:2px;
+            background:var(--border);
+            margin-top:-22px;
+            position:relative;
+            z-index:1;
+            transition:var(--transition);
+        }
+        .step-connector.done { background:linear-gradient(90deg,#10b981,#22c55e); }
+        .progress-track-wrap {
+            margin-top:18px;
+            height:6px;
+            background:var(--border-soft);
+            border-radius:3px;
+            overflow:hidden;
+        }
+        .progress-track {
+            height:100%;
+            width:33%;
+            background:var(--primary-gradient);
+            border-radius:3px;
+            transition:width 500ms cubic-bezier(0.4,0,0.2,1);
+        }
+
+        /* ============================================================
+           FORM CARD
+           ============================================================ */
         .form-card {
-            background:white;
-            border-radius:var(--radius);
+            background:var(--card);
+            border-radius:var(--radius-lg);
             border:1px solid var(--border);
             box-shadow:var(--shadow);
             overflow:hidden;
         }
         .form-card-header {
             padding:18px 26px;
-            background:#fafbfd;
+            background:var(--card-alt);
             border-bottom:1px solid var(--border);
             display:flex;
             align-items:center;
@@ -188,7 +364,7 @@
             flex-wrap:wrap;
         }
         .form-card-header h2 {
-            font-size:17px;
+            font-size:16px;
             font-weight:800;
             display:flex;
             align-items:center;
@@ -196,93 +372,183 @@
             color:var(--text);
         }
         .form-card-header h2 i { color:var(--primary); }
-        .status-pill {
-            background:#d1fae5;
-            color:#065f46;
+        .draft-indicator {
+            display:none;
+            align-items:center;
+            gap:6px;
+            font-size:11.5px;
+            font-weight:700;
+            color:var(--info-text);
+            background:var(--info-soft);
             padding:5px 12px;
             border-radius:20px;
-            font-size:11px;
-            font-weight:800;
-            text-transform:uppercase;
-            letter-spacing:0.4px;
+        }
+        .draft-indicator.show { display:inline-flex; }
+        .draft-indicator i { font-size:11px; animation:pulse 1.6s ease infinite; }
+        @keyframes pulse { 0%, 100% { opacity:1; } 50% { opacity:0.5; } }
+
+        .form-body { padding:26px; position:relative; }
+
+        /* Step panels */
+        .step-panel {
+            display:none;
+            animation:fadeSlide 380ms cubic-bezier(0.16,1,0.3,1);
+        }
+        .step-panel.active { display:block; }
+        @keyframes fadeSlide {
+            from { opacity:0; transform:translateX(20px); }
+            to { opacity:1; transform:translateX(0); }
         }
 
-        .form-body { padding:24px 26px; }
-
+        /* ============================================================
+           GRIDS
+           ============================================================ */
         .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px 22px; }
         .full-width { grid-column:1 / -1; }
 
-        .field-group { display:flex; flex-direction:column; margin-bottom:4px; }
-        .field-group label {
-            font-size:11.5px;
-            font-weight:700;
-            color:var(--text-soft);
-            margin-bottom:6px;
-            text-transform:uppercase;
-            letter-spacing:0.4px;
+        /* ============================================================
+           FLOATING LABEL INPUTS
+           ============================================================ */
+        .float-field {
+            position:relative;
+            margin-bottom:16px;
         }
-        .field-group input,
-        .field-group select,
-        .field-group textarea {
-            padding:11px 14px;
+        .float-field input,
+        .float-field select,
+        .float-field textarea {
+            width:100%;
+            padding:22px 14px 10px 14px;
             border:1.5px solid var(--border);
             border-radius:10px;
             font-size:13.5px;
-            background:#fafbfd;
+            background:var(--bg);
             font-family:inherit;
             color:var(--text);
             font-weight:500;
             transition:var(--transition);
             outline:none;
-            width:100%;
+            appearance:none;
         }
-        .field-group input:focus,
-        .field-group select:focus,
-        .field-group textarea:focus {
+        .float-field textarea { min-height:100px; resize:vertical; padding-top:24px; }
+        .float-field select { cursor:pointer; padding-top:22px; }
+        .float-field label {
+            position:absolute;
+            left:14px;
+            top:50%;
+            transform:translateY(-50%);
+            font-size:13.5px;
+            font-weight:600;
+            color:var(--text-muted);
+            pointer-events:none;
+            transition:var(--transition);
+            background:transparent;
+            padding:0 4px;
+        }
+        .float-field textarea + label { top:22px; transform:translateY(0); }
+        .float-field input:focus,
+        .float-field select:focus,
+        .float-field textarea:focus {
             border-color:var(--primary);
             box-shadow:0 0 0 4px rgba(200,16,46,0.08);
-            background:white;
+            background:var(--card);
         }
-        .field-group input[readonly] {
-            background:#f1f5f9;
-            color:var(--text-muted);
-            cursor:default;
-        }
-        textarea { resize:vertical; min-height:70px; font-family:inherit; }
-
-        .notification-block {
-            background:#f0f9ff;
-            border:1px solid #bae6fd;
-            border-radius:12px;
-            padding:16px 18px;
-            margin-top:18px;
-        }
-        .notification-block label {
-            display:block;
-            font-size:12px;
+        .float-field input:focus + label,
+        .float-field input:not(:placeholder-shown) + label,
+        .float-field input.has-value + label,
+        .float-field select:focus + label,
+        .float-field select.has-value + label,
+        .float-field textarea:focus + label,
+        .float-field textarea:not(:placeholder-shown) + label {
+            top:0;
+            transform:translateY(-50%) scale(0.85);
+            color:var(--primary);
             font-weight:700;
-            color:#0369a1;
-            margin-bottom:10px;
-            text-transform:uppercase;
-            letter-spacing:0.4px;
+            background:var(--card);
         }
-        .notification-note {
-            font-size:12px;
-            color:var(--text-soft);
-            margin-top:10px;
-            font-weight:500;
-        }
+        .float-field input[readonly] { background:var(--border-soft); color:var(--text-muted); cursor:default; }
+        .float-field input[readonly] + label { color:var(--text-muted); }
 
+        /* Inline validation */
+        .float-field.valid input,
+        .float-field.valid select,
+        .float-field.valid textarea { border-color:var(--success); }
+        .float-field.invalid input,
+        .float-field.invalid select,
+        .float-field.invalid textarea {
+            border-color:var(--danger);
+            box-shadow:0 0 0 4px rgba(239,68,68,0.08);
+        }
+        .validation-hint {
+            font-size:11.5px;
+            font-weight:700;
+            margin-top:-10px;
+            margin-bottom:12px;
+            padding-left:4px;
+            display:none;
+            align-items:center;
+            gap:5px;
+            animation:fadeIn 200ms ease;
+        }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:translateY(0); } }
+        .validation-hint.show { display:flex; }
+        .validation-hint.error { color:var(--danger-text); }
+        .validation-hint.success { color:var(--success-text); }
+
+        /* ============================================================
+           REVIEW CARD (Step 3)
+           ============================================================ */
+        .review-card {
+            background:var(--card-alt);
+            border:1px solid var(--border);
+            border-radius:14px;
+            padding:20px;
+        }
+        .review-grid {
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:16px 24px;
+        }
+        .review-item {
+            border-bottom:1px dashed var(--border);
+            padding-bottom:12px;
+        }
+        .review-item.full { grid-column:1/-1; }
+        .review-item:last-child { border-bottom:none; padding-bottom:0; }
+        .review-item label {
+            font-size:10.5px;
+            font-weight:700;
+            color:var(--text-muted);
+            text-transform:uppercase;
+            letter-spacing:0.5px;
+            display:block;
+            margin-bottom:5px;
+        }
+        .review-item .value {
+            font-size:13.5px;
+            font-weight:600;
+            color:var(--text);
+            word-break:break-word;
+        }
+        .review-item .value.empty { color:var(--text-muted); font-style:italic; font-weight:500; }
+
+        /* ============================================================
+           ACTION BAR
+           ============================================================ */
         .action-bar {
             display:flex;
             flex-wrap:wrap;
             gap:12px;
             padding:20px 26px;
             border-top:1px solid var(--border);
-            background:#fafbfd;
+            background:var(--card-alt);
+            justify-content:space-between;
+            align-items:center;
         }
+        .action-group { display:flex; gap:10px; flex-wrap:wrap; }
 
-        /* Saving overlay */
+        /* ============================================================
+           SAVING OVERLAY
+           ============================================================ */
         .saving-overlay {
             display:none;
             position:fixed;
@@ -296,19 +562,19 @@
         }
         .saving-overlay.show { display:flex; }
         .saving-card {
-            background:white;
+            background:var(--card);
             border-radius:18px;
             padding:38px 44px;
             text-align:center;
-            box-shadow:0 30px 80px rgba(15,23,42,0.3);
-            max-width:420px;
+            box-shadow:var(--shadow-lg);
+            max-width:440px;
             width:100%;
             animation:fadeUp 300ms ease;
         }
         @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
-        .saving-card .spinner {
+        .saving-card .spinner-lg {
             width:56px; height:56px;
-            border:5px solid #f1f5f9;
+            border:5px solid var(--border-soft);
             border-top-color:var(--primary);
             border-radius:50%;
             animation:spin 0.9s linear infinite;
@@ -320,191 +586,400 @@
         .saving-card .redirect-note {
             margin-top:14px;
             font-size:13px;
-            color:#065f46;
-            background:#d1fae5;
+            color:var(--success-text);
+            background:var(--success-soft);
             padding:12px 16px;
             border-radius:10px;
-            font-weight:600;
+            font-weight:700;
         }
 
-        /* Toast */
+        /* ============================================================
+           TOAST
+           ============================================================ */
         .toast {
             position:fixed;
-            bottom:24px; right:24px;
-            background:#0f172a;
-            color:white;
-            padding:14px 22px;
+            bottom:24px;
+            right:24px;
+            background:var(--card);
+            color:var(--text);
+            padding:14px 52px 14px 18px;
             border-radius:12px;
-            font-weight:700;
+            font-weight:600;
             z-index:9999;
-            transform:translateY(100px);
+            transform:translateY(120px) scale(0.95);
             opacity:0;
-            transition:320ms cubic-bezier(0.4,0,0.2,1);
+            transition:480ms cubic-bezier(0.34,1.56,0.64,1);
+            border:1px solid var(--border);
             border-left:4px solid var(--primary);
-            max-width:360px;
-            box-shadow:0 16px 48px rgba(15,23,42,0.3);
+            max-width:420px;
+            box-shadow:var(--shadow-lg);
             font-size:13px;
+            display:flex;
+            align-items:center;
+            gap:12px;
+            min-width:280px;
         }
-        .toast.show { transform:translateY(0); opacity:1; }
+        .toast.show { transform:translateY(0) scale(1); opacity:1; }
+        .toast-icon {
+            width:32px; height:32px;
+            border-radius:9px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:14px;
+            flex-shrink:0;
+            background:var(--primary-soft);
+            color:var(--primary);
+        }
+        .toast-body { flex:1; min-width:0; }
+        .toast-title { font-weight:800; font-size:13px; color:var(--text); }
+        .toast-message { font-size:12.5px; color:var(--text-soft); margin-top:1px; }
+        .toast-close {
+            position:absolute;
+            top:10px; right:10px;
+            width:22px; height:22px;
+            border-radius:6px;
+            background:transparent;
+            border:none;
+            color:var(--text-muted);
+            cursor:pointer;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:11px;
+        }
+        .toast-close:hover { background:var(--border-soft); color:var(--text); }
+        .toast.success { border-left-color:var(--success); }
+        .toast.success .toast-icon { background:var(--success-soft); color:var(--success); }
+        .toast.error { border-left-color:var(--danger); }
+        .toast.error .toast-icon { background:var(--danger-soft); color:var(--danger); }
+        .toast.warning { border-left-color:var(--warning); }
+        .toast.warning .toast-icon { background:var(--warning-soft); color:var(--warning); }
+        .toast.info { border-left-color:var(--info); }
+        .toast.info .toast-icon { background:var(--info-soft); color:var(--info); }
 
-        @media print {
-            .topbar, .action-bar, .btn, .no-print { display:none !important; }
-            body { background:white; }
-            .container { margin:0; padding:10px; }
-            .form-card, .hospital-header { box-shadow:none; border:1px solid #ddd; }
-            .field-group input, .field-group select, .field-group textarea {
-                border:none;
-                background:transparent !important;
-                padding:2px 0;
-            }
+        /* ============================================================
+           CONFIRM MODAL
+           ============================================================ */
+        .modal-overlay {
+            display:none;
+            position:fixed;
+            inset:0;
+            background:rgba(15,23,42,0.55);
+            backdrop-filter:blur(8px);
+            z-index:1000;
+            align-items:center;
+            justify-content:center;
+            padding:20px;
+            animation:fadeIn 180ms ease;
         }
-        @media (max-width:768px) {
-            .grid-2 { grid-template-columns:1fr; }
+        .modal-overlay.show { display:flex; }
+        .modal {
+            background:var(--card);
+            border-radius:16px;
+            padding:28px;
+            max-width:420px;
+            width:100%;
+            box-shadow:var(--shadow-lg);
+            animation:modalIn 260ms cubic-bezier(0.16,1,0.3,1);
+            border:1px solid var(--border);
+            text-align:center;
+        }
+        @keyframes modalIn { from { opacity:0; transform:translateY(16px) scale(0.98); } to { opacity:1; transform:translateY(0) scale(1); } }
+        .confirm-icon {
+            width:64px; height:64px;
+            border-radius:50%;
+            margin:0 auto 18px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:26px;
+            background:var(--danger-soft);
+            color:var(--danger);
+            animation:confirmPulse 500ms ease;
+        }
+        @keyframes confirmPulse {
+            0% { transform:scale(0.7); opacity:0; }
+            60% { transform:scale(1.08); }
+            100% { transform:scale(1); opacity:1; }
+        }
+        .confirm-icon.warning { background:var(--warning-soft); color:var(--warning-text); }
+        .confirm-icon.info { background:var(--info-soft); color:var(--info-text); }
+        .modal h3 { font-size:18px; font-weight:800; margin-bottom:8px; color:var(--text); }
+        .modal p { font-size:13.5px; color:var(--text-muted); font-weight:500; margin-bottom:24px; line-height:1.6; }
+        .confirm-actions { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+        .confirm-actions .btn { width:100%; justify-content:center; padding:12px; }
+
+        /* ============================================================
+           PRINT
+           ============================================================ */
+        @media print {
+            .topbar, .breadcrumbs, .step-progress, .action-bar, .btn, .no-print { display:none !important; }
+            body { background:white; opacity:1; }
+            .container { margin:0; padding:10px; max-width:100%; }
+            .form-card, .hospital-header { box-shadow:none; border:1px solid #ddd; }
+            .step-panel { display:block !important; }
+        }
+
+        /* ============================================================
+           MOBILE
+           ============================================================ */
+        @media (max-width:640px) {
             .topbar { padding:12px 16px; }
             .topbar-title small { display:none; }
             .topbar-actions .btn span { display:none; }
-            .hospital-header { flex-direction:column; align-items:flex-start; }
-            .form-card-header { padding:14px 18px; }
-            .form-body { padding:18px; }
-            .action-bar { padding:16px 18px; }
-            .action-bar .btn { flex:1; justify-content:center; }
+            .breadcrumbs { padding:0 16px; }
+            .container { padding:0 14px 40px; }
+            .grid-2, .review-grid { grid-template-columns:1fr; }
+            .hospital-header { flex-direction:column; align-items:flex-start; padding:16px 18px; }
+            .form-card-header, .form-body, .action-bar { padding-left:18px; padding-right:18px; }
+            .action-bar { flex-direction:column; align-items:stretch; }
+            .action-group { width:100%; }
+            .action-group .btn { flex:1; justify-content:center; }
+            .step-label { font-size:10px; }
+            .step-circle { width:34px; height:34px; font-size:12px; }
+            .confirm-actions { grid-template-columns:1fr; }
+            .toast { left:16px; right:16px; bottom:16px; max-width:none; }
         }
+
+        ::-webkit-scrollbar { width:8px; height:8px; }
+        ::-webkit-scrollbar-track { background:transparent; }
+        ::-webkit-scrollbar-thumb { background:var(--border); border-radius:10px; }
+        ::-webkit-scrollbar-thumb:hover { background:var(--text-muted); }
     </style>
 </head>
 <body>
 
-    <!-- TOPBAR -->
-    <header class="topbar">
-        <div class="topbar-left">
-            <div class="brand-mini">M</div>
-            <div class="topbar-title">
-                <h1>New Service Request</h1>
-                <small>Fill in the details below</small>
+<!-- TOPBAR -->
+<header class="topbar">
+    <div class="topbar-left">
+        <div class="brand-mini">M</div>
+        <div class="topbar-title">
+            <h1>New Service Request</h1>
+            <small>Complete the 3 steps below</small>
+        </div>
+    </div>
+    <div class="topbar-actions">
+        <button class="btn btn-outline btn-sm" onclick="goBack()">
+            <i class="fas fa-arrow-left"></i> <span>Dashboard</span>
+        </button>
+        <button class="btn btn-danger btn-sm" onclick="logout()">
+            <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+        </button>
+    </div>
+</header>
+
+<!-- BREADCRUMBS -->
+<div class="breadcrumbs">
+    <a onclick="goBack()"><i class="fas fa-home"></i> Dashboard</a>
+    <i class="fas fa-chevron-right chevron"></i>
+    <span class="current">New Request</span>
+</div>
+
+<div class="container">
+
+    <!-- HOSPITAL HEADER -->
+    <div class="hospital-header">
+        <div class="hospital-brand">
+            <div class="logo-icon">M</div>
+            <div>
+                <h1>MOI VOI COUNTY REFERRAL HOSPITAL</h1>
+                <div class="sub">P.O. BOX 18-80300 VOI · biomedsmoivoi@gmail.com</div>
+                <div class="county">TAITA TAVETA COUNTY</div>
             </div>
         </div>
-        <div class="topbar-actions">
-            <button class="btn btn-outline btn-sm" onclick="window.location.href='dashboard.html'">
-                <i class="fas fa-arrow-left"></i> <span>Dashboard</span>
-            </button>
-            <button class="btn btn-danger btn-sm" onclick="logout()">
-                <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
-            </button>
-        </div>
-    </header>
+        <span class="hospital-badge">Department of Health Services</span>
+    </div>
 
-    <div class="container">
-
-        <!-- HOSPITAL HEADER -->
-        <div class="hospital-header">
-            <div class="hospital-brand">
-                <div class="logo-icon">M</div>
-                <div>
-                    <h1>MOI VOI COUNTY REFERRAL HOSPITAL</h1>
-                    <div class="sub">P.O. BOX 18-80300 VOI · biomedsmoivoi@gmail.com</div>
-                    <div class="county">TAITA TAVETA COUNTY</div>
+    <!-- STEP PROGRESS -->
+    <div class="step-progress">
+        <div class="steps-track">
+            <div class="step-item active" id="stepItem1">
+                <div class="step-circle active" id="stepCircle1">
+                    <i class="fas fa-user"></i>
                 </div>
+                <div class="step-label">Requester</div>
             </div>
-            <span class="hospital-badge">Department of Health Services</span>
+            <div class="step-connector" id="connector1"></div>
+            <div class="step-item" id="stepItem2">
+                <div class="step-circle" id="stepCircle2">2</div>
+                <div class="step-label">Equipment</div>
+            </div>
+            <div class="step-connector" id="connector2"></div>
+            <div class="step-item" id="stepItem3">
+                <div class="step-circle" id="stepCircle3">3</div>
+                <div class="step-label">Review</div>
+            </div>
+        </div>
+        <div class="progress-track-wrap">
+            <div class="progress-track" id="progressTrack"></div>
+        </div>
+    </div>
+
+    <!-- FORM CARD -->
+    <div class="form-card">
+        <div class="form-card-header">
+            <h2 id="stepTitle"><i class="fas fa-user"></i> Step 1 · Requester Details</h2>
+            <span class="draft-indicator" id="draftIndicator">
+                <i class="fas fa-circle"></i> Draft saved
+            </span>
         </div>
 
-        <!-- FORM CARD -->
-        <div class="form-card">
-            <div class="form-card-header">
-                <h2><i class="fas fa-clipboard-list"></i> Service Request Form</h2>
-                <span class="status-pill">● Open</span>
-            </div>
+        <form id="requestForm">
+            <div class="form-body">
 
-            <form id="requestForm">
-                <div class="form-body">
+                <!-- ===== STEP 1: REQUESTER ===== -->
+                <div class="step-panel active" id="panel1">
                     <div class="grid-2">
-                        <div class="field-group">
-                            <label>Request No.</label>
-                            <input type="text" id="reqNo" readonly placeholder="Will be assigned on save" />
+                        <div class="float-field">
+                            <input type="text" id="reqRequester" placeholder=" " readonly required />
+                            <label>Requester Name *</label>
                         </div>
-                        <div class="field-group">
-                            <label>Date & Time</label>
-                            <input type="datetime-local" id="reqDateTime" />
+                        <div class="float-field">
+                            <input type="text" id="reqUnit" placeholder=" " readonly required />
+                            <label>Department / Unit / Ward *</label>
                         </div>
-                        <div class="field-group">
-                            <label>Requester Name</label>
-                            <input type="text" id="reqRequester" readonly placeholder="Auto-filled" />
+                        <div class="float-field full-width">
+                            <input type="datetime-local" id="reqDateTime" placeholder=" " required />
+                            <label>Date &amp; Time *</label>
                         </div>
-                        <div class="field-group">
-                            <label>Department / Unit / Ward</label>
-                            <input type="text" id="reqUnit" readonly placeholder="Auto-filled" />
-                        </div>
-                        <div class="field-group">
-                            <label>Equipment / Item Type</label>
-                            <select id="reqType">
+                    </div>
+                    <div style="background:var(--info-soft); border-radius:10px; padding:14px 16px; font-size:13px; color:var(--info-text); font-weight:600; display:flex; gap:10px; align-items:flex-start;">
+                        <i class="fas fa-info-circle" style="margin-top:2px;"></i>
+                        <span>Your name and department are filled automatically from your profile. Confirm they are correct before continuing.</span>
+                    </div>
+                </div>
+
+                <!-- ===== STEP 2: EQUIPMENT ===== -->
+                <div class="step-panel" id="panel2">
+                    <div class="grid-2">
+                        <div class="float-field">
+                            <select id="reqType" placeholder=" ">
                                 <option value="Equipment">Equipment</option>
                                 <option value="Other">Other (tap, electrical, etc.)</option>
                             </select>
+                            <label>Equipment / Item Type *</label>
                         </div>
-                        <div class="field-group">
-                            <label>Equipment Name / Description</label>
-                            <input type="text" id="reqEquipName" placeholder="e.g. Ventilator" />
+                        <div class="float-field">
+                            <input type="text" id="reqEquipName" placeholder=" " required />
+                            <label>Equipment Name / Description *</label>
                         </div>
                     </div>
 
-                    <div id="reqEquipDetails" class="grid-2" style="display:none; margin-top:16px;">
-                        <div class="field-group">
-                            <label>Inventory / Asset No.</label>
-                            <input type="text" id="reqInventory" readonly style="background:#f1f5f9; color:var(--text-muted);" placeholder="Coming soon" />
-                        </div>
-                        <div class="field-group">
+                    <div id="reqEquipDetails" class="grid-2" style="display:none; margin-top:8px;">
+                        <div class="float-field">
+                            <input type="text" id="reqSerial" placeholder=" " />
                             <label>Serial No.</label>
-                            <input type="text" id="reqSerial" placeholder="e.g. SN-2024-8812" />
                         </div>
-                        <div class="field-group">
+                        <div class="float-field">
+                            <input type="text" id="reqModel" placeholder=" " />
                             <label>Model / Make</label>
-                            <input type="text" id="reqModel" placeholder="e.g. DuraSink Pro-3000" />
                         </div>
                     </div>
 
-                    <div class="field-group" style="margin-top:16px;">
-                        <label>Description of Fault / Complaint</label>
-                        <textarea id="reqComplaint" rows="3" placeholder="Describe the issue in detail…"></textarea>
+                    <div class="float-field full-width" style="margin-top:16px;">
+                        <textarea id="reqComplaint" placeholder=" " rows="4" required></textarea>
+                        <label>Description of Fault / Complaint *</label>
                     </div>
+                    <div class="validation-hint" id="hintComplaint"></div>
 
-                    <div class="notification-block">
-                        <label><i class="fas fa-envelope"></i> Email Notification</label>
-                        <button type="button" class="btn btn-info" onclick="sendEmailNotification()">
+                    <div style="background:var(--info-soft); border-radius:10px; padding:16px 18px; margin-top:14px;">
+                        <div style="font-size:12px; font-weight:800; color:var(--info-text); text-transform:uppercase; letter-spacing:0.4px; margin-bottom:10px; display:flex; align-items:center; gap:8px;">
+                            <i class="fas fa-envelope"></i> Optional Email Notification
+                        </div>
+                        <button type="button" class="btn btn-info btn-sm" onclick="sendEmailNotification()">
                             <i class="fas fa-paper-plane"></i> Send Email
                         </button>
-                        <div class="notification-note">
+                        <div style="font-size:12px; color:var(--text-soft); margin-top:10px; font-weight:500;">
                             Opens your default email client with the request details.
                         </div>
                     </div>
                 </div>
 
-                <div class="action-bar no-print">
-                    <button type="button" class="btn btn-success" id="saveRequestBtn" onclick="saveRequest()">
-                        <i class="fas fa-save"></i> Save Request
-                    </button>
-                    <button type="button" class="btn btn-outline" onclick="window.print()">
-                        <i class="fas fa-print"></i> Print
+                <!-- ===== STEP 3: REVIEW ===== -->
+                <div class="step-panel" id="panel3">
+                    <div class="review-card">
+                        <div class="review-grid" id="reviewGrid"></div>
+                    </div>
+                    <div style="background:var(--warning-soft); border-radius:10px; padding:14px 16px; margin-top:16px; font-size:13px; color:var(--warning-text); font-weight:600; display:flex; gap:10px; align-items:flex-start;">
+                        <i class="fas fa-exclamation-triangle" style="margin-top:2px;"></i>
+                        <span>Please review the details above. Once you submit, the request will be sent to the maintenance team.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ACTION BAR -->
+            <div class="action-bar">
+                <div class="action-group">
+                    <button type="button" class="btn btn-outline" id="backStepBtn" onclick="prevStep()" style="display:none;">
+                        <i class="fas fa-arrow-left"></i> Back
                     </button>
                 </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- SAVING OVERLAY -->
-    <div class="saving-overlay" id="savingOverlay">
-        <div class="saving-card">
-            <div class="spinner"></div>
-            <h2 id="savingTitle">Saving your request…</h2>
-            <p id="savingMessage">Please wait.</p>
-            <div class="redirect-note" id="redirectNote" style="display:none;">
-                ✅ Request saved successfully!<br>
-                Redirecting you to the dashboard…
+                <div class="action-group">
+                    <button type="button" class="btn btn-outline" onclick="resetForm()">
+                        <i class="fas fa-redo"></i> Reset
+                    </button>
+                    <button type="button" class="btn btn-primary" id="nextStepBtn" onclick="nextStep()">
+                        Next Step <i class="fas fa-arrow-right"></i>
+                    </button>
+                    <button type="button" class="btn btn-success" id="submitBtn" onclick="saveRequest()" style="display:none;">
+                        <i class="fas fa-paper-plane"></i> Submit Request
+                    </button>
+                </div>
             </div>
+        </form>
+    </div>
+</div>
+
+<!-- SAVING OVERLAY -->
+<div class="saving-overlay" id="savingOverlay">
+    <div class="saving-card">
+        <div class="spinner-lg"></div>
+        <h2 id="savingTitle">Saving your request…</h2>
+        <p id="savingMessage">Please wait.</p>
+        <div class="redirect-note" id="redirectNote" style="display:none;">
+            ✅ Request saved successfully!<br>
+            Redirecting you to the dashboard…
         </div>
     </div>
+</div>
 
-    <div id="toast" class="toast">Message</div>
+<!-- CONFIRM MODAL -->
+<div class="modal-overlay" id="confirmModal">
+    <div class="modal">
+        <div class="confirm-icon warning" id="confirmIcon"><i class="fas fa-exclamation-triangle"></i></div>
+        <h3 id="confirmTitle">Are you sure?</h3>
+        <p id="confirmMessage">This action cannot be undone.</p>
+        <div class="confirm-actions">
+            <button class="btn btn-outline" id="confirmCancelBtn">Cancel</button>
+            <button class="btn btn-danger" id="confirmOkBtn">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast">
+    <div class="toast-icon" id="toastIcon"><i class="fas fa-info"></i></div>
+    <div class="toast-body">
+        <div class="toast-title" id="toastTitle">Message</div>
+        <div class="toast-message" id="toastMessage"></div>
+    </div>
+    <button class="toast-close" onclick="hideToast()"><i class="fas fa-times"></i></button>
+</div>
 
 <script type="module">
+    // ============================================================
+    // PAGE TRANSITION
+    // ============================================================
+    window.addEventListener('DOMContentLoaded', () => {
+        requestAnimationFrame(() => document.body.classList.add('page-ready'));
+    });
+    window.goBack = function() {
+        document.body.classList.remove('page-ready');
+        document.body.classList.add('page-leaving');
+        setTimeout(() => window.location.href = 'dashboard.html', 220);
+    };
+
     const firebaseConfig = {
         apiKey: "AIzaSyDnsz1s-VnewbUszXNJptcdMZ_h0QsNHYQ",
         authDomain: "moivoibiomed.firebaseapp.com",
@@ -525,40 +1000,421 @@
     const REQUESTS_COLL = 'requests';
     const USERS_COLL = 'users';
     const COUNTERS_COLL = 'counters';
+    const DRAFT_KEY = 'mcrh-request-draft';
 
     let currentUser = null;
     let isSaving = false;
+    let currentStep = 1;
+    let draftSaveTimer = null;
 
+    // ============================================================
+    // THEME (sync from localStorage)
+    // ============================================================
+    (function initTheme() {
+        document.documentElement.setAttribute('data-theme', localStorage.getItem('mcrh-theme') || 'light');
+    })();
+
+    // ============================================================
+    // TOAST
+    // ============================================================
+    let toastTimer = null;
+    window.showToast = function(message, type = 'success', title = null) {
+        const toast = document.getElementById('toast');
+        const icon = document.getElementById('toastIcon');
+        const types = {
+            success: { icon:'fa-check-circle', title: title || 'Success' },
+            error: { icon:'fa-times-circle', title: title || 'Error' },
+            warning: { icon:'fa-exclamation-triangle', title: title || 'Warning' },
+            info: { icon:'fa-info-circle', title: title || 'Info' }
+        };
+        const t = types[type] || types.info;
+        toast.className = 'toast ' + type;
+        icon.innerHTML = `<i class="fas ${t.icon}"></i>`;
+        document.getElementById('toastTitle').textContent = t.title;
+        document.getElementById('toastMessage').textContent = message;
+        toast.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove('show'), 4000);
+    };
+    window.hideToast = function() { document.getElementById('toast').classList.remove('show'); };
+
+    // ============================================================
+    // RIPPLE
+    // ============================================================
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest('.btn');
+        if (!btn || btn.disabled) return;
+        const rect = btn.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        const x = e.clientX - rect.left - size / 2;
+        const y = e.clientY - rect.top - size / 2;
+        const ripple = document.createElement('span');
+        ripple.className = 'ripple';
+        ripple.style.width = ripple.style.height = size + 'px';
+        ripple.style.left = x + 'px';
+        ripple.style.top = y + 'px';
+        btn.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 650);
+    });
+
+    // ============================================================
+    // CONFIRM MODAL
+    // ============================================================
+    window.showConfirm = function({ title, message, type = 'warning', okText = 'Confirm', cancelText = 'Cancel', onConfirm }) {
+        const modal = document.getElementById('confirmModal');
+        const iconEl = document.getElementById('confirmIcon');
+        const titleEl = document.getElementById('confirmTitle');
+        const msgEl = document.getElementById('confirmMessage');
+        const okBtn = document.getElementById('confirmOkBtn');
+        const cancelBtn = document.getElementById('confirmCancelBtn');
+        const iconMap = {
+            danger: { icon:'fa-exclamation-triangle', cls:'' },
+            warning: { icon:'fa-exclamation-circle', cls:'warning' },
+            info: { icon:'fa-info-circle', cls:'info' }
+        };
+        const ic = iconMap[type] || iconMap.warning;
+        iconEl.className = 'confirm-icon ' + ic.cls;
+        iconEl.innerHTML = `<i class="fas ${ic.icon}"></i>`;
+        titleEl.textContent = title;
+        msgEl.textContent = message;
+        okBtn.textContent = okText;
+        cancelBtn.textContent = cancelText;
+        okBtn.className = 'btn btn-' + (type === 'danger' ? 'danger' : 'warning');
+        const newOk = okBtn.cloneNode(true);
+        const newCancel = cancelBtn.cloneNode(true);
+        okBtn.replaceWith(newOk);
+        cancelBtn.replaceWith(newCancel);
+        newOk.addEventListener('click', () => { closeConfirm(); onConfirm && onConfirm(); });
+        newCancel.addEventListener('click', closeConfirm);
+        modal.classList.add('show');
+    };
+    function closeConfirm() { document.getElementById('confirmModal').classList.remove('show'); }
+    window.closeConfirm = closeConfirm;
+    document.getElementById('confirmModal').addEventListener('click', function(e) { if (e.target === this) closeConfirm(); });
+
+    // ============================================================
+    // AUTH
+    // ============================================================
     onAuthStateChanged(auth, async (user) => {
         if (!user) { window.location.href = 'login.html'; return; }
         try {
-            const userDoc = await getDoc(doc(db, USERS_COLL, user.uid));
-            if (!userDoc.exists()) { await signOut(auth); window.location.href = 'login.html'; return; }
-            const userData = userDoc.data();
-            if (!userData.approved) {
+            const snap = await getDoc(doc(db, USERS_COLL, user.uid));
+            if (!snap.exists()) { await signOut(auth); window.location.href = 'login.html'; return; }
+            const data = snap.data();
+            if (!data.approved) {
                 alert('Your account is pending approval.');
-                await signOut(auth); window.location.href = 'login.html'; return;
+                await signOut(auth);
+                window.location.href = 'login.html';
+                return;
             }
-            currentUser = { id: user.uid, ...userData };
+            currentUser = { id: user.uid, ...data };
             document.getElementById('reqRequester').value = currentUser.name || '';
-            if (currentUser.role === 'requester' && currentUser.department) {
-                document.getElementById('reqUnit').value = currentUser.department;
-            }
+            document.getElementById('reqUnit').value = currentUser.department || '';
+            markFilled('reqRequester');
+            markFilled('reqUnit');
             init();
-        } catch (err) { console.error(err); window.location.href = 'login.html'; }
+        } catch (err) {
+            console.error(err);
+            window.location.href = 'login.html';
+        }
     });
 
-    window.logout = function() { signOut(auth).then(() => window.location.href = 'login.html'); };
+    window.logout = function() {
+        showConfirm({
+            title: 'Log out?',
+            message: 'Your saved draft will remain on this device.',
+            type: 'warning',
+            okText: 'Log out',
+            onConfirm: () => signOut(auth).then(() => {
+                document.body.classList.remove('page-ready');
+                document.body.classList.add('page-leaving');
+                setTimeout(() => window.location.href = 'login.html', 220);
+            })
+        });
+    };
 
-    function showToast(msg, isError = false) {
-        const t = document.getElementById('toast');
-        t.textContent = msg;
-        t.style.borderLeftColor = isError ? '#ef4444' : '#C8102E';
-        t.classList.add('show');
-        clearTimeout(t._timer);
-        t._timer = setTimeout(() => t.classList.remove('show'), 3500);
+    // ============================================================
+    // STEP NAVIGATION
+    // ============================================================
+    window.nextStep = function() {
+        if (!validateStep(currentStep)) return;
+        if (currentStep < 3) {
+            currentStep++;
+            renderStep();
+            saveDraft();
+        }
+    };
+
+    window.prevStep = function() {
+        if (currentStep > 1) {
+            currentStep--;
+            renderStep();
+        }
+    };
+
+    function renderStep() {
+        // Panels
+        for (let i = 1; i <= 3; i++) {
+            document.getElementById('panel' + i).classList.toggle('active', i === currentStep);
+        }
+        // Step circles
+        for (let i = 1; i <= 3; i++) {
+            const circle = document.getElementById('stepCircle' + i);
+            const item = document.getElementById('stepItem' + i);
+            circle.classList.remove('active', 'done');
+            item.classList.remove('active', 'done');
+            if (i < currentStep) {
+                circle.classList.add('done');
+                circle.innerHTML = '<i class="fas fa-check"></i>';
+                item.classList.add('done');
+            } else if (i === currentStep) {
+                circle.classList.add('active');
+                circle.innerHTML = (i === 1) ? '<i class="fas fa-user"></i>' : i;
+                item.classList.add('active');
+            } else {
+                circle.innerHTML = i;
+            }
+        }
+        // Connectors
+        document.getElementById('connector1').classList.toggle('done', currentStep > 1);
+        document.getElementById('connector2').classList.toggle('done', currentStep > 2);
+        // Progress
+        document.getElementById('progressTrack').style.width = (currentStep / 3 * 100) + '%';
+        // Title
+        const titles = [
+            { icon:'fa-user', text:'Step 1 · Requester Details' },
+            { icon:'fa-tools', text:'Step 2 · Equipment & Complaint' },
+            { icon:'fa-clipboard-check', text:'Step 3 · Review & Submit' }
+        ];
+        document.getElementById('stepTitle').innerHTML = `<i class="fas ${titles[currentStep-1].icon}"></i> ${titles[currentStep-1].text}`;
+        // Buttons
+        document.getElementById('backStepBtn').style.display = currentStep > 1 ? 'inline-flex' : 'none';
+        document.getElementById('nextStepBtn').style.display = currentStep < 3 ? 'inline-flex' : 'none';
+        document.getElementById('submitBtn').style.display = currentStep === 3 ? 'inline-flex' : 'none';
+        // Build review on step 3
+        if (currentStep === 3) buildReview();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    // ============================================================
+    // VALIDATION
+    // ============================================================
+    function validateStep(step) {
+        if (step === 1) {
+            const reqName = document.getElementById('reqRequester').value.trim();
+            const unit = document.getElementById('reqUnit').value.trim();
+            const dt = document.getElementById('reqDateTime').value;
+            if (!reqName || !unit || !dt) {
+                showToast('Please confirm your requester details.', 'warning', 'Missing Info');
+                return false;
+            }
+            return true;
+        }
+        if (step === 2) {
+            const equip = document.getElementById('reqEquipName').value.trim();
+            const complaint = document.getElementById('reqComplaint').value.trim();
+            let ok = true;
+            if (!equip) {
+                setInvalid('reqEquipName');
+                showToast('Equipment name is required.', 'warning', 'Missing Info');
+                ok = false;
+            } else setValid('reqEquipName');
+            if (!complaint) {
+                setInvalid('reqComplaint');
+                showHint('hintComplaint', 'Please describe the fault', 'error');
+                ok = false;
+            } else if (complaint.length < 10) {
+                setInvalid('reqComplaint');
+                showHint('hintComplaint', 'Please add more detail (at least 10 characters)', 'error');
+                ok = false;
+            } else {
+                setValid('reqComplaint');
+                showHint('hintComplaint', 'Looking good ✓', 'success');
+            }
+            return ok;
+        }
+        return true;
+    }
+
+    function setValid(id) {
+        const el = document.getElementById(id);
+        el.closest('.float-field').classList.add('valid');
+        el.closest('.float-field').classList.remove('invalid');
+    }
+    function setInvalid(id) {
+        const el = document.getElementById(id);
+        el.closest('.float-field').classList.add('invalid');
+        el.closest('.float-field').classList.remove('valid');
+    }
+    function showHint(id, msg, type) {
+        const h = document.getElementById(id);
+        h.textContent = (type === 'error' ? '⚠ ' : '✓ ') + msg;
+        h.className = 'validation-hint show ' + type;
+    }
+    function markFilled(id) {
+        const el = document.getElementById(id);
+        if (el.value) el.classList.add('has-value');
+    }
+
+    // Live validation
+    document.querySelectorAll('.float-field input, .float-field select, .float-field textarea').forEach(el => {
+        el.addEventListener('input', () => {
+            if (el.value) el.classList.add('has-value');
+            else el.classList.remove('has-value');
+            // Live validate
+            if (el.id === 'reqEquipName') {
+                if (el.value.trim()) setValid('reqEquipName');
+                else setInvalid('reqEquipName');
+            }
+            if (el.id === 'reqComplaint') {
+                const v = el.value.trim();
+                if (v.length >= 10) { setValid('reqComplaint'); showHint('hintComplaint', 'Looking good', 'success'); }
+                else if (v.length > 0) { setInvalid('reqComplaint'); showHint('hintComplaint', 'Add more detail (min 10 chars)', 'error'); }
+                else { setInvalid('reqComplaint'); showHint('hintComplaint', 'Please describe the fault', 'error'); }
+            }
+            scheduleDraftSave();
+        });
+        el.addEventListener('change', () => {
+            if (el.value) el.classList.add('has-value');
+            scheduleDraftSave();
+        });
+    });
+
+    // Toggle equipment details
+    document.getElementById('reqType').addEventListener('change', function() {
+        document.getElementById('reqEquipDetails').style.display = (this.value === 'Equipment') ? 'grid' : 'none';
+    });
+
+    // ============================================================
+    // REVIEW BUILDER
+    // ============================================================
+    function buildReview() {
+        const fields = [
+            ['Requester Name', 'reqRequester'],
+            ['Department / Unit', 'reqUnit'],
+            ['Date & Time', 'reqDateTime'],
+            ['Equipment Type', 'reqType'],
+            ['Equipment Name', 'reqEquipName'],
+            ['Serial No.', 'reqSerial'],
+            ['Model / Make', 'reqModel'],
+            ['Complaint', 'reqComplaint', 'full']
+        ];
+        let html = '';
+        fields.forEach(([label, id, cls]) => {
+            let val = document.getElementById(id)?.value || '';
+            if (id === 'reqDateTime' && val) val = new Date(val).toLocaleString();
+            const display = val ? val : '<span class="value empty">Not provided</span>';
+            html += `<div class="review-item ${cls || ''}"><label>${label}</label><div class="value">${display}</div></div>`;
+        });
+        document.getElementById('reviewGrid').innerHTML = html;
+    }
+
+    // ============================================================
+    // AUTO-SAVE DRAFT
+    // ============================================================
+    function scheduleDraftSave() {
+        clearTimeout(draftSaveTimer);
+        draftSaveTimer = setTimeout(saveDraft, 800);
+    }
+
+    function saveDraft() {
+        try {
+            const draft = {
+                step: currentStep,
+                reqDateTime: document.getElementById('reqDateTime').value,
+                reqType: document.getElementById('reqType').value,
+                reqEquipName: document.getElementById('reqEquipName').value,
+                reqSerial: document.getElementById('reqSerial').value,
+                reqModel: document.getElementById('reqModel').value,
+                reqComplaint: document.getElementById('reqComplaint').value,
+                savedAt: new Date().toISOString()
+            };
+            localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+            const ind = document.getElementById('draftIndicator');
+            ind.classList.add('show');
+            setTimeout(() => ind.classList.remove('show'), 2000);
+        } catch (err) { console.warn('Draft save failed:', err); }
+    }
+
+    function restoreDraft() {
+        try {
+            const raw = localStorage.getItem(DRAFT_KEY);
+            if (!raw) return;
+            const draft = JSON.parse(raw);
+            if (!draft.savedAt) return;
+            const age = Date.now() - new Date(draft.savedAt).getTime();
+            if (age > 24 * 60 * 60 * 1000) {
+                localStorage.removeItem(DRAFT_KEY);
+                return;
+            }
+            // Ask to restore
+            const ind = document.getElementById('draftIndicator');
+            ind.innerHTML = `<i class="fas fa-history"></i> Previous draft found`;
+            ind.classList.add('show');
+            setTimeout(() => {
+                showConfirm({
+                    title: 'Restore previous draft?',
+                    message: 'We found unsaved data from your last visit. Would you like to restore it?',
+                    type: 'info',
+                    okText: 'Restore',
+                    cancelText: 'Start fresh',
+                    onConfirm: () => {
+                        document.getElementById('reqDateTime').value = draft.reqDateTime || '';
+                        document.getElementById('reqType').value = draft.reqType || 'Equipment';
+                        document.getElementById('reqEquipName').value = draft.reqEquipName || '';
+                        document.getElementById('reqSerial').value = draft.reqSerial || '';
+                        document.getElementById('reqModel').value = draft.reqModel || '';
+                        document.getElementById('reqComplaint').value = draft.reqComplaint || '';
+                        if (draft.step) currentStep = Math.min(draft.step, 2);
+                        document.querySelectorAll('.float-field input, .float-field select, .float-field textarea').forEach(el => {
+                            if (el.value) el.classList.add('has-value');
+                        });
+                        document.getElementById('reqEquipDetails').style.display = (draft.reqType === 'Equipment') ? 'grid' : 'none';
+                        renderStep();
+                        showToast('Draft restored', 'success');
+                    }
+                });
+            }, 500);
+        } catch (err) { console.warn('Draft restore failed:', err); }
+    }
+
+    // Save draft before leaving
+    window.addEventListener('beforeunload', () => { saveDraft(); });
+
+    // ============================================================
+    // RESET FORM
+    // ============================================================
+    window.resetForm = function() {
+        showConfirm({
+            title: 'Reset form?',
+            message: 'All unsaved data will be cleared. Your saved draft will also be deleted.',
+            type: 'warning',
+            okText: 'Reset',
+            onConfirm: () => {
+                document.getElementById('reqDateTime').value = '';
+                document.getElementById('reqType').value = 'Equipment';
+                document.getElementById('reqEquipName').value = '';
+                document.getElementById('reqSerial').value = '';
+                document.getElementById('reqModel').value = '';
+                document.getElementById('reqComplaint').value = '';
+                document.getElementById('reqRequester').value = currentUser?.name || '';
+                document.getElementById('reqUnit').value = currentUser?.department || '';
+                document.querySelectorAll('.float-field input, .float-field select, .float-field textarea').forEach(el => {
+                    el.classList.toggle('has-value', !!el.value);
+                    el.closest('.float-field').classList.remove('valid', 'invalid');
+                });
+                document.getElementById('reqEquipDetails').style.display = 'grid';
+                currentStep = 1;
+                localStorage.removeItem(DRAFT_KEY);
+                renderStep();
+                showToast('Form reset', 'info');
+            }
+        });
+    };
+
+    // ============================================================
+    // SAVE REQUEST
+    // ============================================================
     async function getNextRequestNumber() {
         const ref = doc(db, COUNTERS_COLL, 'requestCounter');
         try {
@@ -574,12 +1430,6 @@
             return `REQ-${Date.now().toString().slice(-6)}`;
         }
     }
-
-    function toggleEquipFields() {
-        const type = document.getElementById('reqType').value;
-        document.getElementById('reqEquipDetails').style.display = (type === 'Equipment') ? 'grid' : 'none';
-    }
-    document.getElementById('reqType').addEventListener('change', toggleEquipFields);
 
     function showSavingOverlay(message, redirect = false) {
         const overlay = document.getElementById('savingOverlay');
@@ -601,28 +1451,24 @@
 
     window.saveRequest = async function() {
         if (isSaving) return;
-        const requester = document.getElementById('reqRequester').value.trim();
-        const unit = document.getElementById('reqUnit').value.trim();
-        const dateTime = document.getElementById('reqDateTime').value;
-        const type = document.getElementById('reqType').value;
-        const equipName = document.getElementById('reqEquipName').value.trim();
-        const inventory = document.getElementById('reqInventory').value.trim();
-        const serial = document.getElementById('reqSerial').value.trim();
-        const model = document.getElementById('reqModel').value.trim();
-        const complaint = document.getElementById('reqComplaint').value.trim();
-
-        if (!requester || !unit || !dateTime || !complaint) {
-            showToast('Please fill all required fields.', true);
-            return;
-        }
+        if (!validateStep(1) || !validateStep(2)) return;
 
         isSaving = true;
-        const btn = document.getElementById('saveRequestBtn');
+        const btn = document.getElementById('submitBtn');
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Saving…';
         showSavingOverlay('Generating request number and saving to cloud…');
 
         try {
+            const requester = document.getElementById('reqRequester').value.trim();
+            const unit = document.getElementById('reqUnit').value.trim();
+            const dateTime = document.getElementById('reqDateTime').value;
+            const type = document.getElementById('reqType').value;
+            const equipName = document.getElementById('reqEquipName').value.trim();
+            const serial = document.getElementById('reqSerial').value.trim();
+            const model = document.getElementById('reqModel').value.trim();
+            const complaint = document.getElementById('reqComplaint').value.trim();
+
             const reqNo = await getNextRequestNumber();
             const data = {
                 requestNo: reqNo,
@@ -630,51 +1476,82 @@
                 requesterId: currentUser.id,
                 unit, dateTime, type,
                 equipName: (type === 'Equipment') ? equipName : 'Other',
-                inventory: (type === 'Equipment') ? inventory : '',
+                inventory: '',
                 serial: (type === 'Equipment') ? serial : '',
                 modelMake: (type === 'Equipment') ? model : '',
-                complaint, status: 'Open', received: false,
+                complaint,
+                status: 'Open',
+                received: false,
                 createdAt: serverTimestamp()
             };
             await addDoc(collection(db, REQUESTS_COLL), data);
-
+            localStorage.removeItem(DRAFT_KEY);
             showSavingOverlay('', true);
-            showToast(`✅ Request ${reqNo} saved. Redirecting…`);
-            setTimeout(() => window.location.href = 'dashboard.html', 1600);
+            showToast(`Request ${reqNo} submitted successfully`, 'success', 'Saved');
+            setTimeout(() => {
+                document.body.classList.remove('page-ready');
+                document.body.classList.add('page-leaving');
+                setTimeout(() => window.location.href = 'dashboard.html', 220);
+            }, 1600);
         } catch (err) {
-            showToast('❌ Error: ' + err.message, true);
+            console.error('❌ Save error:', err);
+            showToast(err.message, 'error', 'Failed');
             document.getElementById('savingOverlay').classList.remove('show');
             btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-save"></i> Save Request';
+            btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Request';
             isSaving = false;
         }
     };
 
+    // ============================================================
+    // EMAIL NOTIFICATION
+    // ============================================================
     window.sendEmailNotification = function() {
-        const reqNo = document.getElementById('reqNo').value || 'New Request';
+        const reqNo = 'New Request';
         const requester = document.getElementById('reqRequester').value || 'N/A';
         const unit = document.getElementById('reqUnit').value || 'N/A';
         const equipName = document.getElementById('reqEquipName').value || 'N/A';
         const complaint = document.getElementById('reqComplaint').value || 'N/A';
-        const date = document.getElementById('reqDateTime').value
-            ? new Date(document.getElementById('reqDateTime').value).toLocaleString() : 'N/A';
+        const dt = document.getElementById('reqDateTime').value;
+        const date = dt ? new Date(dt).toLocaleString() : 'N/A';
         const subject = `Service Request ${reqNo} - ${equipName}`;
         const body = `Request No.: ${reqNo}%0ADate: ${date}%0ARequester: ${requester}%0AUnit: ${unit}%0AEquipment: ${equipName}%0AComplaint: ${complaint}%0A%0APlease attend to this request.`;
         window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`, '_blank');
-        showToast('📧 Opening email client…');
+        showToast('Opening email client…', 'info');
     };
 
-    async function init() {
-        document.getElementById('reqDateTime').value = new Date().toISOString().slice(0, 16);
-        document.getElementById('reqNo').value = 'Will be assigned on save';
-        if (currentUser) {
-            document.getElementById('reqRequester').value = currentUser.name || '';
-            if (currentUser.role === 'requester' && currentUser.department) {
-                document.getElementById('reqUnit').value = currentUser.department;
-            }
+    // ============================================================
+    // KEYBOARD SHORTCUTS
+    // ============================================================
+    document.addEventListener('keydown', (e) => {
+        const tag = e.target.tagName;
+        const isTyping = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
+        if (e.key === 'Escape' && !isTyping) {
+            closeConfirm();
         }
-        toggleEquipFields();
+        if (isTyping) return;
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+            e.preventDefault();
+            if (currentStep === 3) saveRequest();
+            else nextStep();
+        }
+    });
+
+    // ============================================================
+    // INIT
+    // ============================================================
+    function init() {
+        // Default date to now
+        const now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        document.getElementById('reqDateTime').value = now.toISOString().slice(0, 16);
+        markFilled('reqDateTime');
+        // Try to restore draft
+        restoreDraft();
+        renderStep();
     }
+
+    console.log('🚀 Request form ready.');
 </script>
 </body>
 </html>

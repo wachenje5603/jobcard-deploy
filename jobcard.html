@@ -30,24 +30,59 @@
             --primary:#C8102E;
             --primary-light:#e81a3f;
             --primary-gradient:linear-gradient(135deg,#C8102E 0%,#e81a3f 100%);
+            --primary-soft:rgba(200,16,46,0.08);
             --bg:#f4f6fb;
             --card:#fff;
+            --card-alt:#fafbfd;
             --border:#e8ebf1;
             --border-soft:#f1f4f9;
             --text:#0f172a;
             --text-soft:#475569;
             --text-muted:#94a3b8;
             --success:#10b981;
+            --success-soft:#d1fae5;
+            --success-text:#047857;
             --warning:#f59e0b;
+            --warning-soft:#fef3c7;
+            --warning-text:#b45309;
             --danger:#ef4444;
+            --danger-soft:#fee2e2;
+            --danger-text:#b91c1c;
             --info:#0ea5e9;
+            --info-soft:#e0f2fe;
+            --info-text:#0369a1;
             --radius:14px;
             --radius-sm:10px;
             --shadow-sm:0 1px 3px rgba(15,23,42,0.04);
             --shadow:0 4px 14px rgba(15,23,42,0.06);
             --shadow-lg:0 20px 60px rgba(15,23,42,0.1);
             --transition:200ms cubic-bezier(0.4,0,0.2,1);
+            --transition-slow:320ms cubic-bezier(0.4,0,0.2,1);
         }
+
+        [data-theme="dark"] {
+            --bg:#0b1220;
+            --card:#131c30;
+            --card-alt:#1a2540;
+            --border:rgba(255,255,255,0.08);
+            --border-soft:rgba(255,255,255,0.04);
+            --text:#f1f5f9;
+            --text-soft:#cbd5e1;
+            --text-muted:#94a3b8;
+            --success-soft:rgba(16,185,129,0.15);
+            --success-text:#6ee7b7;
+            --warning-soft:rgba(245,158,11,0.15);
+            --warning-text:#fcd34d;
+            --danger-soft:rgba(239,68,68,0.15);
+            --danger-text:#fca5a5;
+            --info-soft:rgba(14,165,233,0.15);
+            --info-text:#7dd3fc;
+            --shadow-sm:0 1px 3px rgba(0,0,0,0.4);
+            --shadow:0 4px 14px rgba(0,0,0,0.4);
+            --shadow-lg:0 20px 60px rgba(0,0,0,0.6);
+        }
+
+        html, body { transition: background-color var(--transition-slow), color var(--transition-slow); }
         body {
             font-family:'Plus Jakarta Sans','Inter',-apple-system,sans-serif;
             background:var(--bg);
@@ -59,11 +94,15 @@
             min-height:100vh;
             -webkit-font-smoothing:antialiased;
             -moz-osx-font-smoothing:grayscale;
+            opacity:0;
+            transition: opacity 320ms ease;
         }
+        body.page-ready { opacity:1; }
+        body.page-leaving { opacity:0; }
 
         /* ============ TOPBAR ============ */
         .topbar {
-            background:white;
+            background:var(--card);
             border-bottom:1px solid var(--border);
             padding:14px 28px;
             display:flex;
@@ -89,9 +128,53 @@
             box-shadow:0 4px 12px rgba(200,16,46,0.25);
             flex-shrink:0;
         }
-        .topbar-title h1 { font-size:16px; font-weight:800; letter-spacing:-0.3px; }
+        .topbar-title h1 { font-size:16px; font-weight:800; letter-spacing:-0.3px; color:var(--text); }
         .topbar-title small { font-size:11.5px; color:var(--text-muted); font-weight:500; }
         .topbar-actions { display:flex; gap:8px; align-items:center; flex-shrink:0; }
+
+        .theme-toggle {
+            width:40px; height:40px;
+            border-radius:10px;
+            border:1.5px solid var(--border);
+            background:var(--card);
+            color:var(--text-soft);
+            cursor:pointer;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:14px;
+            transition:var(--transition);
+        }
+        .theme-toggle:hover { border-color:var(--primary); color:var(--primary); transform:rotate(15deg); }
+        .theme-toggle i { transition:transform 400ms cubic-bezier(0.4,0,0.2,1); }
+        [data-theme="dark"] .theme-toggle i.fa-moon { transform:rotate(360deg); }
+
+        /* ============ BREADCRUMBS ============ */
+        .breadcrumbs {
+            display:flex;
+            align-items:center;
+            gap:8px;
+            font-size:12px;
+            font-weight:600;
+            color:var(--text-muted);
+            padding:0 28px;
+            margin-top:14px;
+            opacity:0;
+            animation:fadeInUp 400ms ease 150ms forwards;
+        }
+        @keyframes fadeInUp { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
+        .breadcrumbs a {
+            color:var(--text-muted);
+            text-decoration:none;
+            transition:var(--transition);
+            display:flex;
+            align-items:center;
+            gap:6px;
+            cursor:pointer;
+        }
+        .breadcrumbs a:hover { color:var(--primary); }
+        .breadcrumbs i.chevron { font-size:9px; opacity:0.5; }
+        .breadcrumbs .current { color:var(--text); font-weight:700; }
 
         /* ============ BUTTONS ============ */
         .btn {
@@ -108,20 +191,43 @@
             font-family:inherit;
             text-decoration:none;
             white-space:nowrap;
+            position:relative;
+            overflow:hidden;
         }
-        .btn i { font-size:13px; }
+        .btn i { font-size:13px; z-index:1; position:relative; }
+        .btn > * { z-index:1; position:relative; }
+        .btn::before {
+            content:'';
+            position:absolute;
+            inset:0;
+            background:linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.28), transparent 70%);
+            transform:translateX(-100%);
+            transition:600ms ease;
+            pointer-events:none;
+        }
+        .btn:hover:not(:disabled)::before { transform:translateX(100%); }
+        .ripple {
+            position:absolute;
+            border-radius:50%;
+            background:rgba(255,255,255,0.55);
+            transform:scale(0);
+            animation:rippleExpand 620ms cubic-bezier(0.4,0,0.2,1);
+            pointer-events:none;
+        }
+        @keyframes rippleExpand { to { transform:scale(3); opacity:0; } }
+        .btn-outline .ripple { background:rgba(200,16,46,0.15); }
         .btn-primary { background:var(--primary-gradient); color:white; box-shadow:0 4px 14px rgba(200,16,46,0.28); }
-        .btn-primary:hover { transform:translateY(-2px); box-shadow:0 8px 22px rgba(200,16,46,0.36); }
+        .btn-primary:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 8px 22px rgba(200,16,46,0.36); }
         .btn-success { background:linear-gradient(135deg,#10b981,#22c55e); color:white; box-shadow:0 4px 14px rgba(16,185,129,0.28); }
-        .btn-success:hover { transform:translateY(-2px); box-shadow:0 8px 22px rgba(16,185,129,0.36); }
-        .btn-outline { background:white; border:1.5px solid var(--border); color:var(--text-soft); }
-        .btn-outline:hover { border-color:var(--primary); color:var(--primary); background:#fff5f6; }
+        .btn-success:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 8px 22px rgba(16,185,129,0.36); }
+        .btn-outline { background:var(--card); border:1.5px solid var(--border); color:var(--text-soft); }
+        .btn-outline:hover:not(:disabled) { border-color:var(--primary); color:var(--primary); background:var(--primary-soft); }
         .btn-danger { background:linear-gradient(135deg,#ef4444,#dc2626); color:white; }
-        .btn-danger:hover { transform:translateY(-2px); box-shadow:0 8px 22px rgba(239,68,68,0.32); }
+        .btn-danger:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 8px 22px rgba(239,68,68,0.32); }
         .btn-warning { background:linear-gradient(135deg,#f59e0b,#fbbf24); color:#1e293b; }
-        .btn-warning:hover { transform:translateY(-2px); }
+        .btn-warning:hover:not(:disabled) { transform:translateY(-2px); }
         .btn-info { background:linear-gradient(135deg,#0ea5e9,#22d3ee); color:white; }
-        .btn-info:hover { transform:translateY(-2px); }
+        .btn-info:hover:not(:disabled) { transform:translateY(-2px); }
         .btn-sm { padding:8px 14px; font-size:12px; border-radius:9px; gap:6px; }
         .btn:disabled { opacity:0.6; cursor:not-allowed; transform:none !important; }
 
@@ -134,7 +240,7 @@
 
         /* ============ HOSPITAL HEADER ============ */
         .hospital-header {
-            background:white;
+            background:var(--card);
             border-radius:var(--radius);
             padding:22px 26px;
             border:1px solid var(--border);
@@ -160,24 +266,9 @@
             flex-shrink:0;
             box-shadow:0 6px 16px rgba(200,16,46,0.25);
         }
-        .hospital-brand h1 {
-            font-size:18px;
-            font-weight:800;
-            color:var(--primary);
-            letter-spacing:-0.3px;
-        }
-        .hospital-brand .sub {
-            font-size:11.5px;
-            color:var(--text-soft);
-            font-weight:500;
-            margin-top:2px;
-        }
-        .hospital-brand .county {
-            font-size:12px;
-            font-weight:700;
-            color:var(--primary);
-            margin-top:2px;
-        }
+        .hospital-brand h1 { font-size:18px; font-weight:800; color:var(--primary); letter-spacing:-0.3px; }
+        .hospital-brand .sub { font-size:11.5px; color:var(--text-soft); font-weight:500; margin-top:2px; }
+        .hospital-brand .county { font-size:12px; font-weight:700; color:var(--primary); margin-top:2px; }
         .hospital-badge {
             background:var(--primary-gradient);
             color:white;
@@ -189,9 +280,96 @@
             letter-spacing:0.5px;
         }
 
+        /* ============ STEP PROGRESS (5 steps) ============ */
+        .step-progress {
+            background:var(--card);
+            border-radius:var(--radius);
+            padding:22px 26px;
+            border:1px solid var(--border);
+            box-shadow:var(--shadow);
+            margin-bottom:18px;
+        }
+        .steps-track {
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:4px;
+            position:relative;
+        }
+        .step-item {
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            gap:8px;
+            flex:1;
+            position:relative;
+            z-index:2;
+        }
+        .step-circle {
+            width:38px; height:38px;
+            border-radius:50%;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-weight:800;
+            font-size:13px;
+            background:var(--border-soft);
+            color:var(--text-muted);
+            border:2px solid var(--border);
+            transition:var(--transition);
+            position:relative;
+        }
+        .step-circle.done {
+            background:linear-gradient(135deg,#10b981,#22c55e);
+            color:white;
+            border-color:transparent;
+            box-shadow:0 4px 12px rgba(16,185,129,0.3);
+        }
+        .step-circle.active {
+            background:var(--primary-gradient);
+            color:white;
+            border-color:transparent;
+            box-shadow:0 4px 14px rgba(200,16,46,0.35);
+            transform:scale(1.08);
+        }
+        .step-label {
+            font-size:10.5px;
+            font-weight:700;
+            color:var(--text-muted);
+            text-transform:uppercase;
+            letter-spacing:0.4px;
+            text-align:center;
+        }
+        .step-item.active .step-label { color:var(--primary); }
+        .step-item.done .step-label { color:var(--success-text); }
+        .step-connector {
+            flex:1;
+            height:2px;
+            background:var(--border);
+            margin-top:-22px;
+            position:relative;
+            z-index:1;
+            transition:var(--transition);
+        }
+        .step-connector.done { background:linear-gradient(90deg,#10b981,#22c55e); }
+        .progress-track-wrap {
+            margin-top:18px;
+            height:6px;
+            background:var(--border-soft);
+            border-radius:3px;
+            overflow:hidden;
+        }
+        .progress-track {
+            height:100%;
+            width:20%;
+            background:var(--primary-gradient);
+            border-radius:3px;
+            transition:width 500ms cubic-bezier(0.4,0,0.2,1);
+        }
+
         /* ============ FORM CARD ============ */
         .form-card {
-            background:white;
+            background:var(--card);
             border-radius:var(--radius);
             border:1px solid var(--border);
             box-shadow:var(--shadow);
@@ -199,7 +377,7 @@
         }
         .form-card-header {
             padding:18px 26px;
-            background:#fafbfd;
+            background:var(--card-alt);
             border-bottom:1px solid var(--border);
             display:flex;
             align-items:center;
@@ -224,11 +402,22 @@
             text-transform:uppercase;
             letter-spacing:0.4px;
         }
-        .status.pending { background:#fef3c7; color:#b45309; }
-        .status.completed { background:#d1fae5; color:#047857; }
-        .status.writtenoff { background:#fee2e2; color:#b91c1c; }
+        .status.pending { background:var(--warning-soft); color:var(--warning-text); }
+        .status.completed { background:var(--success-soft); color:var(--success-text); }
+        .status.writtenoff { background:var(--danger-soft); color:var(--danger-text); }
 
         .form-body { padding:24px 26px; }
+
+        /* ============ STEP PANELS ============ */
+        .step-panel {
+            display:none;
+            animation:fadeSlide 380ms cubic-bezier(0.16,1,0.3,1);
+        }
+        .step-panel.active { display:block; }
+        @keyframes fadeSlide {
+            from { opacity:0; transform:translateX(20px); }
+            to { opacity:1; transform:translateX(0); }
+        }
 
         /* ============ GRIDS ============ */
         .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:14px 22px; }
@@ -253,7 +442,7 @@
             border:1.5px solid var(--border);
             border-radius:10px;
             font-size:13.5px;
-            background:#fafbfd;
+            background:var(--bg);
             font-family:inherit;
             color:var(--text);
             font-weight:500;
@@ -266,10 +455,10 @@
         .field-group textarea:focus {
             border-color:var(--primary);
             box-shadow:0 0 0 4px rgba(200,16,46,0.08);
-            background:white;
+            background:var(--card);
         }
         .field-group input[readonly] {
-            background:#f1f5f9;
+            background:var(--border-soft);
             color:var(--text-muted);
             cursor:default;
         }
@@ -277,12 +466,13 @@
 
         /* ============ SECTION BLOCKS ============ */
         .section-block {
-            background:#fafbfd;
+            background:var(--card-alt);
             border:1px solid var(--border);
             border-radius:12px;
             padding:18px 20px;
             margin-top:18px;
         }
+        .section-block:first-child { margin-top:0; }
         .section-block h3 {
             font-size:12.5px;
             font-weight:800;
@@ -315,14 +505,11 @@
             cursor:pointer;
             padding:8px 14px;
             border-radius:9px;
-            background:white;
+            background:var(--card);
             border:1.5px solid var(--border);
             transition:var(--transition);
         }
-        .inline-group label:hover {
-            border-color:var(--primary);
-            color:var(--primary);
-        }
+        .inline-group label:hover { border-color:var(--primary); color:var(--primary); }
         .inline-group input[type="radio"],
         .inline-group input[type="checkbox"] {
             width:16px; height:16px;
@@ -331,18 +518,13 @@
         }
 
         /* ============ SIGNATURES ============ */
-        .signature-area {
-            border-top:1px solid var(--border);
-            padding-top:22px;
-            margin-top:22px;
-        }
         .signature-grid {
             display:grid;
             grid-template-columns:1fr 1fr;
             gap:20px;
         }
         .signature-box {
-            background:#fafbfd;
+            background:var(--card-alt);
             padding:18px;
             border-radius:12px;
             border:1px solid var(--border);
@@ -361,7 +543,7 @@
         .sig-pad-wrapper {
             border:1.5px dashed var(--border);
             border-radius:10px;
-            background:white;
+            background:var(--card);
             margin:6px 0 10px 0;
             position:relative;
             overflow:hidden;
@@ -395,10 +577,10 @@
             align-items:center;
             gap:5px;
         }
-        .sig-actions .btn-clear { background:#fee2e2; color:#b91c1c; }
-        .sig-actions .btn-clear:hover { background:#dc2626; color:white; }
-        .sig-actions .btn-undo { background:#fef3c7; color:#b45309; }
-        .sig-actions .btn-undo:hover { background:#f59e0b; color:white; }
+        .sig-actions .btn-clear { background:var(--danger-soft); color:var(--danger-text); }
+        .sig-actions .btn-clear:hover { background:var(--danger); color:white; }
+        .sig-actions .btn-undo { background:var(--warning-soft); color:var(--warning-text); }
+        .sig-actions .btn-undo:hover { background:var(--warning); color:white; }
         .sig-status {
             font-size:11.5px;
             margin-top:6px;
@@ -409,8 +591,94 @@
             width:fit-content;
         }
         .sig-status.show { display:block; }
-        .sig-status.signed { background:#d1fae5; color:#047857; }
-        .sig-status.empty { background:#fee2e2; color:#b91c1c; }
+        .sig-status.signed { background:var(--success-soft); color:var(--success-text); }
+        .sig-status.empty { background:var(--danger-soft); color:var(--danger-text); }
+
+        /* ============ REVIEW CARD (Step 5) ============ */
+        .review-hero {
+            background:linear-gradient(135deg, var(--primary-gradient));
+            color:white;
+            border-radius:14px;
+            padding:22px 26px;
+            margin-bottom:18px;
+            display:flex;
+            align-items:center;
+            gap:16px;
+            box-shadow:0 8px 24px rgba(200,16,46,0.25);
+        }
+        .review-hero .hero-icon {
+            width:56px; height:56px;
+            background:rgba(255,255,255,0.2);
+            border-radius:14px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:26px;
+            flex-shrink:0;
+            backdrop-filter:blur(10px);
+        }
+        .review-hero .hero-text h3 {
+            font-size:18px;
+            font-weight:800;
+            letter-spacing:-0.3px;
+            margin-bottom:2px;
+        }
+        .review-hero .hero-text p {
+            font-size:12.5px;
+            opacity:0.9;
+            font-weight:500;
+        }
+
+        .review-card {
+            background:var(--card-alt);
+            border:1px solid var(--border);
+            border-radius:12px;
+            padding:18px 20px;
+            margin-top:16px;
+        }
+        .review-card:first-child { margin-top:0; }
+        .review-card h4 {
+            font-size:12.5px;
+            font-weight:800;
+            color:var(--primary);
+            margin-bottom:14px;
+            text-transform:uppercase;
+            letter-spacing:0.4px;
+            display:flex;
+            align-items:center;
+            gap:8px;
+            padding-bottom:10px;
+            border-bottom:1px solid var(--border);
+        }
+        .review-grid {
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:12px 24px;
+        }
+        .review-item {
+            border-bottom:1px dashed var(--border);
+            padding-bottom:10px;
+        }
+        .review-item:last-child { border-bottom:none; padding-bottom:0; }
+        .review-item.full { grid-column:1/-1; }
+        .review-item label {
+            font-size:10.5px;
+            font-weight:700;
+            color:var(--text-muted);
+            text-transform:uppercase;
+            letter-spacing:0.5px;
+            display:block;
+            margin-bottom:5px;
+        }
+        .review-item .value {
+            font-size:13.5px;
+            font-weight:600;
+            color:var(--text);
+            word-break:break-word;
+        }
+        .review-item .value.empty { color:var(--text-muted); font-style:italic; font-weight:500; }
+        .review-item .value.warn { color:var(--warning-text); font-weight:700; }
+        .review-item .value.ok { color:var(--success-text); font-weight:700; }
 
         /* ============ ACTION BAR ============ */
         .action-bar {
@@ -419,8 +687,54 @@
             gap:12px;
             padding:20px 26px;
             border-top:1px solid var(--border);
-            background:#fafbfd;
+            background:var(--card-alt);
+            justify-content:space-between;
+            align-items:center;
         }
+        .action-group { display:flex; gap:10px; flex-wrap:wrap; }
+
+        /* ============ INFO NOTE ============ */
+        .info-note {
+            background:var(--info-soft);
+            border-radius:10px;
+            padding:14px 16px;
+            font-size:13px;
+            color:var(--info-text);
+            font-weight:600;
+            display:flex;
+            gap:10px;
+            align-items:flex-start;
+            margin-top:16px;
+        }
+        .info-note i { margin-top:2px; }
+
+        .warning-note {
+            background:var(--warning-soft);
+            border-radius:10px;
+            padding:14px 16px;
+            font-size:13px;
+            color:var(--warning-text);
+            font-weight:600;
+            display:flex;
+            gap:10px;
+            align-items:flex-start;
+            margin-top:16px;
+        }
+        .warning-note i { margin-top:2px; }
+
+        .success-note {
+            background:var(--success-soft);
+            border-radius:10px;
+            padding:14px 16px;
+            font-size:13px;
+            color:var(--success-text);
+            font-weight:600;
+            display:flex;
+            gap:10px;
+            align-items:flex-start;
+            margin-top:16px;
+        }
+        .success-note i { margin-top:2px; }
 
         /* ============ SAVING OVERLAY ============ */
         .saving-overlay {
@@ -437,14 +751,15 @@
         }
         .saving-overlay.show { display:flex; }
         .saving-card {
-            background:white;
+            background:var(--card);
             border-radius:18px;
             padding:38px 44px;
             text-align:center;
-            box-shadow:0 30px 80px rgba(15,23,42,0.3);
+            box-shadow:var(--shadow-lg);
             max-width:440px;
             width:100%;
             animation:fadeUp 300ms ease;
+            border:1px solid var(--border);
         }
         @keyframes fadeUp {
             from { opacity:0; transform:translateY(20px); }
@@ -452,29 +767,20 @@
         }
         .saving-card .spinner {
             width:56px; height:56px;
-            border:5px solid #f1f5f9;
+            border:5px solid var(--border-soft);
             border-top-color:var(--primary);
             border-radius:50%;
             animation:spin 0.9s linear infinite;
             margin:0 auto 18px;
         }
         @keyframes spin { to { transform:rotate(360deg); } }
-        .saving-card h2 {
-            font-size:19px;
-            color:var(--primary);
-            margin-bottom:8px;
-            font-weight:800;
-        }
-        .saving-card p {
-            font-size:13.5px;
-            color:var(--text-soft);
-            font-weight:500;
-        }
+        .saving-card h2 { font-size:19px; color:var(--primary); margin-bottom:8px; font-weight:800; }
+        .saving-card p { font-size:13.5px; color:var(--text-soft); font-weight:500; }
         .saving-card .redirect-note {
             margin-top:14px;
             font-size:13px;
-            color:#065f46;
-            background:#d1fae5;
+            color:var(--success-text);
+            background:var(--success-soft);
             padding:12px 16px;
             border-radius:10px;
             font-weight:700;
@@ -484,26 +790,96 @@
         .toast {
             position:fixed;
             bottom:24px; right:24px;
+            background:var(--card);
+            color:var(--text);
+            padding:14px 52px 14px 18px;
+            border-radius:12px;
+            font-weight:600;
+            z-index:9999;
+            transform:translateY(120px) scale(0.95);
+            opacity:0;
+            transition:480ms cubic-bezier(0.34,1.56,0.64,1);
+            border:1px solid var(--border);
+            border-left:4px solid var(--primary);
+            max-width:420px;
+            box-shadow:var(--shadow-lg);
+            font-size:13px;
+            display:flex;
+            align-items:center;
+            gap:12px;
+            min-width:280px;
+        }
+        .toast.show { transform:translateY(0) scale(1); opacity:1; }
+        .toast-icon {
+            width:32px; height:32px;
+            border-radius:9px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:14px;
+            flex-shrink:0;
+            background:var(--primary-soft);
+            color:var(--primary);
+        }
+        .toast-body { flex:1; min-width:0; }
+        .toast-title { font-weight:800; font-size:13px; color:var(--text); }
+        .toast-message { font-size:12.5px; color:var(--text-soft); margin-top:1px; }
+        .toast-close {
+            position:absolute;
+            top:10px; right:10px;
+            width:22px; height:22px;
+            border-radius:6px;
+            background:transparent;
+            border:none;
+            color:var(--text-muted);
+            cursor:pointer;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:11px;
+        }
+        .toast-close:hover { background:var(--border-soft); color:var(--text); }
+        .toast.success { border-left-color:var(--success); }
+        .toast.success .toast-icon { background:var(--success-soft); color:var(--success); }
+        .toast.error { border-left-color:var(--danger); }
+        .toast.error .toast-icon { background:var(--danger-soft); color:var(--danger); }
+        .toast.warning { border-left-color:var(--warning); }
+        .toast.warning .toast-icon { background:var(--warning-soft); color:var(--warning); }
+        .toast.info { border-left-color:var(--info); }
+        .toast.info .toast-icon { background:var(--info-soft); color:var(--info); }
+
+        /* ============ TOOLTIP ============ */
+        [data-tooltip] { position:relative; }
+        [data-tooltip]::after {
+            content:attr(data-tooltip);
+            position:absolute;
+            bottom:100%;
+            left:50%;
+            transform:translateX(-50%) translateY(-6px);
             background:#0f172a;
             color:white;
-            padding:14px 22px;
-            border-radius:12px;
-            font-weight:700;
-            z-index:9999;
-            transform:translateY(100px);
+            padding:6px 12px;
+            border-radius:8px;
+            font-size:11.5px;
+            font-weight:600;
+            white-space:nowrap;
             opacity:0;
-            transition:320ms cubic-bezier(0.4,0,0.2,1);
-            border-left:4px solid var(--primary);
-            max-width:360px;
-            box-shadow:0 16px 48px rgba(15,23,42,0.3);
-            font-size:13px;
+            pointer-events:none;
+            transition:var(--transition);
+            z-index:9999;
+            box-shadow:0 4px 14px rgba(0,0,0,0.3);
+            border:1px solid rgba(255,255,255,0.1);
+            font-family:inherit;
         }
-        .toast.show { transform:translateY(0); opacity:1; }
+        [data-tooltip]:hover::after {
+            opacity:1;
+            transform:translateX(-50%) translateY(-10px);
+        }
 
-        /* ============ PRINT ============ */
+        /* ============ PRINT (unchanged) ============ */
         @media print {
-            .topbar, .action-bar, .btn, .sig-actions, .no-print { display:none !important; }
-            body { background:white; }
+            .topbar, .breadcrumbs, .step-progress, .action-bar, .btn, .sig-actions, .no-print { display:none !important; }
+            body { background:white; opacity:1 !important; }
             .container { margin:0; padding:10px; max-width:100%; }
             .form-card, .hospital-header { box-shadow:none; border:1px solid #ddd; }
             .field-group input, .field-group select, .field-group textarea {
@@ -517,6 +893,10 @@
             .sig-placeholder { display:none !important; }
             .sig-status { display:none !important; }
             .section-block { border:1px solid #ccc; background:#fafafa; break-inside:avoid; }
+            /* Force all step panels to show when printing */
+            .step-panel { display:block !important; animation:none !important; }
+            /* Hide the review hero on print */
+            .review-hero { display:none !important; }
         }
 
         /* ============ RESPONSIVE ============ */
@@ -528,14 +908,20 @@
             .topbar { padding:12px 16px; }
             .topbar-title small { display:none; }
             .topbar-actions .btn span { display:none; }
+            .breadcrumbs { padding:0 16px; }
             .container { margin:16px auto; padding:0 14px 40px; }
             .grid-2, .grid-3, .grid-4 { grid-template-columns:1fr; }
-            .signature-grid { grid-template-columns:1fr; }
+            .signature-grid, .review-grid { grid-template-columns:1fr; }
             .hospital-header { flex-direction:column; align-items:flex-start; padding:18px; }
             .form-card-header { padding:14px 18px; }
             .form-body { padding:18px; }
-            .action-bar { padding:16px 18px; }
-            .action-bar .btn { flex:1; justify-content:center; }
+            .action-bar { padding:16px 18px; flex-direction:column; align-items:stretch; }
+            .action-group { width:100%; }
+            .action-group .btn { flex:1; justify-content:center; }
+            .step-label { font-size:9px; }
+            .step-circle { width:30px; height:30px; font-size:11px; }
+            .review-hero { flex-direction:column; text-align:center; }
+            .toast { left:16px; right:16px; bottom:16px; max-width:none; }
         }
     </style>
 </head>
@@ -547,18 +933,28 @@
             <div class="brand-mini">M</div>
             <div class="topbar-title">
                 <h1>Equipment Job Card</h1>
-                <small>Complete and submit the maintenance record</small>
+                <small>Complete the 5 steps below</small>
             </div>
         </div>
         <div class="topbar-actions">
-            <button class="btn btn-outline btn-sm" onclick="goToDashboard()">
+            <button class="theme-toggle" id="themeToggle" data-tooltip="Toggle theme">
+                <i class="fas fa-moon"></i>
+            </button>
+            <button class="btn btn-outline btn-sm" onclick="goToDashboard()" data-tooltip="Back to Dashboard">
                 <i class="fas fa-arrow-left"></i> <span>Dashboard</span>
             </button>
-            <button class="btn btn-danger btn-sm" onclick="logout()">
+            <button class="btn btn-danger btn-sm" onclick="logout()" data-tooltip="Logout">
                 <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
             </button>
         </div>
     </header>
+
+    <!-- ============ BREADCRUMBS ============ -->
+    <div class="breadcrumbs">
+        <a onclick="goToDashboard()"><i class="fas fa-home"></i> Dashboard</a>
+        <i class="fas fa-chevron-right chevron"></i>
+        <span class="current">Job Card</span>
+    </div>
 
     <div class="container">
 
@@ -575,298 +971,423 @@
             <span class="hospital-badge">Department of Health Services</span>
         </div>
 
+        <!-- ============ STEP PROGRESS (5 steps) ============ -->
+        <div class="step-progress">
+            <div class="steps-track">
+                <div class="step-item active" id="stepItem1">
+                    <div class="step-circle active" id="stepCircle1">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                    <div class="step-label">Request</div>
+                </div>
+                <div class="step-connector" id="connector1"></div>
+                <div class="step-item" id="stepItem2">
+                    <div class="step-circle" id="stepCircle2">2</div>
+                    <div class="step-label">Service</div>
+                </div>
+                <div class="step-connector" id="connector2"></div>
+                <div class="step-item" id="stepItem3">
+                    <div class="step-circle" id="stepCircle3">3</div>
+                    <div class="step-label">Status</div>
+                </div>
+                <div class="step-connector" id="connector3"></div>
+                <div class="step-item" id="stepItem4">
+                    <div class="step-circle" id="stepCircle4">4</div>
+                    <div class="step-label">Signatures</div>
+                </div>
+                <div class="step-connector" id="connector4"></div>
+                <div class="step-item" id="stepItem5">
+                    <div class="step-circle" id="stepCircle5">5</div>
+                    <div class="step-label">Review</div>
+                </div>
+            </div>
+            <div class="progress-track-wrap">
+                <div class="progress-track" id="progressTrack"></div>
+            </div>
+        </div>
+
         <!-- ============ FORM CARD ============ -->
         <div class="form-card">
             <div class="form-card-header">
-                <h2><i class="fas fa-tools"></i> Equipment Maintenance Job Card</h2>
+                <h2 id="stepTitle"><i class="fas fa-clipboard-list"></i> Step 1 · Request &amp; Equipment</h2>
                 <span class="status pending" id="jobStatusBadge">● PENDING</span>
             </div>
 
             <form id="jobcardForm">
                 <div class="form-body">
 
-                    <!-- ===== AUTO-FILLED FROM REQUEST ===== -->
-                    <div class="grid-2">
-                        <div class="field-group">
-                            <label>Job Card No.</label>
-                            <input type="text" id="jobNo" readonly placeholder="Auto-generated" />
-                        </div>
-                        <div class="field-group">
-                            <label>Request No.</label>
-                            <select id="jobRequestNo" onchange="loadRequestData()">
-                                <option value="">-- Select Request --</option>
-                            </select>
-                        </div>
-                        <div class="field-group">
-                            <label>Reporting Date / Time</label>
-                            <input type="datetime-local" id="jobReportingDateTime" readonly />
-                        </div>
-                        <div class="field-group">
-                            <label>Unit / Ward</label>
-                            <input type="text" id="jobUnit" readonly />
-                        </div>
-                        <div class="field-group">
-                            <label>Requester Name</label>
-                            <input type="text" id="jobRequester" readonly />
-                        </div>
-                        <div class="field-group">
-                            <label>Equipment Name</label>
-                            <input type="text" id="jobEquipName" readonly />
-                        </div>
-                        <div class="field-group">
-                            <label>Inventory / Asset No.</label>
-                            <input type="text" id="jobInventory" readonly />
-                        </div>
-                        <div class="field-group">
-                            <label>Serial No.</label>
-                            <input type="text" id="jobSerial" readonly />
-                        </div>
-                        <div class="field-group">
-                            <label>Model / Make</label>
-                            <input type="text" id="jobModel" readonly />
-                        </div>
-                        <div class="field-group full-width">
-                            <label>Complaint by User</label>
-                            <textarea id="jobComplaint" readonly rows="2"></textarea>
-                        </div>
-                        <div class="field-group full-width">
-                            <label>🩺 Diagnosis by Maintenance Team</label>
-                            <textarea id="jobDiagnosis" rows="2" placeholder="Preliminary diagnosis..."></textarea>
-                        </div>
-                    </div>
+                    <!-- =============================================
+                         STEP 1: REQUEST & EQUIPMENT
+                         ============================================= -->
+                    <div class="step-panel active" id="panel1">
 
-                    <!-- ===== HIDDEN REQUESTER ID ===== -->
-                    <input type="hidden" id="jobRequesterId" />
-
-                    <!-- ===== HANDOVER ===== -->
-                    <div class="section-block">
-                        <h3><i class="fas fa-exchange-alt"></i> Handover</h3>
-                        <div class="grid-3">
-                            <div class="field-group">
-                                <label>Received from (Requester)</label>
-                                <input type="text" id="jobReceivedFrom" readonly />
-                            </div>
-                            <div class="field-group">
-                                <label>Date / Time Received</label>
-                                <input type="datetime-local" id="jobReceivedDateTime" />
-                            </div>
-                            <div class="field-group">
-                                <label>Received by (Technician)</label>
-                                <input type="text" id="jobReceivedBy" readonly />
-                            </div>
-                            <div class="field-group">
-                                <label>Handed back to (User)</label>
-                                <select id="jobHandedTo">
-                                    <option value="">-- Select --</option>
-                                </select>
-                            </div>
-                            <div class="field-group">
-                                <label>Date / Time Handed</label>
-                                <input type="datetime-local" id="jobHandedDateTime" />
-                            </div>
-                            <div class="field-group">
-                                <label>Handed by (Technician)</label>
-                                <input type="text" id="jobHandedBy" readonly />
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- ===== SERVICE TYPE ===== -->
-                    <div class="section-block">
-                        <h3><i class="fas fa-clipboard-check"></i> Service Type</h3>
-                        <div class="inline-group">
-                            <label><input type="radio" name="serviceType" value="General Service/Overhaul" checked /> General Service/Overhaul</label>
-                            <label><input type="radio" name="serviceType" value="Repair" /> Repair</label>
-                            <label><input type="radio" name="serviceType" value="PPM (Planned Preventive)" /> PPM (Planned Preventive)</label>
-                            <label><input type="radio" name="serviceType" value="Emergency Call" /> Emergency Call</label>
-                        </div>
-                    </div>
-
-                    <!-- ===== TIMELINE ===== -->
-                    <div class="section-block">
-                        <h3><i class="fas fa-clock"></i> Technician Timeline &amp; Effort</h3>
-                        <div class="grid-3">
-                            <div class="field-group">
-                                <label>Job Started</label>
-                                <input type="datetime-local" id="jobStartDateTime" />
-                            </div>
-                            <div class="field-group">
-                                <label>Job Completed</label>
-                                <input type="datetime-local" id="jobEndDateTime" />
-                            </div>
-                            <div class="field-group">
-                                <label>Total Time (hh:mm)</label>
-                                <input type="text" id="jobTotalTime" readonly placeholder="Auto-calc" />
-                            </div>
-                            <div class="field-group">
-                                <label>Response Time (hh:mm)</label>
-                                <input type="text" id="jobResponseTime" readonly placeholder="Auto-calc" />
-                            </div>
-                            <div class="field-group">
-                                <label>Admin / Requisition Time</label>
-                                <input type="text" id="jobAdminTime" placeholder="e.g. 00:30" />
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- ===== STATUS ===== -->
-                    <div class="section-block">
-                        <h3><i class="fas fa-info-circle"></i> Job Status &amp; Completion</h3>
-                        <div class="field-group">
-                            <label>Status</label>
-                            <select id="jobStatus" onchange="toggleStatusFields()">
-                                <option value="Pending">Pending / Postponed</option>
-                                <option value="Completed">Completed</option>
-                                <option value="Written Off">Written Off</option>
-                            </select>
-                        </div>
-
-                        <div id="pendingFields" style="margin-top:14px;">
+                        <div class="section-block">
+                            <h3><i class="fas fa-file-alt"></i> Job Identification</h3>
                             <div class="grid-2">
                                 <div class="field-group">
-                                    <label>Reason for Postponement</label>
-                                    <select id="jobPostponeReason">
-                                        <option value="Low priority">Low priority</option>
-                                        <option value="Awaiting spare parts">Awaiting spare parts</option>
-                                        <option value="Awaiting approval">Awaiting approval</option>
-                                        <option value="Other">Other</option>
+                                    <label>Job Card No.</label>
+                                    <input type="text" id="jobNo" readonly placeholder="Auto-generated" />
+                                </div>
+                                <div class="field-group">
+                                    <label>Request No. *</label>
+                                    <select id="jobRequestNo" onchange="loadRequestData()">
+                                        <option value="">-- Select Request --</option>
                                     </select>
                                 </div>
                                 <div class="field-group">
-                                    <label>Expected Completion Date</label>
-                                    <input type="datetime-local" id="jobExpectedDate" />
+                                    <label>Reporting Date / Time</label>
+                                    <input type="datetime-local" id="jobReportingDateTime" readonly />
+                                </div>
+                                <div class="field-group">
+                                    <label>Unit / Ward</label>
+                                    <input type="text" id="jobUnit" readonly />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="section-block">
+                            <h3><i class="fas fa-user"></i> Requester &amp; Equipment</h3>
+                            <div class="grid-2">
+                                <div class="field-group">
+                                    <label>Requester Name</label>
+                                    <input type="text" id="jobRequester" readonly />
+                                </div>
+                                <div class="field-group">
+                                    <label>Equipment Name</label>
+                                    <input type="text" id="jobEquipName" readonly />
+                                </div>
+                                <div class="field-group">
+                                    <label>Inventory / Asset No.</label>
+                                    <input type="text" id="jobInventory" readonly />
+                                </div>
+                                <div class="field-group">
+                                    <label>Serial No.</label>
+                                    <input type="text" id="jobSerial" readonly />
                                 </div>
                                 <div class="field-group full-width">
-                                    <label>Additional Note</label>
-                                    <textarea id="jobPostponeNote" rows="2" placeholder="Details..."></textarea>
+                                    <label>Model / Make</label>
+                                    <input type="text" id="jobModel" readonly />
                                 </div>
                             </div>
                         </div>
 
-                        <div id="completedFields" style="display:none; margin-top:14px;">
-                            <div class="field-group">
-                                <label>🔧 Defects Found</label>
-                                <textarea id="jobDefects" rows="2" placeholder="List defects..."></textarea>
+                        <div class="section-block">
+                            <h3><i class="fas fa-comment-medical"></i> Complaint &amp; Diagnosis</h3>
+                            <div class="field-group full-width" style="margin-bottom:14px;">
+                                <label>Complaint by User</label>
+                                <textarea id="jobComplaint" readonly rows="2"></textarea>
                             </div>
-                            <div class="field-group">
-                                <label>🛠️ Action Taken</label>
-                                <textarea id="jobActionTaken" rows="2" placeholder="Describe repairs..."></textarea>
+                            <div class="field-group full-width">
+                                <label>🩺 Diagnosis by Maintenance Team</label>
+                                <textarea id="jobDiagnosis" rows="3" placeholder="Preliminary diagnosis..."></textarea>
                             </div>
                         </div>
 
-                        <div id="writtenOffFields" style="display:none; margin-top:14px;">
+                        <input type="hidden" id="jobRequesterId" />
+
+                        <div class="info-note">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Select a <strong>Request No.</strong> above to auto-fill equipment and requester details from the service request.</span>
+                        </div>
+                    </div>
+
+                    <!-- =============================================
+                         STEP 2: HANDOVER & SERVICE
+                         ============================================= -->
+                    <div class="step-panel" id="panel2">
+
+                        <div class="section-block">
+                            <h3><i class="fas fa-exchange-alt"></i> Handover</h3>
+                            <div class="grid-3">
+                                <div class="field-group">
+                                    <label>Received from (Requester)</label>
+                                    <input type="text" id="jobReceivedFrom" readonly />
+                                </div>
+                                <div class="field-group">
+                                    <label>Date / Time Received</label>
+                                    <input type="datetime-local" id="jobReceivedDateTime" />
+                                </div>
+                                <div class="field-group">
+                                    <label>Received by (Technician)</label>
+                                    <input type="text" id="jobReceivedBy" readonly />
+                                </div>
+                                <div class="field-group">
+                                    <label>Handed back to (User)</label>
+                                    <select id="jobHandedTo">
+                                        <option value="">-- Select --</option>
+                                    </select>
+                                </div>
+                                <div class="field-group">
+                                    <label>Date / Time Handed</label>
+                                    <input type="datetime-local" id="jobHandedDateTime" />
+                                </div>
+                                <div class="field-group">
+                                    <label>Handed by (Technician)</label>
+                                    <input type="text" id="jobHandedBy" readonly />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="section-block">
+                            <h3><i class="fas fa-clipboard-check"></i> Service Type</h3>
+                            <div class="inline-group">
+                                <label><input type="radio" name="serviceType" value="General Service/Overhaul" checked /> General Service/Overhaul</label>
+                                <label><input type="radio" name="serviceType" value="Repair" /> Repair</label>
+                                <label><input type="radio" name="serviceType" value="PPM (Planned Preventive)" /> PPM (Planned Preventive)</label>
+                                <label><input type="radio" name="serviceType" value="Emergency Call" /> Emergency Call</label>
+                            </div>
+                        </div>
+
+                        <div class="section-block">
+                            <h3><i class="fas fa-clock"></i> Technician Timeline &amp; Effort</h3>
+                            <div class="grid-3">
+                                <div class="field-group">
+                                    <label>Job Started</label>
+                                    <input type="datetime-local" id="jobStartDateTime" />
+                                </div>
+                                <div class="field-group">
+                                    <label>Job Completed</label>
+                                    <input type="datetime-local" id="jobEndDateTime" />
+                                </div>
+                                <div class="field-group">
+                                    <label>Total Time (hh:mm)</label>
+                                    <input type="text" id="jobTotalTime" readonly placeholder="Auto-calc" />
+                                </div>
+                                <div class="field-group">
+                                    <label>Response Time (hh:mm)</label>
+                                    <input type="text" id="jobResponseTime" readonly placeholder="Auto-calc" />
+                                </div>
+                                <div class="field-group">
+                                    <label>Admin / Requisition Time</label>
+                                    <input type="text" id="jobAdminTime" placeholder="e.g. 00:30" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- =============================================
+                         STEP 3: STATUS & MEASUREMENTS
+                         ============================================= -->
+                    <div class="step-panel" id="panel3">
+
+                        <div class="section-block">
+                            <h3><i class="fas fa-info-circle"></i> Job Status</h3>
                             <div class="field-group">
-                                <label>Reason for Write‑Off</label>
-                                <select id="jobWriteOffReason">
-                                    <option value="Wear & Tear">Wear &amp; Tear</option>
-                                    <option value="Mainly unstable">Mainly unstable</option>
-                                    <option value="Contamination water/oil">Contamination water/oil</option>
-                                    <option value="User error">User error</option>
-                                    <option value="Rough handling/operator fault">Rough handling / operator fault</option>
-                                    <option value="Dirt">Dirt</option>
-                                    <option value="Defective/wrong installation">Defective / wrong installation</option>
-                                    <option value="Others">Others</option>
+                                <label>Status *</label>
+                                <select id="jobStatus" onchange="toggleStatusFields()">
+                                    <option value="Pending">Pending / Postponed</option>
+                                    <option value="Completed">Completed</option>
+                                    <option value="Written Off">Written Off</option>
                                 </select>
                             </div>
+
+                            <div id="pendingFields" style="margin-top:14px;">
+                                <div class="grid-2">
+                                    <div class="field-group">
+                                        <label>Reason for Postponement</label>
+                                        <select id="jobPostponeReason">
+                                            <option value="Low priority">Low priority</option>
+                                            <option value="Awaiting spare parts">Awaiting spare parts</option>
+                                            <option value="Awaiting approval">Awaiting approval</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                    <div class="field-group">
+                                        <label>Expected Completion Date</label>
+                                        <input type="datetime-local" id="jobExpectedDate" />
+                                    </div>
+                                    <div class="field-group full-width">
+                                        <label>Additional Note</label>
+                                        <textarea id="jobPostponeNote" rows="2" placeholder="Details..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="completedFields" style="display:none; margin-top:14px;">
+                                <div class="field-group" style="margin-bottom:14px;">
+                                    <label>🔧 Defects Found *</label>
+                                    <textarea id="jobDefects" rows="2" placeholder="List defects..."></textarea>
+                                </div>
+                                <div class="field-group">
+                                    <label>🛠️ Action Taken *</label>
+                                    <textarea id="jobActionTaken" rows="2" placeholder="Describe repairs..."></textarea>
+                                </div>
+                            </div>
+
+                            <div id="writtenOffFields" style="display:none; margin-top:14px;">
+                                <div class="field-group" style="margin-bottom:14px;">
+                                    <label>Reason for Write‑Off</label>
+                                    <select id="jobWriteOffReason">
+                                        <option value="Wear & Tear">Wear &amp; Tear</option>
+                                        <option value="Mainly unstable">Mainly unstable</option>
+                                        <option value="Contamination water/oil">Contamination water/oil</option>
+                                        <option value="User error">User error</option>
+                                        <option value="Rough handling/operator fault">Rough handling / operator fault</option>
+                                        <option value="Dirt">Dirt</option>
+                                        <option value="Defective/wrong installation">Defective / wrong installation</option>
+                                        <option value="Others">Others</option>
+                                    </select>
+                                </div>
+                                <div class="field-group">
+                                    <label>Additional Comments</label>
+                                    <textarea id="jobWriteOffNote" rows="2" placeholder="Details..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="section-block">
+                            <h3><i class="fas fa-ruler-combined"></i> Measurements</h3>
+                            <div class="grid-4">
+                                <div class="field-group"><label>Current (A)</label><input type="text" id="jobMeasureCurrent" placeholder="N/A" /></div>
+                                <div class="field-group"><label>Voltage (V)</label><input type="text" id="jobMeasureVoltage" placeholder="N/A" /></div>
+                                <div class="field-group"><label>Insulation (MΩ)</label><input type="text" id="jobMeasureInsulation" placeholder="N/A" /></div>
+                                <div class="field-group"><label>Pressure (bar/mbar)</label><input type="text" id="jobMeasurePressure" placeholder="N/A" /></div>
+                            </div>
+                        </div>
+
+                        <div class="section-block">
+                            <h3><i class="fas fa-check-circle"></i> Final Verification</h3>
+                            <div class="inline-group" style="margin-bottom:14px;">
+                                <label><input type="checkbox" id="jobFunctionOk" checked /> Function O.K.</label>
+                                <label><input type="checkbox" id="jobSafetyOk" checked /> Safety O.K.</label>
+                            </div>
                             <div class="field-group">
-                                <label>Additional Comments</label>
-                                <textarea id="jobWriteOffNote" rows="2" placeholder="Details..."></textarea>
+                                <label>Comments / Additional Notes</label>
+                                <textarea id="jobComments" rows="2" placeholder="Any extra observations..."></textarea>
                             </div>
                         </div>
                     </div>
 
-                    <!-- ===== MEASUREMENTS ===== -->
-                    <div class="section-block">
-                        <h3><i class="fas fa-ruler-combined"></i> Measurements</h3>
-                        <div class="grid-4">
-                            <div class="field-group"><label>Current (A)</label><input type="text" id="jobMeasureCurrent" placeholder="N/A" /></div>
-                            <div class="field-group"><label>Voltage (V)</label><input type="text" id="jobMeasureVoltage" placeholder="N/A" /></div>
-                            <div class="field-group"><label>Insulation (MΩ)</label><input type="text" id="jobMeasureInsulation" placeholder="N/A" /></div>
-                            <div class="field-group"><label>Pressure (bar/mbar)</label><input type="text" id="jobMeasurePressure" placeholder="N/A" /></div>
+                    <!-- =============================================
+                         STEP 4: SIGNATURES
+                         ============================================= -->
+                    <div class="step-panel" id="panel4">
+
+                        <div class="section-block">
+                            <h3><i class="fas fa-signature"></i> Signatures</h3>
+                            <div class="signature-grid">
+                                <div class="signature-box">
+                                    <h4><i class="fas fa-user-cog"></i> Technician Signature</h4>
+                                    <div class="field-group">
+                                        <label>Name</label>
+                                        <select id="jobTechName">
+                                            <option value="">-- Select --</option>
+                                        </select>
+                                    </div>
+                                    <div class="field-group">
+                                        <label>Draw Signature</label>
+                                        <div class="sig-pad-wrapper" id="jobTechSigWrapper">
+                                            <canvas id="jobTechSigCanvas" width="400" height="120"></canvas>
+                                            <div class="sig-placeholder" id="jobTechSigPlaceholder">✍️ Sign here</div>
+                                        </div>
+                                        <div class="sig-actions">
+                                            <button type="button" class="btn-sm btn-clear" onclick="clearSignature('jobTech')"><i class="fas fa-trash"></i> Clear</button>
+                                            <button type="button" class="btn-sm btn-undo" onclick="undoSignature('jobTech')"><i class="fas fa-undo"></i> Undo</button>
+                                        </div>
+                                        <div class="sig-status" id="jobTechSigStatus">✅ Signed</div>
+                                    </div>
+                                    <div class="field-group">
+                                        <label>Date</label>
+                                        <input type="date" id="jobTechDate" />
+                                    </div>
+                                </div>
+                                <div class="signature-box">
+                                    <h4><i class="fas fa-user-check"></i> Supervisor Signature</h4>
+                                    <div class="field-group">
+                                        <label>Name</label>
+                                        <select id="jobCertName">
+                                            <option value="">-- Select --</option>
+                                        </select>
+                                    </div>
+                                    <div class="field-group">
+                                        <label>Draw Signature</label>
+                                        <div class="sig-pad-wrapper" id="jobCertSigWrapper">
+                                            <canvas id="jobCertSigCanvas" width="400" height="120"></canvas>
+                                            <div class="sig-placeholder" id="jobCertSigPlaceholder">✍️ Sign here</div>
+                                        </div>
+                                        <div class="sig-actions">
+                                            <button type="button" class="btn-sm btn-clear" onclick="clearSignature('jobCert')"><i class="fas fa-trash"></i> Clear</button>
+                                            <button type="button" class="btn-sm btn-undo" onclick="undoSignature('jobCert')"><i class="fas fa-undo"></i> Undo</button>
+                                        </div>
+                                        <div class="sig-status" id="jobCertSigStatus">✅ Signed</div>
+                                    </div>
+                                    <div class="field-group">
+                                        <label>Date</label>
+                                        <input type="date" id="jobCertDate" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="info-note">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Both signatures are optional for <strong>Pending</strong> jobs but recommended for <strong>Completed</strong> or <strong>Written Off</strong> records.</span>
                         </div>
                     </div>
 
-                    <!-- ===== FINAL VERIFICATION ===== -->
-                    <div class="section-block">
-                        <h3><i class="fas fa-check-circle"></i> Final Verification</h3>
-                        <div class="inline-group" style="margin-bottom:14px;">
-                            <label><input type="checkbox" id="jobFunctionOk" checked /> Function O.K.</label>
-                            <label><input type="checkbox" id="jobSafetyOk" checked /> Safety O.K.</label>
-                        </div>
-                        <div class="field-group">
-                            <label>Comments / Additional Notes</label>
-                            <textarea id="jobComments" rows="2" placeholder="Any extra observations..."></textarea>
-                        </div>
-                    </div>
+                    <!-- =============================================
+                         STEP 5: REVIEW & SUBMIT
+                         ============================================= -->
+                    <div class="step-panel" id="panel5">
 
-                    <!-- ===== SIGNATURES ===== -->
-                    <div class="signature-area">
-                        <div class="signature-grid">
-                            <div class="signature-box">
-                                <h4><i class="fas fa-user-cog"></i> Technician Signature</h4>
-                                <div class="field-group">
-                                    <label>Name</label>
-                                    <select id="jobTechName">
-                                        <option value="">-- Select --</option>
-                                    </select>
-                                </div>
-                                <div class="field-group">
-                                    <label>Draw Signature</label>
-                                    <div class="sig-pad-wrapper" id="jobTechSigWrapper">
-                                        <canvas id="jobTechSigCanvas" width="400" height="120"></canvas>
-                                        <div class="sig-placeholder" id="jobTechSigPlaceholder">✍️ Sign here</div>
-                                    </div>
-                                    <div class="sig-actions">
-                                        <button type="button" class="btn-sm btn-clear" onclick="clearSignature('jobTech')"><i class="fas fa-trash"></i> Clear</button>
-                                        <button type="button" class="btn-sm btn-undo" onclick="undoSignature('jobTech')"><i class="fas fa-undo"></i> Undo</button>
-                                    </div>
-                                    <div class="sig-status" id="jobTechSigStatus">✅ Signed</div>
-                                </div>
-                                <div class="field-group">
-                                    <label>Date</label>
-                                    <input type="date" id="jobTechDate" />
-                                </div>
+                        <div class="review-hero">
+                            <div class="hero-icon"><i class="fas fa-clipboard-check"></i></div>
+                            <div class="hero-text">
+                                <h3>Review Before Submitting</h3>
+                                <p>Check everything below — this is exactly what will be saved to the maintenance record.</p>
                             </div>
-                            <div class="signature-box">
-                                <h4><i class="fas fa-user-check"></i> Supervisor Signature</h4>
-                                <div class="field-group">
-                                    <label>Name</label>
-                                    <select id="jobCertName">
-                                        <option value="">-- Select --</option>
-                                    </select>
-                                </div>
-                                <div class="field-group">
-                                    <label>Draw Signature</label>
-                                    <div class="sig-pad-wrapper" id="jobCertSigWrapper">
-                                        <canvas id="jobCertSigCanvas" width="400" height="120"></canvas>
-                                        <div class="sig-placeholder" id="jobCertSigPlaceholder">✍️ Sign here</div>
-                                    </div>
-                                    <div class="sig-actions">
-                                        <button type="button" class="btn-sm btn-clear" onclick="clearSignature('jobCert')"><i class="fas fa-trash"></i> Clear</button>
-                                        <button type="button" class="btn-sm btn-undo" onclick="undoSignature('jobCert')"><i class="fas fa-undo"></i> Undo</button>
-                                    </div>
-                                    <div class="sig-status" id="jobCertSigStatus">✅ Signed</div>
-                                </div>
-                                <div class="field-group">
-                                    <label>Date</label>
-                                    <input type="date" id="jobCertDate" />
-                                </div>
-                            </div>
+                        </div>
+
+                        <div class="review-card">
+                            <h4><i class="fas fa-file-alt"></i> Job Identification</h4>
+                            <div class="review-grid" id="reviewJobId"></div>
+                        </div>
+
+                        <div class="review-card">
+                            <h4><i class="fas fa-tools"></i> Equipment &amp; Complaint</h4>
+                            <div class="review-grid" id="reviewEquipment"></div>
+                        </div>
+
+                        <div class="review-card">
+                            <h4><i class="fas fa-exchange-alt"></i> Handover &amp; Service</h4>
+                            <div class="review-grid" id="reviewService"></div>
+                        </div>
+
+                        <div class="review-card">
+                            <h4><i class="fas fa-info-circle"></i> Status &amp; Measurements</h4>
+                            <div class="review-grid" id="reviewStatus"></div>
+                        </div>
+
+                        <div class="review-card">
+                            <h4><i class="fas fa-signature"></i> Signatures</h4>
+                            <div class="review-grid" id="reviewSignatures"></div>
+                        </div>
+
+                        <div class="warning-note">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span>Once you click <strong>Submit Job Card</strong>, the record will be saved and cannot be edited from this screen. You can still print it at any time using <strong>Ctrl + P</strong>.</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- ===== ACTION BAR ===== -->
+                <!-- ============ ACTION BAR ============ -->
                 <div class="action-bar no-print">
-                    <button type="button" class="btn btn-success" id="saveJobBtn" onclick="saveJobCard()">
-                        <i class="fas fa-save"></i> Save Job Card
-                    </button>
-                    <button type="button" class="btn btn-outline" onclick="window.print()">
-                        <i class="fas fa-print"></i> Print
-                    </button>
-                    <button type="button" class="btn btn-outline" onclick="resetJobCardForm()">
-                        <i class="fas fa-redo"></i> Reset
-                    </button>
+                    <div class="action-group">
+                        <button type="button" class="btn btn-outline" id="backStepBtn" onclick="prevStep()" style="display:none;">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </button>
+                    </div>
+                    <div class="action-group">
+                        <button type="button" class="btn btn-outline" onclick="resetJobCardForm()">
+                            <i class="fas fa-redo"></i> Reset
+                        </button>
+                        <button type="button" class="btn btn-primary" id="nextStepBtn" onclick="nextStep()">
+                            Next Step <i class="fas fa-arrow-right"></i>
+                        </button>
+                        <button type="button" class="btn btn-success" id="saveJobBtn" onclick="saveJobCard()" style="display:none;">
+                            <i class="fas fa-paper-plane"></i> Submit Job Card
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>
@@ -885,9 +1406,65 @@
         </div>
     </div>
 
-    <div id="toast" class="toast">Message</div>
+    <!-- ============ TOAST ============ -->
+    <div id="toast" class="toast">
+        <div class="toast-icon" id="toastIcon"><i class="fas fa-info"></i></div>
+        <div class="toast-body">
+            <div class="toast-title" id="toastTitle">Message</div>
+            <div class="toast-message" id="toastMessage"></div>
+        </div>
+        <button class="toast-close" onclick="hideToast()"><i class="fas fa-times"></i></button>
+    </div>
 
     <script type="module">
+        // ============================================================
+        // PAGE TRANSITION + THEME + RIPPLE
+        // ============================================================
+        window.addEventListener('DOMContentLoaded', () => {
+            requestAnimationFrame(() => document.body.classList.add('page-ready'));
+        });
+        function navigateTo(url) {
+            document.body.classList.remove('page-ready');
+            document.body.classList.add('page-leaving');
+            setTimeout(() => window.location.href = url, 220);
+        }
+        window.goToDashboard = function() { navigateTo('dashboard.html'); };
+
+        // THEME
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            const toggle = document.getElementById('themeToggle');
+            if (toggle) {
+                const icon = toggle.querySelector('i');
+                icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+            }
+            localStorage.setItem('mcrh-theme', theme);
+        }
+        (function initTheme() {
+            applyTheme(localStorage.getItem('mcrh-theme') || 'light');
+        })();
+        document.getElementById('themeToggle')?.addEventListener('click', () => {
+            const current = document.documentElement.getAttribute('data-theme') || 'light';
+            applyTheme(current === 'dark' ? 'light' : 'dark');
+        });
+
+        // RIPPLE
+        document.addEventListener('click', (e) => {
+            const btn = e.target.closest('.btn');
+            if (!btn || btn.disabled) return;
+            const rect = btn.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+            const ripple = document.createElement('span');
+            ripple.className = 'ripple';
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            btn.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 650);
+        });
+
         // ============================================================
         // FIREBASE CONFIG
         // ============================================================
@@ -923,51 +1500,67 @@
         let allRequests = [];
         let allJobCards = [];
         let isSaving = false;
+        let currentStep = 1;
+        const TOTAL_STEPS = 5;
 
         // ============================================================
         // AUTH
         // ============================================================
         onAuthStateChanged(auth, async (user) => {
-            if (!user) { window.location.href = 'login.html'; return; }
+            if (!user) { navigateTo('login.html'); return; }
             try {
                 const userDoc = await getDoc(doc(db, USERS_COLL, user.uid));
-                if (!userDoc.exists()) { await signOut(auth); window.location.href = 'login.html'; return; }
+                if (!userDoc.exists()) { await signOut(auth); navigateTo('login.html'); return; }
                 const userData = userDoc.data();
                 if (!userData.approved) {
                     alert('Your account is pending approval. Please contact admin.');
-                    await signOut(auth); window.location.href = 'login.html'; return;
+                    await signOut(auth); navigateTo('login.html'); return;
                 }
                 const role = userData.role || 'requester';
                 if (role !== 'maintenance' && role !== 'admin') {
                     alert('You do not have permission to access this page.');
-                    window.location.href = 'dashboard.html'; return;
+                    navigateTo('dashboard.html'); return;
                 }
                 currentUser = { id: user.uid, ...userData };
                 await initPage();
             } catch (err) {
                 console.error('Auth error:', err);
-                window.location.href = 'login.html';
+                navigateTo('login.html');
             }
         });
 
         // ============================================================
         // NAV
         // ============================================================
-        window.logout = function() { signOut(auth).then(() => window.location.href = 'login.html'); };
-        window.goToDashboard = function() { window.location.href = 'dashboard.html'; };
+        window.logout = function() { signOut(auth).then(() => navigateTo('login.html')); };
+
+        // ============================================================
+        // TOAST
+        // ============================================================
+        let toastTimer = null;
+        window.showToast = function(message, type = 'success', title = null) {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toastIcon');
+            const types = {
+                success: { icon:'fa-check-circle', title: title || 'Success' },
+                error: { icon:'fa-times-circle', title: title || 'Error' },
+                warning: { icon:'fa-exclamation-triangle', title: title || 'Warning' },
+                info: { icon:'fa-info-circle', title: title || 'Info' }
+            };
+            const t = types[type] || types.info;
+            toast.className = 'toast ' + type;
+            icon.innerHTML = `<i class="fas ${t.icon}"></i>`;
+            document.getElementById('toastTitle').textContent = t.title;
+            document.getElementById('toastMessage').textContent = message;
+            toast.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => toast.classList.remove('show'), 4000);
+        };
+        window.hideToast = function() { document.getElementById('toast').classList.remove('show'); };
 
         // ============================================================
         // HELPERS
         // ============================================================
-        function showToast(msg, isError = false) {
-            const t = document.getElementById('toast');
-            t.textContent = msg;
-            t.style.borderLeftColor = isError ? '#ef4444' : '#C8102E';
-            t.classList.add('show');
-            clearTimeout(t._timer);
-            t._timer = setTimeout(() => t.classList.remove('show'), 3500);
-        }
-
         function calcTimeDiff(start, end) {
             if (!start || !end) return '--:--';
             try {
@@ -990,6 +1583,18 @@
                 const mins = Math.floor((diffMs % 3600000) / 60000);
                 return `${String(hrs).padStart(2,'0')}:${String(mins).padStart(2,'0')}`;
             } catch { return '--:--'; }
+        }
+
+        function formatDateTimeForDisplay(val) {
+            if (!val) return '';
+            try {
+                const d = new Date(val);
+                if (isNaN(d)) return val;
+                return d.toLocaleString(undefined, {
+                    year: 'numeric', month: 'short', day: 'numeric',
+                    hour: '2-digit', minute: '2-digit'
+                });
+            } catch { return val; }
         }
 
         async function generateJobNumber() {
@@ -1031,6 +1636,199 @@
                 note.style.display = 'none';
             }
             overlay.classList.add('show');
+        }
+
+        // ============================================================
+        // STEP NAVIGATION
+        // ============================================================
+        window.nextStep = function() {
+            if (!validateStep(currentStep)) return;
+            if (currentStep < TOTAL_STEPS) {
+                currentStep++;
+                renderStep();
+            }
+        };
+
+        window.prevStep = function() {
+            if (currentStep > 1) {
+                currentStep--;
+                renderStep();
+            }
+        };
+
+        function renderStep() {
+            // Panels
+            for (let i = 1; i <= TOTAL_STEPS; i++) {
+                const panel = document.getElementById('panel' + i);
+                if (panel) panel.classList.toggle('active', i === currentStep);
+            }
+            // Step circles
+            for (let i = 1; i <= TOTAL_STEPS; i++) {
+                const circle = document.getElementById('stepCircle' + i);
+                const item = document.getElementById('stepItem' + i);
+                if (!circle || !item) continue;
+                circle.classList.remove('active', 'done');
+                item.classList.remove('active', 'done');
+                if (i < currentStep) {
+                    circle.classList.add('done');
+                    circle.innerHTML = '<i class="fas fa-check"></i>';
+                    item.classList.add('done');
+                } else if (i === currentStep) {
+                    circle.classList.add('active');
+                    circle.innerHTML = (i === 1) ? '<i class="fas fa-clipboard-list"></i>' : i;
+                    item.classList.add('active');
+                } else {
+                    circle.innerHTML = i;
+                }
+            }
+            // Connectors
+            for (let i = 1; i < TOTAL_STEPS; i++) {
+                const conn = document.getElementById('connector' + i);
+                if (conn) conn.classList.toggle('done', currentStep > i);
+            }
+            // Progress
+            document.getElementById('progressTrack').style.width = (currentStep / TOTAL_STEPS * 100) + '%';
+            // Title
+            const titles = [
+                { icon:'fa-clipboard-list', text:'Step 1 · Request & Equipment' },
+                { icon:'fa-tools', text:'Step 2 · Handover & Service' },
+                { icon:'fa-info-circle', text:'Step 3 · Status & Measurements' },
+                { icon:'fa-signature', text:'Step 4 · Signatures' },
+                { icon:'fa-clipboard-check', text:'Step 5 · Review & Submit' }
+            ];
+            document.getElementById('stepTitle').innerHTML =
+                `<i class="fas ${titles[currentStep-1].icon}"></i> ${titles[currentStep-1].text}`;
+            // Buttons
+            document.getElementById('backStepBtn').style.display = currentStep > 1 ? 'inline-flex' : 'none';
+            document.getElementById('nextStepBtn').style.display = currentStep < TOTAL_STEPS ? 'inline-flex' : 'none';
+            document.getElementById('saveJobBtn').style.display = currentStep === TOTAL_STEPS ? 'inline-flex' : 'none';
+            // Build review on step 5
+            if (currentStep === TOTAL_STEPS) buildReview();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ============================================================
+        // VALIDATION
+        // ============================================================
+        function validateStep(step) {
+            if (step === 1) {
+                const requestNo = document.getElementById('jobRequestNo').value;
+                if (!requestNo) {
+                    showToast('Please select a Request No. to continue.', 'warning', 'Missing Info');
+                    document.getElementById('jobRequestNo').focus();
+                    return false;
+                }
+                return true;
+            }
+            if (step === 3) {
+                const status = document.getElementById('jobStatus').value;
+                if (status === 'Completed') {
+                    const defects = document.getElementById('jobDefects').value.trim();
+                    const action = document.getElementById('jobActionTaken').value.trim();
+                    if (!defects || !action) {
+                        showToast('Please fill Defects Found and Action Taken before continuing.', 'warning', 'Missing Info');
+                        return false;
+                    }
+                }
+                return true;
+            }
+            return true;
+        }
+
+        // ============================================================
+        // REVIEW BUILDER (Step 5)
+        // ============================================================
+        function buildReview() {
+            const getVal = (id) => document.getElementById(id)?.value || '';
+            const empty = '<span class="value empty">Not provided</span>';
+
+            const techName = document.getElementById('jobTechName').selectedOptions[0]?.textContent || '';
+            const certName = document.getElementById('jobCertName').selectedOptions[0]?.textContent || '';
+            const handedToName = document.getElementById('jobHandedTo').selectedOptions[0]?.textContent || '';
+            const techSigned = techSigPad && !techSigPad.isEmpty();
+            const certSigned = certSigPad && !certSigPad.isEmpty();
+            const status = document.getElementById('jobStatus').value;
+            const serviceType = document.querySelector('input[name="serviceType"]:checked')?.value || '';
+
+            const makeItem = (label, value, cls = '') => {
+                const display = (value && String(value).trim() !== '')
+                    ? String(value)
+                    : empty;
+                return `<div class="review-item ${cls}"><label>${label}</label><div class="value">${display}</div></div>`;
+            };
+
+            // Job Identification
+            document.getElementById('reviewJobId').innerHTML =
+                makeItem('Job Card No.', getVal('jobNo')) +
+                makeItem('Request No.', getVal('jobRequestNo')) +
+                makeItem('Reporting Date', formatDateTimeForDisplay(getVal('jobReportingDateTime'))) +
+                makeItem('Unit / Ward', getVal('jobUnit'));
+
+            // Equipment & Complaint
+            document.getElementById('reviewEquipment').innerHTML =
+                makeItem('Requester', getVal('jobRequester')) +
+                makeItem('Equipment', getVal('jobEquipName')) +
+                makeItem('Inventory No.', getVal('jobInventory')) +
+                makeItem('Serial No.', getVal('jobSerial')) +
+                makeItem('Model / Make', getVal('jobModel')) +
+                makeItem('Complaint', getVal('jobComplaint'), 'full') +
+                makeItem('Diagnosis', getVal('jobDiagnosis'), 'full');
+
+            // Handover & Service
+            document.getElementById('reviewService').innerHTML =
+                makeItem('Received From', getVal('jobReceivedFrom')) +
+                makeItem('Received At', formatDateTimeForDisplay(getVal('jobReceivedDateTime'))) +
+                makeItem('Handed To', handedToName) +
+                makeItem('Handed At', formatDateTimeForDisplay(getVal('jobHandedDateTime'))) +
+                makeItem('Service Type', serviceType) +
+                makeItem('Job Started', formatDateTimeForDisplay(getVal('jobStartDateTime'))) +
+                makeItem('Job Completed', formatDateTimeForDisplay(getVal('jobEndDateTime'))) +
+                makeItem('Total Time', getVal('jobTotalTime')) +
+                makeItem('Response Time', getVal('jobResponseTime')) +
+                makeItem('Admin Time', getVal('jobAdminTime'));
+
+            // Status & Measurements
+            let statusHtml =
+                makeItem('Status', status) +
+                makeItem('Function OK', getVal('jobFunctionOk') ? 'Yes' : 'No') +
+                makeItem('Safety OK', getVal('jobSafetyOk') ? 'Yes' : 'No') +
+                makeItem('Current (A)', getVal('jobMeasureCurrent')) +
+                makeItem('Voltage (V)', getVal('jobMeasureVoltage')) +
+                makeItem('Insulation (MΩ)', getVal('jobMeasureInsulation')) +
+                makeItem('Pressure', getVal('jobMeasurePressure'));
+
+            if (status === 'Completed') {
+                statusHtml += makeItem('Defects Found', getVal('jobDefects'), 'full') +
+                              makeItem('Action Taken', getVal('jobActionTaken'), 'full');
+            }
+            if (status === 'Pending') {
+                statusHtml += makeItem('Postpone Reason', getVal('jobPostponeReason')) +
+                              makeItem('Expected Date', formatDateTimeForDisplay(getVal('jobExpectedDate'))) +
+                              makeItem('Postpone Note', getVal('jobPostponeNote'), 'full');
+            }
+            if (status === 'Written Off') {
+                statusHtml += makeItem('Write-Off Reason', getVal('jobWriteOffReason')) +
+                              makeItem('Write-Off Note', getVal('jobWriteOffNote'), 'full');
+            }
+            statusHtml += makeItem('Comments', getVal('jobComments'), 'full');
+
+            document.getElementById('reviewStatus').innerHTML = statusHtml;
+
+            // Signatures
+            const techSigHtml = techSigned
+                ? '<span class="value ok">✅ Signed</span>'
+                : '<span class="value warn">⚠️ Not signed</span>';
+            const certSigHtml = certSigned
+                ? '<span class="value ok">✅ Signed</span>'
+                : '<span class="value warn">⚠️ Not signed</span>';
+
+            document.getElementById('reviewSignatures').innerHTML =
+                makeItem('Technician Name', techName) +
+                makeItem('Technician Date', getVal('jobTechDate')) +
+                `<div class="review-item"><label>Technician Signature</label>${techSigHtml}</div>` +
+                makeItem('Supervisor Name', certName) +
+                makeItem('Supervisor Date', getVal('jobCertDate')) +
+                `<div class="review-item"><label>Supervisor Signature</label>${certSigHtml}</div>`;
         }
 
         // ============================================================
@@ -1257,9 +2055,9 @@
                     document.getElementById('jobReceivedDateTime').value = r.dateTime || '';
                 }
                 populateSupervisorDropdown(r.unit);
-                showToast('✅ Request data loaded.');
+                showToast('✅ Request data loaded.', 'success', 'Loaded');
             } catch (err) {
-                showToast('Error loading request: ' + err.message, true);
+                showToast('Error loading request: ' + err.message, 'error');
             }
         };
 
@@ -1307,15 +2105,30 @@
         document.getElementById('jobReportingDateTime').addEventListener('change', updateJobTimeFields);
 
         // ============================================================
-        // SAVE JOB CARD – redirect to dashboard after save
+        // SAVE JOB CARD
         // ============================================================
         window.saveJobCard = async function() {
             if (isSaving) return;
 
             const requestNo = document.getElementById('jobRequestNo').value;
             if (!requestNo) {
-                showToast('Please select a request.', true);
+                showToast('Please select a request.', 'error');
+                currentStep = 1;
+                renderStep();
                 return;
+            }
+
+            // Validate completed status fields
+            const status = document.getElementById('jobStatus').value;
+            if (status === 'Completed') {
+                const defects = document.getElementById('jobDefects').value.trim();
+                const action = document.getElementById('jobActionTaken').value.trim();
+                if (!defects || !action) {
+                    showToast('Please fill Defects Found and Action Taken.', 'warning', 'Missing Info');
+                    currentStep = 3;
+                    renderStep();
+                    return;
+                }
             }
 
             isSaving = true;
@@ -1415,10 +2228,10 @@
 
             } catch (err) {
                 console.error('❌ Save error:', err);
-                showToast('❌ Error: ' + err.message, true);
+                showToast('❌ Error: ' + err.message, 'error');
                 document.getElementById('savingOverlay').classList.remove('show');
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-save"></i> Save Job Card';
+                btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Job Card';
                 isSaving = false;
                 return;
             }
@@ -1427,7 +2240,7 @@
             showToast(`✅ Job card ${savedJobNo} saved. Redirecting…`);
 
             setTimeout(() => {
-                window.location.href = 'dashboard.html';
+                navigateTo('dashboard.html');
             }, 1500);
         };
 
@@ -1489,9 +2302,9 @@
                 if (j.techId) document.getElementById('jobTechName').value = j.techId;
                 if (j.handedToId) document.getElementById('jobHandedTo').value = j.handedToId;
 
-                showToast('📂 Job card loaded for editing.');
+                showToast('📂 Job card loaded for editing.', 'info', 'Loaded');
             } catch (err) {
-                showToast('Error loading: ' + err.message, true);
+                showToast('Error loading: ' + err.message, 'error');
             }
         };
 
@@ -1524,7 +2337,9 @@
             document.getElementById('jobCertName').innerHTML = '<option value="">-- Select --</option>';
             populateRequestDropdown();
             generateJobNumber().then(num => document.getElementById('jobNo').value = num);
-            showToast('🔄 Form reset.');
+            currentStep = 1;
+            renderStep();
+            showToast('🔄 Form reset.', 'info', 'Reset');
         }
         window.resetJobCardForm = resetJobCardForm;
 
@@ -1556,8 +2371,40 @@
             const viewParam = urlParams.get('view');
             if (viewParam) await window.loadJobCard(viewParam);
 
-            console.log('🚀 Job Card system ready.');
+            renderStep();
+            console.log('🚀 Job Card wizard ready.');
         }
+
+        // ============================================================
+        // KEYBOARD SHORTCUTS
+        // ============================================================
+        document.addEventListener('keydown', (e) => {
+            const tag = e.target.tagName;
+            const isTyping = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
+            if (isTyping) return;
+
+            // Ctrl+S saves on last step
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                if (currentStep === TOTAL_STEPS) saveJobCard();
+                else showToast('Complete all steps before submitting.', 'info');
+            }
+            // Ctrl+Enter advances / submits
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                if (currentStep === TOTAL_STEPS) saveJobCard();
+                else nextStep();
+            }
+            // Arrow keys navigate steps
+            if (e.key === 'ArrowRight' && !e.ctrlKey && !e.metaKey && currentStep < TOTAL_STEPS) {
+                e.preventDefault();
+                nextStep();
+            }
+            if (e.key === 'ArrowLeft' && !e.ctrlKey && !e.metaKey && currentStep > 1) {
+                e.preventDefault();
+                prevStep();
+            }
+        });
     </script>
 </body>
 </html>

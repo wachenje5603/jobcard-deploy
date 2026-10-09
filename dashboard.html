@@ -27,16 +27,12 @@
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
 
-        /* ============================================================
-           DESIGN TOKENS (Light + Dark)
-           ============================================================ */
         :root {
             --primary:#C8102E;
             --primary-dark:#a00d24;
             --primary-light:#e81a3f;
             --primary-gradient:linear-gradient(135deg,#C8102E 0%,#e81a3f 100%);
             --primary-soft:rgba(200,16,46,0.08);
-
             --bg:#f4f6fb;
             --bg-elevated:#ffffff;
             --card:#ffffff;
@@ -44,12 +40,9 @@
             --border:#e8ebf1;
             --border-soft:#f1f4f9;
             --border-hover:rgba(200,16,46,0.25);
-
             --text:#0f172a;
             --text-soft:#475569;
             --text-muted:#94a3b8;
-            --text-inverse:#ffffff;
-
             --success:#10b981;
             --success-soft:#d1fae5;
             --success-text:#047857;
@@ -65,26 +58,20 @@
             --purple:#8b5cf6;
             --purple-soft:#f3e8ff;
             --purple-text:#6d28d9;
-
             --radius:12px;
             --radius-sm:8px;
             --radius-lg:16px;
-
             --shadow-xs:0 1px 2px rgba(15,23,42,0.04);
             --shadow-sm:0 1px 3px rgba(15,23,42,0.04);
             --shadow:0 4px 14px rgba(15,23,42,0.06);
             --shadow-md:0 8px 24px rgba(15,23,42,0.08);
             --shadow-lg:0 20px 60px rgba(15,23,42,0.1);
-            --shadow-primary:0 8px 22px rgba(200,16,46,0.28);
-
             --transition:200ms cubic-bezier(0.4,0,0.2,1);
             --transition-slow:320ms cubic-bezier(0.4,0,0.2,1);
-
             --sidebar-width:240px;
             --sidebar-collapsed:68px;
         }
 
-        /* Dark theme overrides */
         [data-theme="dark"] {
             --bg:#0b1220;
             --bg-elevated:#131c30;
@@ -93,11 +80,9 @@
             --border:rgba(255,255,255,0.08);
             --border-soft:rgba(255,255,255,0.04);
             --border-hover:rgba(200,16,46,0.4);
-
             --text:#f1f5f9;
             --text-soft:#cbd5e1;
             --text-muted:#94a3b8;
-
             --success-soft:rgba(16,185,129,0.15);
             --success-text:#6ee7b7;
             --warning-soft:rgba(245,158,11,0.15);
@@ -108,7 +93,6 @@
             --info-text:#7dd3fc;
             --purple-soft:rgba(139,92,246,0.15);
             --purple-text:#c4b5fd;
-
             --shadow-xs:0 1px 2px rgba(0,0,0,0.3);
             --shadow-sm:0 1px 3px rgba(0,0,0,0.4);
             --shadow:0 4px 14px rgba(0,0,0,0.4);
@@ -117,14 +101,51 @@
         }
 
         html, body { transition: background-color var(--transition-slow), color var(--transition-slow); }
-
         body {
             font-family:'Plus Jakarta Sans','Inter',-apple-system,sans-serif;
             background:var(--bg);
             color:var(--text);
             -webkit-font-smoothing:antialiased;
-            -moz-osx-font-smoothing:grayscale;
             overflow-x:hidden;
+        }
+
+        /* ============================================================
+           PAGE TRANSITION (Option 4)
+           ============================================================ */
+        body { opacity:0; transition: opacity 320ms ease; }
+        body.page-ready { opacity:1; }
+        body.page-leaving { opacity:0; }
+
+        /* ============================================================
+           BREADCRUMBS (Option 4)
+           ============================================================ */
+        .breadcrumbs {
+            display:flex;
+            align-items:center;
+            gap:8px;
+            font-size:12px;
+            font-weight:600;
+            color:var(--text-muted);
+            padding:0 24px;
+            margin-top:12px;
+            margin-bottom:2px;
+            opacity:0;
+            animation:fadeInUp 400ms ease 150ms forwards;
+        }
+        @keyframes fadeInUp { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
+        .breadcrumbs a {
+            color:var(--text-muted);
+            text-decoration:none;
+            transition:var(--transition);
+            display:flex;
+            align-items:center;
+            gap:6px;
+        }
+        .breadcrumbs a:hover { color:var(--primary); }
+        .breadcrumbs i.chevron { font-size:9px; opacity:0.5; }
+        .breadcrumbs .current {
+            color:var(--text);
+            font-weight:700;
         }
 
         /* ============================================================
@@ -167,7 +188,6 @@
             margin-left:0;
         }
         .sidebar.collapsed .user-chip { justify-content:center; padding:10px 6px; }
-        .sidebar.collapsed .nav-section-title { padding:6px 0; height:12px; }
 
         .sidebar-header {
             padding:20px 18px;
@@ -193,7 +213,6 @@
         }
         .sidebar-title { font-weight:700; font-size:14px; line-height:1.2; white-space:nowrap; }
         .sidebar-title small { font-size:10.5px; color:rgba(255,255,255,0.5); font-weight:500; display:block; }
-
         .sidebar-collapse-btn {
             position:absolute;
             right:-12px;
@@ -231,7 +250,6 @@
             color:rgba(255,255,255,0.4);
             padding:10px 12px 6px;
             font-weight:700;
-            transition:var(--transition);
         }
         .nav-item {
             display:flex;
@@ -262,11 +280,8 @@
             border-radius:20px;
             font-size:10.5px;
             font-weight:700;
-            transition:var(--transition);
         }
         .nav-item.active .badge-count { background:rgba(255,255,255,0.25); }
-
-        /* Collapsed tooltips */
         .sidebar.collapsed .nav-item::after {
             content:attr(data-tooltip);
             position:absolute;
@@ -302,7 +317,6 @@
             border-radius:10px;
             background:rgba(255,255,255,0.05);
             margin-bottom:8px;
-            transition:var(--transition);
         }
         .user-avatar {
             width:34px; height:34px;
@@ -320,7 +334,7 @@
         .user-chip-info .role { font-size:10px; color:rgba(255,255,255,0.55); text-transform:uppercase; letter-spacing:0.5px; font-weight:600; }
 
         /* ============================================================
-           MAIN AREA
+           MAIN
            ============================================================ */
         .main-area {
             flex:1;
@@ -344,7 +358,6 @@
             top:0;
             z-index:50;
             box-shadow:var(--shadow-sm);
-            transition:background-color var(--transition-slow), border-color var(--transition-slow);
         }
         .topbar-left { display:flex; align-items:center; gap:14px; min-width:0; }
         .menu-toggle {
@@ -361,7 +374,34 @@
         .page-title small { display:block; font-size:12px; font-weight:500; color:var(--text-muted); margin-top:1px; }
         .topbar-actions { display:flex; gap:8px; align-items:center; flex-shrink:0; }
 
-        /* Theme toggle */
+        /* Command palette trigger button */
+        .command-trigger {
+            display:flex;
+            align-items:center;
+            gap:8px;
+            padding:8px 14px;
+            border:1.5px solid var(--border);
+            background:var(--card);
+            border-radius:10px;
+            cursor:pointer;
+            color:var(--text-muted);
+            font-size:12.5px;
+            font-weight:600;
+            font-family:inherit;
+            transition:var(--transition);
+        }
+        .command-trigger:hover { border-color:var(--primary); color:var(--primary); }
+        .command-trigger kbd {
+            font-family:inherit;
+            background:var(--border-soft);
+            padding:2px 6px;
+            border-radius:5px;
+            font-size:10px;
+            font-weight:700;
+            color:var(--text-soft);
+        }
+        .command-trigger:hover kbd { background:var(--primary-soft); color:var(--primary); }
+
         .theme-toggle {
             width:38px; height:38px;
             border-radius:10px;
@@ -374,19 +414,13 @@
             justify-content:center;
             font-size:14px;
             transition:var(--transition);
-            position:relative;
-            overflow:hidden;
         }
-        .theme-toggle:hover {
-            border-color:var(--primary);
-            color:var(--primary);
-            transform:rotate(15deg);
-        }
+        .theme-toggle:hover { border-color:var(--primary); color:var(--primary); transform:rotate(15deg); }
         .theme-toggle i { transition:transform 400ms cubic-bezier(0.4,0,0.2,1); }
         [data-theme="dark"] .theme-toggle i.fa-moon { transform:rotate(360deg); }
 
         /* ============================================================
-           BUTTONS
+           BUTTONS — with Ripple (Tier 2)
            ============================================================ */
         .btn {
             padding:9px 16px;
@@ -407,15 +441,32 @@
         }
         .btn i { font-size:12px; z-index:1; position:relative; }
         .btn > * { z-index:1; position:relative; }
-        .btn::after {
+        .btn::before {
             content:'';
             position:absolute;
             inset:0;
             background:linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.28), transparent 70%);
             transform:translateX(-100%);
             transition:600ms ease;
+            pointer-events:none;
         }
-        .btn:hover:not(:disabled)::after { transform:translateX(100%); }
+        .btn:hover:not(:disabled)::before { transform:translateX(100%); }
+
+        /* Ripple circle */
+        .ripple {
+            position:absolute;
+            border-radius:50%;
+            background:rgba(255,255,255,0.55);
+            transform:scale(0);
+            animation:rippleExpand 620ms cubic-bezier(0.4,0,0.2,1);
+            pointer-events:none;
+        }
+        @keyframes rippleExpand {
+            to { transform:scale(3); opacity:0; }
+        }
+        .btn-outline .ripple, .btn-outline::before { background:rgba(200,16,46,0.15); }
+        .btn-outline::before { background:linear-gradient(120deg, transparent 30%, rgba(200,16,46,0.15), transparent 70%); }
+
         .btn-primary { background:var(--primary-gradient); color:white; box-shadow:0 4px 12px rgba(200,16,46,0.28); }
         .btn-primary:hover:not(:disabled) { transform:translateY(-1px); box-shadow:0 6px 16px rgba(200,16,46,0.36); }
         .btn-success { background:linear-gradient(135deg,#10b981,#22c55e); color:white; box-shadow:0 4px 12px rgba(16,185,129,0.25); }
@@ -454,7 +505,16 @@
             display:flex;
             align-items:center;
             gap:12px;
+            opacity:0;
+            animation:fadeInUp 400ms cubic-bezier(0.16,1,0.3,1) forwards;
         }
+        .kpi-card:nth-child(1) { animation-delay:60ms; }
+        .kpi-card:nth-child(2) { animation-delay:120ms; }
+        .kpi-card:nth-child(3) { animation-delay:180ms; }
+        .kpi-card:nth-child(4) { animation-delay:240ms; }
+        .kpi-card:nth-child(5) { animation-delay:300ms; }
+        .kpi-card:nth-child(6) { animation-delay:360ms; }
+        .kpi-card:nth-child(7) { animation-delay:420ms; }
         .kpi-card::before {
             content:'';
             position:absolute;
@@ -511,14 +571,6 @@
         .kpi-card.myrequests::before { background:var(--purple); }
         .kpi-card.myrequests .kpi-icon { background:var(--purple-soft); color:var(--purple-text); }
 
-        /* Animated counter */
-        .kpi-value.counting { animation:counterPulse 600ms ease; }
-        @keyframes counterPulse {
-            0% { transform:scale(0.9); opacity:0.5; }
-            50% { transform:scale(1.05); }
-            100% { transform:scale(1); opacity:1; }
-        }
-
         /* ANALYTICS DRAWER */
         .analytics-drawer {
             background:var(--card);
@@ -527,7 +579,6 @@
             box-shadow:var(--shadow-sm);
             margin-bottom:18px;
             overflow:hidden;
-            transition:var(--transition);
         }
         .analytics-drawer-header {
             display:flex;
@@ -547,11 +598,7 @@
             color:var(--text);
         }
         .analytics-drawer-title i { color:var(--primary); }
-        .analytics-drawer-chevron {
-            color:var(--text-muted);
-            transition:transform var(--transition);
-            font-size:12px;
-        }
+        .analytics-drawer-chevron { color:var(--text-muted); transition:transform var(--transition); font-size:12px; }
         .analytics-drawer.open .analytics-drawer-chevron { transform:rotate(180deg); }
         .analytics-drawer-body {
             max-height:0;
@@ -560,12 +607,7 @@
             border-top:1px solid var(--border);
         }
         .analytics-drawer.open .analytics-drawer-body { max-height:400px; }
-        .charts-row {
-            display:grid;
-            grid-template-columns:1fr 1fr;
-            gap:16px;
-            padding:18px;
-        }
+        .charts-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; padding:18px; }
         .chart-box {
             background:var(--card-alt);
             border-radius:var(--radius-sm);
@@ -591,6 +633,8 @@
             border:1px solid var(--border);
             box-shadow:var(--shadow-sm);
             overflow:hidden;
+            opacity:0;
+            animation:fadeInUp 400ms cubic-bezier(0.16,1,0.3,1) 200ms forwards;
         }
         .panel-header {
             display:flex;
@@ -636,7 +680,6 @@
         }
         .tab.active .count { background:rgba(200,16,46,0.15); color:var(--primary); }
 
-        /* TOOLBAR */
         .toolbar { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
         .search-box { position:relative; }
         .search-box i {
@@ -661,23 +704,8 @@
         }
         .search-box input:focus { border-color:var(--primary); background:var(--card); box-shadow:0 0 0 3px rgba(200,16,46,0.08); }
         .search-box input::placeholder { color:var(--text-muted); }
-        .filter-select {
-            padding:8px 12px;
-            border:1.5px solid var(--border);
-            border-radius:8px;
-            font-size:12.5px;
-            background:var(--bg);
-            font-family:inherit;
-            color:var(--text);
-            font-weight:600;
-            cursor:pointer;
-            outline:none;
-            transition:var(--transition);
-        }
-        .filter-select:focus { border-color:var(--primary); background:var(--card); }
 
-        /* Filter Chips */
-        .filter-chips { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px; }
+        .filter-chips { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px; padding:0 18px; }
         .filter-chip {
             padding:6px 14px;
             border-radius:20px;
@@ -705,7 +733,7 @@
         .filter-chip:not(.active) .chip-count { background:var(--border-soft); color:var(--text-muted); }
 
         /* ============================================================
-           TABLE — PREMIUM REDESIGN
+           TABLE
            ============================================================ */
         .table-scroll { max-height:62vh; overflow-y:auto; overflow-x:auto; }
         table { width:100%; border-collapse:separate; border-spacing:0; font-size:13px; }
@@ -727,17 +755,8 @@
         }
         table thead th.sortable { cursor:pointer; transition:var(--transition); }
         table thead th.sortable:hover { color:var(--primary); background:var(--primary-soft); }
-        table thead th .sort-icon {
-            font-size:9px;
-            margin-left:6px;
-            opacity:0.4;
-            transition:var(--transition);
-        }
-        table thead th.sort-asc .sort-icon,
-        table thead th.sort-desc .sort-icon { opacity:1; color:var(--primary); }
-        table thead th.sort-asc .sort-icon::before { content:'\f0de'; }
-        table thead th.sort-desc .sort-icon::before { content:'\f0dd'; }
-
+        table thead th .sort-icon { font-size:9px; margin-left:6px; opacity:0.4; transition:var(--transition); }
+        table thead th.sort-asc .sort-icon, table thead th.sort-desc .sort-icon { opacity:1; color:var(--primary); }
         table tbody td {
             padding:14px 16px;
             border-bottom:1px solid var(--border-soft);
@@ -748,14 +767,14 @@
             transition:var(--transition);
             background:var(--card);
         }
-        table tbody tr { transition:var(--transition); position:relative; }
+        table tbody tr { transition:var(--transition); opacity:0; animation:rowFade 320ms ease forwards; }
+        @keyframes rowFade { from { opacity:0; } to { opacity:1; } }
         table tbody tr:nth-child(even) td { background:var(--card-alt); }
         table tbody tr:hover td { background:var(--primary-soft); }
         table tbody tr:hover td:first-child { box-shadow:inset 3px 0 0 var(--primary); }
         table tbody tr:last-child td { border-bottom:none; }
         table td strong { color:var(--text); font-weight:700; }
 
-        /* Avatar in table */
         .cell-with-avatar { display:flex; align-items:center; gap:10px; }
         .row-avatar {
             width:32px; height:32px;
@@ -769,19 +788,17 @@
             font-size:12px;
             flex-shrink:0;
             text-transform:uppercase;
-            letter-spacing:0;
             box-shadow:0 2px 6px rgba(200,16,46,0.25);
         }
-        .row-avatar.alt-1 { background:linear-gradient(135deg,#0ea5e9,#22d3ee); box-shadow:0 2px 6px rgba(14,165,233,0.25); }
-        .row-avatar.alt-2 { background:linear-gradient(135deg,#8b5cf6,#a78bfa); box-shadow:0 2px 6px rgba(139,92,246,0.25); }
-        .row-avatar.alt-3 { background:linear-gradient(135deg,#10b981,#22c55e); box-shadow:0 2px 6px rgba(16,185,129,0.25); }
-        .row-avatar.alt-4 { background:linear-gradient(135deg,#f59e0b,#fbbf24); box-shadow:0 2px 6px rgba(245,158,11,0.25); }
+        .row-avatar.alt-1 { background:linear-gradient(135deg,#0ea5e9,#22d3ee); }
+        .row-avatar.alt-2 { background:linear-gradient(135deg,#8b5cf6,#a78bfa); }
+        .row-avatar.alt-3 { background:linear-gradient(135deg,#10b981,#22c55e); }
+        .row-avatar.alt-4 { background:linear-gradient(135deg,#f59e0b,#fbbf24); }
 
         .row-name { display:flex; flex-direction:column; min-width:0; }
         .row-name .primary { font-weight:700; color:var(--text); font-size:13px; }
         .row-name .secondary { font-size:11.5px; color:var(--text-muted); font-weight:500; margin-top:1px; }
 
-        /* Status badge with dot */
         .status-badge {
             padding:4px 11px;
             border-radius:20px;
@@ -793,12 +810,7 @@
             text-transform:uppercase;
             letter-spacing:0.3px;
         }
-        .status-badge::before {
-            content:'';
-            width:6px; height:6px;
-            border-radius:50%;
-            flex-shrink:0;
-        }
+        .status-badge::before { content:''; width:6px; height:6px; border-radius:50%; flex-shrink:0; }
         .status-badge.pending { background:var(--warning-soft); color:var(--warning-text); }
         .status-badge.pending::before { background:var(--warning); }
         .status-badge.completed { background:var(--success-soft); color:var(--success-text); }
@@ -813,11 +825,8 @@
         .status-badge.received::before { background:var(--success); }
 
         .row-actions { display:flex; gap:5px; align-items:center; }
-        .row-actions .divider { width:1px; height:20px; background:var(--border); margin:0 2px; }
 
-        /* ============================================================
-           SKELETON LOADERS
-           ============================================================ */
+        /* SKELETON */
         .skeleton {
             background:linear-gradient(90deg, var(--border-soft) 25%, var(--border) 50%, var(--border-soft) 75%);
             background-size:200% 100%;
@@ -829,16 +838,12 @@
             background:linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);
             background-size:200% 100%;
         }
-        @keyframes shimmer {
-            0% { background-position:200% 0; }
-            100% { background-position:-200% 0; }
-        }
+        @keyframes shimmer { 0% { background-position:200% 0; } 100% { background-position:-200% 0; } }
         .skeleton-row { display:flex; align-items:center; gap:12px; padding:14px 16px; border-bottom:1px solid var(--border-soft); }
         .skeleton-row .skeleton-avatar { width:32px; height:32px; border-radius:50%; flex-shrink:0; }
         .skeleton-row .skeleton-text { height:12px; border-radius:6px; flex:1; }
         .skeleton-row .skeleton-text.short { flex:0 0 80px; }
 
-        /* EMPTY STATE */
         .empty-state { text-align:center; padding:60px 20px; color:var(--text-muted); }
         .empty-state i { font-size:48px; margin-bottom:14px; opacity:0.25; }
         .empty-state h3 { font-size:16px; font-weight:800; color:var(--text); margin-bottom:6px; }
@@ -877,10 +882,7 @@
             color:var(--text);
             border:1px solid var(--border);
         }
-        @keyframes modalIn {
-            from { opacity:0; transform:translateY(16px) scale(0.98); }
-            to { opacity:1; transform:translateY(0) scale(1); }
-        }
+        @keyframes modalIn { from { opacity:0; transform:translateY(16px) scale(0.98); } to { opacity:1; transform:translateY(0) scale(1); } }
         .modal .close-btn {
             float:right;
             background:var(--border-soft);
@@ -896,15 +898,7 @@
             justify-content:center;
         }
         .modal .close-btn:hover { background:var(--primary); color:white; transform:rotate(90deg); }
-        .modal h2 {
-            font-size:19px;
-            font-weight:800;
-            margin-bottom:18px;
-            color:var(--text);
-            display:flex;
-            align-items:center;
-            gap:10px;
-        }
+        .modal h2 { font-size:19px; font-weight:800; margin-bottom:18px; color:var(--text); display:flex; align-items:center; gap:10px; }
         .modal h2 i { color:var(--primary); font-size:18px; }
         .modal hr { border:none; border-top:1px solid var(--border); margin:20px 0; }
         .modal .form-group { margin-bottom:13px; }
@@ -959,12 +953,154 @@
             display:none;
         }
 
-        /* ============ CONFIRM MODAL ============ */
-        .confirm-modal {
-            max-width:420px;
-            padding:28px;
+        /* ============================================================
+           COMMAND PALETTE (Tier 2)
+           ============================================================ */
+        .command-overlay {
+            display:none;
+            position:fixed;
+            inset:0;
+            background:rgba(15,23,42,0.65);
+            backdrop-filter:blur(12px);
+            -webkit-backdrop-filter:blur(12px);
+            z-index:2000;
+            align-items:flex-start;
+            justify-content:center;
+            padding:15vh 20px 20px;
+            animation:fadeIn 150ms ease;
+        }
+        .command-overlay.show { display:flex; }
+        .command-palette {
+            background:var(--card);
+            border-radius:16px;
+            width:100%;
+            max-width:580px;
+            box-shadow:var(--shadow-lg);
+            overflow:hidden;
+            animation:commandIn 220ms cubic-bezier(0.16,1,0.3,1);
+            border:1px solid var(--border);
+        }
+        @keyframes commandIn {
+            from { opacity:0; transform:translateY(-12px) scale(0.98); }
+            to { opacity:1; transform:translateY(0) scale(1); }
+        }
+        .command-input-wrap {
+            display:flex;
+            align-items:center;
+            gap:12px;
+            padding:16px 20px;
+            border-bottom:1px solid var(--border);
+        }
+        .command-input-wrap i { color:var(--text-muted); font-size:16px; }
+        .command-input-wrap input {
+            flex:1;
+            border:none;
+            background:transparent;
+            font-size:15px;
+            font-family:inherit;
+            color:var(--text);
+            outline:none;
+            font-weight:500;
+        }
+        .command-input-wrap input::placeholder { color:var(--text-muted); }
+        .command-input-wrap kbd {
+            font-family:inherit;
+            background:var(--border-soft);
+            padding:3px 8px;
+            border-radius:6px;
+            font-size:11px;
+            font-weight:700;
+            color:var(--text-soft);
+        }
+        .command-results {
+            max-height:400px;
+            overflow-y:auto;
+            padding:8px;
+        }
+        .command-section-title {
+            font-size:10px;
+            text-transform:uppercase;
+            letter-spacing:0.6px;
+            color:var(--text-muted);
+            font-weight:700;
+            padding:10px 12px 6px;
+        }
+        .command-item {
+            display:flex;
+            align-items:center;
+            gap:12px;
+            padding:11px 14px;
+            border-radius:9px;
+            cursor:pointer;
+            transition:var(--transition);
+            font-size:13.5px;
+            font-weight:600;
+            color:var(--text-soft);
+        }
+        .command-item:hover, .command-item.active {
+            background:var(--primary-soft);
+            color:var(--primary);
+        }
+        .command-item i {
+            width:20px;
+            text-align:center;
+            font-size:14px;
+            color:var(--text-muted);
+        }
+        .command-item:hover i, .command-item.active i { color:var(--primary); }
+        .command-item .kbd-hint {
+            margin-left:auto;
+            font-size:11px;
+            font-weight:700;
+            color:var(--text-muted);
+            background:var(--border-soft);
+            padding:2px 7px;
+            border-radius:5px;
+        }
+        .command-item:hover .kbd-hint, .command-item.active .kbd-hint {
+            background:var(--primary);
+            color:white;
+        }
+
+        /* ============================================================
+           SHORTCUTS OVERLAY (Option 4)
+           ============================================================ */
+        .shortcuts-grid {
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:14px 24px;
+            margin-top:8px;
+        }
+        .shortcut-row {
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:12px;
+            padding:8px 0;
+            border-bottom:1px solid var(--border-soft);
+            font-size:13px;
+            font-weight:600;
+            color:var(--text-soft);
+        }
+        .shortcut-row:last-child { border-bottom:none; }
+        .shortcut-keys { display:flex; gap:4px; }
+        .shortcut-keys kbd {
+            font-family:inherit;
+            background:var(--border-soft);
+            border:1px solid var(--border);
+            padding:3px 8px;
+            border-radius:6px;
+            font-size:11px;
+            font-weight:800;
+            color:var(--text);
+            min-width:24px;
             text-align:center;
         }
+
+        /* ============================================================
+           CONFIRM MODAL
+           ============================================================ */
+        .confirm-modal { max-width:420px; padding:28px; text-align:center; }
         .confirm-icon {
             width:64px; height:64px;
             border-radius:50%;
@@ -984,27 +1120,12 @@
         .confirm-icon.warning { background:var(--warning-soft); color:var(--warning-text); }
         .confirm-icon.info { background:var(--info-soft); color:var(--info-text); }
         .confirm-icon.success { background:var(--success-soft); color:var(--success); }
-        .confirm-modal h3 {
-            font-size:18px;
-            font-weight:800;
-            margin-bottom:8px;
-            color:var(--text);
-        }
-        .confirm-modal p {
-            font-size:13.5px;
-            color:var(--text-muted);
-            font-weight:500;
-            margin-bottom:24px;
-            line-height:1.6;
-        }
-        .confirm-actions {
-            display:grid;
-            grid-template-columns:1fr 1fr;
-            gap:10px;
-        }
+        .confirm-modal h3 { font-size:18px; font-weight:800; margin-bottom:8px; color:var(--text); }
+        .confirm-modal p { font-size:13.5px; color:var(--text-muted); font-weight:500; margin-bottom:24px; line-height:1.6; }
+        .confirm-actions { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
         .confirm-actions .btn { width:100%; justify-content:center; padding:12px; margin-top:0; }
 
-        /* ============ USER LIST ============ */
+        /* USER LIST */
         .user-list { list-style:none; padding:0; margin:0; }
         .user-list li {
             display:flex;
@@ -1073,7 +1194,7 @@
         .pending-user-item .user-info small { color:var(--text-muted); font-size:11.5px; display:block; margin-top:2px; }
 
         /* ============================================================
-           TOAST — PREMIUM REDESIGN
+           TOAST
            ============================================================ */
         .toast {
             position:fixed;
@@ -1154,7 +1275,37 @@
         .toast-undo-btn:hover { background:var(--primary-soft); }
 
         /* ============================================================
-           HIDDEN PDF TEMPLATES
+           TOOLTIP SYSTEM (Option 4)
+           ============================================================ */
+        [data-tooltip]:not(.nav-item) { position:relative; }
+        [data-tooltip]:not(.nav-item)::after {
+            content:attr(data-tooltip);
+            position:absolute;
+            bottom:100%;
+            left:50%;
+            transform:translateX(-50%) translateY(-6px);
+            background:#0f172a;
+            color:white;
+            padding:6px 12px;
+            border-radius:8px;
+            font-size:11.5px;
+            font-weight:600;
+            white-space:nowrap;
+            opacity:0;
+            pointer-events:none;
+            transition:var(--transition);
+            z-index:9999;
+            box-shadow:0 4px 14px rgba(0,0,0,0.3);
+            border:1px solid rgba(255,255,255,0.1);
+            font-family:inherit;
+        }
+        [data-tooltip]:not(.nav-item):hover::after {
+            opacity:1;
+            transform:translateX(-50%) translateY(-10px);
+        }
+
+        /* ============================================================
+           PDF HIDDEN TEMPLATES
            ============================================================ */
         #pdfTemplate, #requestPdfTemplate {
             position:fixed;
@@ -1195,10 +1346,13 @@
             .menu-toggle { display:flex; align-items:center; justify-content:center; }
             .sidebar-backdrop.show { display:block; opacity:1; }
             .charts-row { grid-template-columns:1fr; }
+            .command-trigger span { display:none; }
+            .command-trigger kbd { display:none; }
         }
         @media (max-width:640px) {
             .content { padding:16px; }
             .topbar { padding:12px 16px; }
+            .breadcrumbs { padding:0 16px; }
             .kpi-strip { grid-template-columns:repeat(2, 1fr); gap:10px; }
             .kpi-value { font-size:18px; }
             .page-title { font-size:15px; }
@@ -1211,6 +1365,7 @@
             .modal { padding:22px; }
             .confirm-actions { grid-template-columns:1fr; }
             .toast { left:16px; right:16px; bottom:16px; max-width:none; }
+            .shortcuts-grid { grid-template-columns:1fr; }
         }
 
         ::-webkit-scrollbar { width:8px; height:8px; }
@@ -1228,7 +1383,7 @@
         <div class="sidebar-header">
             <div class="sidebar-logo">M</div>
             <div class="sidebar-title">MCRH<small>Maintenance</small></div>
-            <button class="sidebar-collapse-btn" onclick="toggleSidebarCollapse()" title="Collapse sidebar">
+            <button class="sidebar-collapse-btn" onclick="toggleSidebarCollapse()" data-tooltip="Collapse">
                 <i class="fas fa-chevron-left"></i>
             </button>
         </div>
@@ -1258,13 +1413,17 @@
             </button>
 
             <div class="nav-section-title">Reports</div>
-            <button class="nav-item" onclick="window.location.href='analytics.html'" data-tooltip="Analytics">
+            <button class="nav-item" onclick="navigateTo('analytics.html')" data-tooltip="Analytics">
                 <i class="fas fa-chart-bar"></i>
                 <span>Analytics</span>
             </button>
-            <button class="nav-item" onclick="window.location.href='report.html'" data-tooltip="Monthly Report">
+            <button class="nav-item" onclick="navigateTo('report.html')" data-tooltip="Monthly Report">
                 <i class="fas fa-file-alt"></i>
                 <span>Monthly Report</span>
+            </button>
+            <button class="nav-item" onclick="navigateTo('stats.html')" data-tooltip="Public Stats">
+                <i class="fas fa-globe"></i>
+                <span>Public Stats</span>
             </button>
         </nav>
 
@@ -1296,11 +1455,23 @@
                 </div>
             </div>
             <div class="topbar-actions">
-                <button class="theme-toggle" id="themeToggle" title="Toggle theme">
+                <button class="command-trigger" onclick="openCommandPalette()" data-tooltip="Search commands (Ctrl+K)">
+                    <i class="fas fa-search"></i>
+                    <span>Search</span>
+                    <kbd>Ctrl K</kbd>
+                </button>
+                <button class="theme-toggle" id="themeToggle" data-tooltip="Toggle theme">
                     <i class="fas fa-moon"></i>
                 </button>
                 <div id="topbarActions" style="display:flex;gap:8px;"></div>
             </div>
+        </div>
+
+        <!-- BREADCRUMBS -->
+        <div class="breadcrumbs">
+            <a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a>
+            <i class="fas fa-chevron-right chevron"></i>
+            <span class="current" id="breadcrumbCurrent">Requests</span>
         </div>
 
         <div class="content">
@@ -1342,7 +1513,7 @@
                     </div>
                     <div class="toolbar" id="filterBar"></div>
                 </div>
-                <div class="filter-chips" id="filterChips" style="padding:0 18px 4px;"></div>
+                <div class="filter-chips" id="filterChips"></div>
                 <div class="table-scroll">
                     <div id="tableBody">
                         <div class="empty-state">
@@ -1356,7 +1527,35 @@
     </div>
 </div>
 
-<!-- ============ MODAL: User Management ============ -->
+<!-- COMMAND PALETTE -->
+<div class="command-overlay" id="commandOverlay" onclick="if(event.target===this)closeCommandPalette()">
+    <div class="command-palette">
+        <div class="command-input-wrap">
+            <i class="fas fa-search"></i>
+            <input type="text" id="commandInput" placeholder="Type a command or search…" autocomplete="off" />
+            <kbd>Esc</kbd>
+        </div>
+        <div class="command-results" id="commandResults"></div>
+    </div>
+</div>
+
+<!-- SHORTCUTS OVERLAY -->
+<div class="modal-overlay" id="shortcutsModal">
+    <div class="modal" style="max-width:520px;">
+        <button class="close-btn" onclick="closeShortcuts()">&times;</button>
+        <h2><i class="fas fa-keyboard"></i> Keyboard Shortcuts</h2>
+        <div class="shortcuts-grid">
+            <div class="shortcut-row"><span>Open search / commands</span><div class="shortcut-keys"><kbd>Ctrl</kbd><kbd>K</kbd></div></div>
+            <div class="shortcut-row"><span>Show this panel</span><div class="shortcut-keys"><kbd>?</kbd></div></div>
+            <div class="shortcut-row"><span>Close / dismiss</span><div class="shortcut-keys"><kbd>Esc</kbd></div></div>
+            <div class="shortcut-row"><span>Focus search input</span><div class="shortcut-keys"><kbd>/</kbd></div></div>
+            <div class="shortcut-row"><span>New request (dashboard)</span><div class="shortcut-keys"><kbd>N</kbd></div></div>
+            <div class="shortcut-row"><span>Refresh data</span><div class="shortcut-keys"><kbd>R</kbd></div></div>
+        </div>
+    </div>
+</div>
+
+<!-- USER MODAL -->
 <div class="modal-overlay" id="userModal">
     <div class="modal">
         <button class="close-btn" onclick="closeUserModal()">&times;</button>
@@ -1521,7 +1720,7 @@
     </div>
 </div>
 
-<!-- ============ MODAL: Pending Approvals ============ -->
+<!-- APPROVAL MODAL -->
 <div class="modal-overlay" id="approvalModal">
     <div class="modal">
         <button class="close-btn" onclick="closeApprovalModal()">&times;</button>
@@ -1534,7 +1733,7 @@
     </div>
 </div>
 
-<!-- ============ CONFIRM MODAL ============ -->
+<!-- CONFIRM MODAL -->
 <div class="modal-overlay" id="confirmModal">
     <div class="modal confirm-modal">
         <div class="confirm-icon danger" id="confirmIcon"><i class="fas fa-exclamation-triangle"></i></div>
@@ -1561,6 +1760,26 @@
 <div id="requestPdfTemplate"></div>
 
 <script type="module">
+    // ============================================================
+    // PAGE TRANSITION (Option 4)
+    // ============================================================
+    window.addEventListener('DOMContentLoaded', () => {
+        requestAnimationFrame(() => document.body.classList.add('page-ready'));
+    });
+    window.navigateTo = function(url) {
+        document.body.classList.remove('page-ready');
+        document.body.classList.add('page-leaving');
+        setTimeout(() => window.location.href = url, 220);
+    };
+    // Intercept all internal links
+    document.addEventListener('click', (e) => {
+        const a = e.target.closest('a[href$=".html"]');
+        if (a && !a.target && !a.href.startsWith('mailto:') && !a.hasAttribute('data-no-transition')) {
+            e.preventDefault();
+            navigateTo(a.getAttribute('href'));
+        }
+    });
+
     const firebaseConfig = {
         apiKey: "AIzaSyDnsz1s-VnewbUszXNJptcdMZ_h0QsNHYQ",
         authDomain: "moivoibiomed.firebaseapp.com",
@@ -1596,6 +1815,7 @@
     let currentSort = { column: 'requestNo', direction: 'desc' };
     let statusChartInstance = null;
     let trendChartInstance = null;
+    let lastDeleted = null; // For undo
 
     const statsContainer = document.getElementById('statsContainer');
     const tableBody = document.getElementById('tableBody');
@@ -1604,6 +1824,49 @@
     const topbarActions = document.getElementById('topbarActions');
     const pageTitleText = document.getElementById('pageTitleText');
     const pageTitleSub = document.getElementById('pageTitleSub');
+    const breadcrumbCurrent = document.getElementById('breadcrumbCurrent');
+
+    // ============================================================
+    // RIPPLE EFFECT (Tier 2)
+    // ============================================================
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest('.btn');
+        if (!btn || btn.disabled) return;
+        const rect = btn.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        const x = e.clientX - rect.left - size / 2;
+        const y = e.clientY - rect.top - size / 2;
+        const ripple = document.createElement('span');
+        ripple.className = 'ripple';
+        ripple.style.width = ripple.style.height = size + 'px';
+        ripple.style.left = x + 'px';
+        ripple.style.top = y + 'px';
+        btn.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 650);
+    });
+
+    // ============================================================
+    // ANIMATED NUMBER COUNTER (Tier 2)
+    // ============================================================
+    function animateNumber(el, target, duration = 800) {
+        const start = 0;
+        const startTime = performance.now();
+        function tick(now) {
+            const progress = Math.min((now - startTime) / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            el.textContent = Math.round(start + (target - start) * eased);
+            if (progress < 1) requestAnimationFrame(tick);
+            else el.textContent = target;
+        }
+        requestAnimationFrame(tick);
+    }
+
+    function animateKPIs() {
+        document.querySelectorAll('.kpi-value[data-target]').forEach(el => {
+            const target = parseInt(el.dataset.target) || 0;
+            animateNumber(el, target);
+        });
+    }
 
     // ============================================================
     // THEME TOGGLE
@@ -1618,28 +1881,26 @@
     themeToggle.addEventListener('click', () => {
         const current = document.documentElement.getAttribute('data-theme') || 'light';
         applyTheme(current === 'dark' ? 'light' : 'dark');
+        setTimeout(() => { if (currentUser) renderCharts(); }, 50);
     });
-    // Restore saved theme
     (function initTheme() {
         const saved = localStorage.getItem('mcrh-theme') || 'light';
         applyTheme(saved);
     })();
 
     // ============================================================
-    // SIDEBAR COLLAPSE
+    // SIDEBAR
     // ============================================================
     window.toggleSidebarCollapse = function() {
         const sidebar = document.getElementById('sidebar');
         sidebar.classList.toggle('collapsed');
-        const isCollapsed = sidebar.classList.contains('collapsed');
-        localStorage.setItem('mcrh-sidebar-collapsed', isCollapsed ? '1' : '0');
+        localStorage.setItem('mcrh-sidebar-collapsed', sidebar.classList.contains('collapsed') ? '1' : '0');
     };
     (function initSidebar() {
         if (localStorage.getItem('mcrh-sidebar-collapsed') === '1' && window.innerWidth > 1024) {
             document.getElementById('sidebar').classList.add('collapsed');
         }
     })();
-
     window.toggleSidebar = function() {
         document.getElementById('sidebar').classList.toggle('open');
         document.getElementById('sidebarBackdrop').classList.toggle('show');
@@ -1653,7 +1914,7 @@
     };
 
     // ============================================================
-    // TOAST — PREMIUM
+    // TOAST
     // ============================================================
     let toastTimer = null;
     window.showToast = function(message, type = 'success', title = null, undoFn = null) {
@@ -1661,8 +1922,6 @@
         const icon = document.getElementById('toastIcon');
         const titleEl = document.getElementById('toastTitle');
         const msgEl = document.getElementById('toastMessage');
-
-        // Type mapping
         const types = {
             success: { icon:'fa-check-circle', title: title || 'Success' },
             error: { icon:'fa-times-circle', title: title || 'Error' },
@@ -1670,13 +1929,10 @@
             info: { icon:'fa-info-circle', title: title || 'Info' }
         };
         const t = types[type] || types.info;
-
         toast.className = 'toast ' + type;
         icon.innerHTML = `<i class="fas ${t.icon}"></i>`;
         titleEl.textContent = t.title;
         msgEl.textContent = message;
-
-        // Undo button
         const existingUndo = toast.querySelector('.toast-undo-btn');
         if (existingUndo) existingUndo.remove();
         if (undoFn) {
@@ -1686,17 +1942,14 @@
             btn.onclick = () => { undoFn(); hideToast(); };
             toast.querySelector('.toast-body').appendChild(btn);
         }
-
         toast.classList.add('show');
         clearTimeout(toastTimer);
         toastTimer = setTimeout(() => toast.classList.remove('show'), undoFn ? 6000 : 4000);
     };
-    window.hideToast = function() {
-        document.getElementById('toast').classList.remove('show');
-    };
+    window.hideToast = function() { document.getElementById('toast').classList.remove('show'); };
 
     // ============================================================
-    // CONFIRM MODAL — Custom
+    // CONFIRM MODAL
     // ============================================================
     window.showConfirm = function({ title, message, type = 'danger', okText = 'Confirm', cancelText = 'Cancel', onConfirm }) {
         const modal = document.getElementById('confirmModal');
@@ -1705,8 +1958,6 @@
         const msgEl = document.getElementById('confirmMessage');
         const okBtn = document.getElementById('confirmOkBtn');
         const cancelBtn = document.getElementById('confirmCancelBtn');
-
-        // Icon and color
         const iconMap = {
             danger: { icon:'fa-exclamation-triangle', cls:'danger' },
             warning: { icon:'fa-exclamation-circle', cls:'warning' },
@@ -1716,28 +1967,146 @@
         const ic = iconMap[type] || iconMap.danger;
         iconEl.className = 'confirm-icon ' + ic.cls;
         iconEl.innerHTML = `<i class="fas ${ic.icon}"></i>`;
-
         titleEl.textContent = title;
         msgEl.textContent = message;
         okBtn.textContent = okText;
         cancelBtn.textContent = cancelText;
         okBtn.className = 'btn btn-' + (type === 'danger' ? 'danger' : type === 'warning' ? 'warning' : type === 'success' ? 'success' : 'primary');
-
-        // Clear old listeners by cloning
         const newOk = okBtn.cloneNode(true);
         const newCancel = cancelBtn.cloneNode(true);
         okBtn.replaceWith(newOk);
         cancelBtn.replaceWith(newCancel);
-
         newOk.addEventListener('click', () => { closeConfirm(); onConfirm && onConfirm(); });
         newCancel.addEventListener('click', closeConfirm);
-
         modal.classList.add('show');
     };
     function closeConfirm() { document.getElementById('confirmModal').classList.remove('show'); }
     window.closeConfirm = closeConfirm;
-    document.getElementById('confirmModal').addEventListener('click', function(e) {
-        if (e.target === this) closeConfirm();
+    document.getElementById('confirmModal').addEventListener('click', function(e) { if (e.target === this) closeConfirm(); });
+
+    // ============================================================
+    // COMMAND PALETTE (Tier 2)
+    // ============================================================
+    let commandItems = [];
+    let commandActiveIndex = 0;
+
+    function buildCommandItems() {
+        const isAdmin = userRole === 'admin';
+        const isMaintenance = userRole === 'maintenance';
+        const isRequester = userRole === 'requester';
+        let items = [];
+
+        items.push({ section:'Navigation', label:'Go to Requests', icon:'fa-clipboard-list', action:() => switchView('requests') });
+        items.push({ section:'Navigation', label:'Go to Jobcards', icon:'fa-tools', action:() => switchView('jobcards') });
+        items.push({ section:'Navigation', label:'Open Analytics', icon:'fa-chart-bar', action:() => navigateTo('analytics.html') });
+        items.push({ section:'Navigation', label:'Open Monthly Report', icon:'fa-file-alt', action:() => navigateTo('report.html') });
+        items.push({ section:'Navigation', label:'Open Public Stats', icon:'fa-globe', action:() => navigateTo('stats.html') });
+
+        if (isRequester) {
+            items.push({ section:'Actions', label:'New Request', icon:'fa-plus', hint:'N', action:() => navigateTo('request.html') });
+        }
+        if (isMaintenance || isAdmin) {
+            items.push({ section:'Actions', label:'Create Job Card', icon:'fa-tools', action:() => navigateTo('jobcard.html') });
+        }
+        if (isAdmin) {
+            items.push({ section:'Actions', label:'Add New User', icon:'fa-user-plus', action:openUserModal });
+            items.push({ section:'Actions', label:'Show Pending Approvals', icon:'fa-user-check', action:showPendingUsers });
+        }
+        items.push({ section:'Actions', label:'Toggle Dark Mode', icon:'fa-moon', action:() => themeToggle.click() });
+        items.push({ section:'Actions', label:'Show Keyboard Shortcuts', icon:'fa-keyboard', hint:'?', action:openShortcuts });
+        items.push({ section:'Actions', label:'Refresh Data', icon:'fa-sync-alt', hint:'R', action:refreshData });
+        items.push({ section:'Actions', label:'Logout', icon:'fa-sign-out-alt', action:() => document.getElementById('logoutBtn').click() });
+
+        commandItems = items;
+    }
+
+    function renderCommandResults(query = '') {
+        const q = query.toLowerCase().trim();
+        const filtered = q ? commandItems.filter(i => i.label.toLowerCase().includes(q)) : commandItems;
+        const results = document.getElementById('commandResults');
+
+        if (!filtered.length) {
+            results.innerHTML = `<div style="padding:30px;text-align:center;color:var(--text-muted);font-size:13px;font-weight:600;">No matching commands</div>`;
+            return;
+        }
+
+        commandActiveIndex = 0;
+        let html = '';
+        let lastSection = '';
+        filtered.forEach((item, idx) => {
+            if (item.section !== lastSection) {
+                html += `<div class="command-section-title">${item.section}</div>`;
+                lastSection = item.section;
+            }
+            html += `
+                <div class="command-item ${idx === 0 ? 'active' : ''}" data-index="${idx}" onclick="executeCommand(${idx})">
+                    <i class="fas ${item.icon}"></i>
+                    <span>${item.label}</span>
+                    ${item.hint ? `<span class="kbd-hint">${item.hint}</span>` : ''}
+                </div>
+            `;
+        });
+        results.innerHTML = html;
+
+        // Store filtered globally for execution
+        window._filteredCommands = filtered;
+    }
+
+    window.executeCommand = function(idx) {
+        const item = (window._filteredCommands || commandItems)[idx];
+        if (!item) return;
+        closeCommandPalette();
+        setTimeout(() => item.action(), 80);
+    };
+
+    window.openCommandPalette = function() {
+        buildCommandItems();
+        renderCommandResults('');
+        document.getElementById('commandOverlay').classList.add('show');
+        setTimeout(() => document.getElementById('commandInput').focus(), 100);
+    };
+
+    window.closeCommandPalette = function() {
+        document.getElementById('commandOverlay').classList.remove('show');
+        document.getElementById('commandInput').value = '';
+        commandActiveIndex = 0;
+    };
+
+    document.getElementById('commandInput').addEventListener('input', (e) => renderCommandResults(e.target.value));
+    document.getElementById('commandInput').addEventListener('keydown', (e) => {
+        const items = window._filteredCommands || [];
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            commandActiveIndex = Math.min(commandActiveIndex + 1, items.length - 1);
+            updateActiveItem();
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            commandActiveIndex = Math.max(commandActiveIndex - 1, 0);
+            updateActiveItem();
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            executeCommand(commandActiveIndex);
+        }
+    });
+    function updateActiveItem() {
+        document.querySelectorAll('.command-item').forEach((el, i) => {
+            el.classList.toggle('active', i === commandActiveIndex);
+        });
+        const active = document.querySelector('.command-item.active');
+        if (active) active.scrollIntoView({ block:'nearest' });
+    }
+
+    // ============================================================
+    // SHORTCUTS OVERLAY (Option 4)
+    // ============================================================
+    window.openShortcuts = function() {
+        document.getElementById('shortcutsModal').classList.add('show');
+    };
+    window.closeShortcuts = function() {
+        document.getElementById('shortcutsModal').classList.remove('show');
+    };
+    document.getElementById('shortcutsModal').addEventListener('click', function(e) {
+        if (e.target === this) closeShortcuts();
     });
 
     // ============================================================
@@ -1749,7 +2118,7 @@
             message: 'Are you sure you want to log out of your account?',
             type: 'warning',
             okText: 'Log out',
-            onConfirm: () => signOut(auth).then(() => window.location.href = 'login.html')
+            onConfirm: () => signOut(auth).then(() => navigateTo('login.html'))
                 .catch(err => showToast('Logout error: ' + err.message, 'error'))
         });
     });
@@ -1766,14 +2135,12 @@
         if (s === 'received') return 'received';
         return 'open';
     }
-
     function getInitials(name) {
         if (!name) return '?';
         const parts = name.trim().split(/\s+/);
         if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
         return (parts[0].charAt(0) + parts[parts.length-1].charAt(0)).toUpperCase();
     }
-
     function getAvatarClass(seed) {
         if (!seed) return '';
         const hash = String(seed).split('').reduce((a,c) => a + c.charCodeAt(0), 0);
@@ -1787,14 +2154,11 @@
         const whatsappContainer = document.getElementById('whatsappFieldContainer');
         const deptLabel = document.getElementById('deptLabel');
         const passwordField = document.getElementById('passwordField');
-
         deptContainer.style.display = 'none';
         multiDeptContainer.style.display = 'none';
         whatsappContainer.style.display = 'none';
-
         const isEdit = document.getElementById('editUserId').value !== '';
         passwordField.style.display = isEdit ? 'none' : 'block';
-
         if (role === 'requester') {
             deptContainer.style.display = 'block';
             deptLabel.textContent = 'Department (for requester)';
@@ -1805,9 +2169,6 @@
     }
     window.toggleRoleFields = toggleRoleFields;
 
-    // ============================================================
-    // SKELETON LOADER
-    // ============================================================
     function renderSkeleton() {
         let html = '';
         for (let i = 0; i < 6; i++) {
@@ -1935,7 +2296,6 @@
         const totalRequests = allRequests.length;
         const totalJobcards = allJobCards.length;
         const myRequests = getMyRequests();
-
         const pendingReqs = allRequests.filter(r => r.jobStatus === 'Pending' || r.jobStatus === 'No Job').length;
         const completedReqs = allRequests.filter(r => r.jobStatus === 'Completed').length;
         const writtenOffReqs = allRequests.filter(r => r.jobStatus === 'Written Off').length;
@@ -1943,33 +2303,34 @@
         let kpiHtml = '';
         if (isAdmin) {
             kpiHtml = `
-                <div class="kpi-card total" onclick="switchView('requests')"><div class="kpi-icon"><i class="fas fa-list"></i></div><div class="kpi-body"><div class="kpi-value">${totalRequests}</div><div class="kpi-label">All Requests</div></div></div>
-                <div class="kpi-card jobcards" onclick="switchView('jobcards')"><div class="kpi-icon"><i class="fas fa-tools"></i></div><div class="kpi-body"><div class="kpi-value">${totalJobcards}</div><div class="kpi-label">All Jobcards</div></div></div>
-                <div class="kpi-card pending" onclick="applyFilter('pending')"><div class="kpi-icon"><i class="fas fa-clock"></i></div><div class="kpi-body"><div class="kpi-value">${pendingReqs}</div><div class="kpi-label">Pending</div></div></div>
-                <div class="kpi-card completed" onclick="applyFilter('completed')"><div class="kpi-icon"><i class="fas fa-check-circle"></i></div><div class="kpi-body"><div class="kpi-value">${completedReqs}</div><div class="kpi-label">Completed</div></div></div>
-                <div class="kpi-card writtenoff" onclick="applyFilter('writtenoff')"><div class="kpi-icon"><i class="fas fa-times-circle"></i></div><div class="kpi-body"><div class="kpi-value">${writtenOffReqs}</div><div class="kpi-label">Written Off</div></div></div>
-                <div class="kpi-card users" onclick="openUserModal()"><div class="kpi-icon"><i class="fas fa-users"></i></div><div class="kpi-body"><div class="kpi-value">${allUsers.length}</div><div class="kpi-label">Users</div></div></div>
-                <div class="kpi-card pending" onclick="showPendingUsers()"><div class="kpi-icon"><i class="fas fa-user-clock"></i></div><div class="kpi-body"><div class="kpi-value">${pendingApprovalCount}</div><div class="kpi-label">Approvals</div></div></div>
+                <div class="kpi-card total" onclick="switchView('requests')"><div class="kpi-icon"><i class="fas fa-list"></i></div><div class="kpi-body"><div class="kpi-value" data-target="${totalRequests}">0</div><div class="kpi-label">All Requests</div></div></div>
+                <div class="kpi-card jobcards" onclick="switchView('jobcards')"><div class="kpi-icon"><i class="fas fa-tools"></i></div><div class="kpi-body"><div class="kpi-value" data-target="${totalJobcards}">0</div><div class="kpi-label">All Jobcards</div></div></div>
+                <div class="kpi-card pending" onclick="applyFilter('pending')"><div class="kpi-icon"><i class="fas fa-clock"></i></div><div class="kpi-body"><div class="kpi-value" data-target="${pendingReqs}">0</div><div class="kpi-label">Pending</div></div></div>
+                <div class="kpi-card completed" onclick="applyFilter('completed')"><div class="kpi-icon"><i class="fas fa-check-circle"></i></div><div class="kpi-body"><div class="kpi-value" data-target="${completedReqs}">0</div><div class="kpi-label">Completed</div></div></div>
+                <div class="kpi-card writtenoff" onclick="applyFilter('writtenoff')"><div class="kpi-icon"><i class="fas fa-times-circle"></i></div><div class="kpi-body"><div class="kpi-value" data-target="${writtenOffReqs}">0</div><div class="kpi-label">Written Off</div></div></div>
+                <div class="kpi-card users" onclick="openUserModal()"><div class="kpi-icon"><i class="fas fa-users"></i></div><div class="kpi-body"><div class="kpi-value" data-target="${allUsers.length}">0</div><div class="kpi-label">Users</div></div></div>
+                <div class="kpi-card pending" onclick="showPendingUsers()"><div class="kpi-icon"><i class="fas fa-user-clock"></i></div><div class="kpi-body"><div class="kpi-value" data-target="${pendingApprovalCount}">0</div><div class="kpi-label">Approvals</div></div></div>
             `;
         } else if (isMaintenance) {
             const newReqs = allRequests.filter(r => r.jobStatus === 'No Job').length;
             kpiHtml = `
-                <div class="kpi-card total" onclick="switchView('requests')"><div class="kpi-icon"><i class="fas fa-list"></i></div><div class="kpi-body"><div class="kpi-value">${totalRequests}</div><div class="kpi-label">Dept. Requests</div></div></div>
-                <div class="kpi-card jobcards" onclick="switchView('jobcards')"><div class="kpi-icon"><i class="fas fa-tools"></i></div><div class="kpi-body"><div class="kpi-value">${totalJobcards}</div><div class="kpi-label">My Jobcards</div></div></div>
-                <div class="kpi-card new" onclick="applyFilter('new')"><div class="kpi-icon"><i class="fas fa-plus-circle"></i></div><div class="kpi-body"><div class="kpi-value">${newReqs}</div><div class="kpi-label">New</div></div></div>
-                <div class="kpi-card pending" onclick="applyFilter('pending')"><div class="kpi-icon"><i class="fas fa-clock"></i></div><div class="kpi-body"><div class="kpi-value">${pendingReqs}</div><div class="kpi-label">Pending</div></div></div>
-                <div class="kpi-card completed" onclick="applyFilter('completed')"><div class="kpi-icon"><i class="fas fa-check-circle"></i></div><div class="kpi-body"><div class="kpi-value">${completedReqs}</div><div class="kpi-label">Completed</div></div></div>
+                <div class="kpi-card total" onclick="switchView('requests')"><div class="kpi-icon"><i class="fas fa-list"></i></div><div class="kpi-body"><div class="kpi-value" data-target="${totalRequests}">0</div><div class="kpi-label">Dept. Requests</div></div></div>
+                <div class="kpi-card jobcards" onclick="switchView('jobcards')"><div class="kpi-icon"><i class="fas fa-tools"></i></div><div class="kpi-body"><div class="kpi-value" data-target="${totalJobcards}">0</div><div class="kpi-label">My Jobcards</div></div></div>
+                <div class="kpi-card new" onclick="applyFilter('new')"><div class="kpi-icon"><i class="fas fa-plus-circle"></i></div><div class="kpi-body"><div class="kpi-value" data-target="${newReqs}">0</div><div class="kpi-label">New</div></div></div>
+                <div class="kpi-card pending" onclick="applyFilter('pending')"><div class="kpi-icon"><i class="fas fa-clock"></i></div><div class="kpi-body"><div class="kpi-value" data-target="${pendingReqs}">0</div><div class="kpi-label">Pending</div></div></div>
+                <div class="kpi-card completed" onclick="applyFilter('completed')"><div class="kpi-icon"><i class="fas fa-check-circle"></i></div><div class="kpi-body"><div class="kpi-value" data-target="${completedReqs}">0</div><div class="kpi-label">Completed</div></div></div>
             `;
         } else {
             kpiHtml = `
-                <div class="kpi-card myrequests" onclick="switchView('requests')"><div class="kpi-icon"><i class="fas fa-file-alt"></i></div><div class="kpi-body"><div class="kpi-value">${myRequests.length}</div><div class="kpi-label">My Requests</div></div></div>
-                <div class="kpi-card jobcards" onclick="switchView('jobcards')"><div class="kpi-icon"><i class="fas fa-tools"></i></div><div class="kpi-body"><div class="kpi-value">${totalJobcards}</div><div class="kpi-label">Dept. Jobcards</div></div></div>
-                <div class="kpi-card pending" onclick="applyFilter('pending')"><div class="kpi-icon"><i class="fas fa-clock"></i></div><div class="kpi-body"><div class="kpi-value">${myRequests.filter(r => r.jobStatus === 'Pending' || r.jobStatus === 'No Job').length}</div><div class="kpi-label">Pending</div></div></div>
-                <div class="kpi-card completed" onclick="applyFilter('completed')"><div class="kpi-icon"><i class="fas fa-check-circle"></i></div><div class="kpi-body"><div class="kpi-value">${myRequests.filter(r => r.jobStatus === 'Completed').length}</div><div class="kpi-label">Completed</div></div></div>
-                <div class="kpi-card writtenoff" onclick="applyFilter('writtenoff')"><div class="kpi-icon"><i class="fas fa-times-circle"></i></div><div class="kpi-body"><div class="kpi-value">${myRequests.filter(r => r.jobStatus === 'Written Off').length}</div><div class="kpi-label">Written Off</div></div></div>
+                <div class="kpi-card myrequests" onclick="switchView('requests')"><div class="kpi-icon"><i class="fas fa-file-alt"></i></div><div class="kpi-body"><div class="kpi-value" data-target="${myRequests.length}">0</div><div class="kpi-label">My Requests</div></div></div>
+                <div class="kpi-card jobcards" onclick="switchView('jobcards')"><div class="kpi-icon"><i class="fas fa-tools"></i></div><div class="kpi-body"><div class="kpi-value" data-target="${totalJobcards}">0</div><div class="kpi-label">Dept. Jobcards</div></div></div>
+                <div class="kpi-card pending" onclick="applyFilter('pending')"><div class="kpi-icon"><i class="fas fa-clock"></i></div><div class="kpi-body"><div class="kpi-value" data-target="${myRequests.filter(r => r.jobStatus === 'Pending' || r.jobStatus === 'No Job').length}">0</div><div class="kpi-label">Pending</div></div></div>
+                <div class="kpi-card completed" onclick="applyFilter('completed')"><div class="kpi-icon"><i class="fas fa-check-circle"></i></div><div class="kpi-body"><div class="kpi-value" data-target="${myRequests.filter(r => r.jobStatus === 'Completed').length}">0</div><div class="kpi-label">Completed</div></div></div>
+                <div class="kpi-card writtenoff" onclick="applyFilter('writtenoff')"><div class="kpi-icon"><i class="fas fa-times-circle"></i></div><div class="kpi-body"><div class="kpi-value" data-target="${myRequests.filter(r => r.jobStatus === 'Written Off').length}">0</div><div class="kpi-label">Written Off</div></div></div>
             `;
         }
         statsContainer.innerHTML = kpiHtml;
+        animateKPIs();
 
         document.getElementById('navReqCount').textContent = allRequests.length;
         document.getElementById('navJobCount').textContent = allJobCards.length;
@@ -1989,21 +2350,20 @@
         const isAdmin = userRole === 'admin';
         const isMaintenance = userRole === 'maintenance';
         const isRequester = userRole === 'requester';
-
         let html = '';
         if (isRequester) {
-            html = `<button class="btn btn-primary btn-sm" onclick="window.location.href='request.html'"><i class="fas fa-plus"></i> <span>New Request</span></button>`;
+            html = `<button class="btn btn-primary btn-sm" onclick="navigateTo('request.html')" data-tooltip="New Request"><i class="fas fa-plus"></i> <span>New Request</span></button>`;
         } else if (isMaintenance) {
             html = `
-                <button class="btn btn-success btn-sm" onclick="window.location.href='jobcard.html'"><i class="fas fa-tools"></i> <span>Create Job</span></button>
-                <button class="btn btn-outline btn-sm" onclick="window.location.href='analytics.html'"><i class="fas fa-chart-bar"></i> <span>Analytics</span></button>
+                <button class="btn btn-success btn-sm" onclick="navigateTo('jobcard.html')" data-tooltip="Create Job"><i class="fas fa-tools"></i> <span>Create Job</span></button>
+                <button class="btn btn-outline btn-sm" onclick="navigateTo('analytics.html')" data-tooltip="Analytics"><i class="fas fa-chart-bar"></i> <span>Analytics</span></button>
             `;
         } else if (isAdmin) {
             html = `
-                <button class="btn btn-primary btn-sm" onclick="window.location.href='request.html'"><i class="fas fa-plus"></i> <span>Request</span></button>
-                <button class="btn btn-success btn-sm" onclick="window.location.href='jobcard.html'"><i class="fas fa-tools"></i> <span>Job Card</span></button>
-                <button class="btn btn-outline btn-sm" onclick="openUserModal()"><i class="fas fa-users-cog"></i> <span>Users</span></button>
-                <button class="btn btn-outline btn-sm" onclick="refreshData()" title="Refresh"><i class="fas fa-sync-alt"></i></button>
+                <button class="btn btn-primary btn-sm" onclick="navigateTo('request.html')" data-tooltip="New Request"><i class="fas fa-plus"></i> <span>Request</span></button>
+                <button class="btn btn-success btn-sm" onclick="navigateTo('jobcard.html')" data-tooltip="Create Job Card"><i class="fas fa-tools"></i> <span>Job Card</span></button>
+                <button class="btn btn-outline btn-sm" onclick="openUserModal()" data-tooltip="Manage Users"><i class="fas fa-users-cog"></i> <span>Users</span></button>
+                <button class="btn btn-outline btn-sm" onclick="refreshData()" data-tooltip="Refresh (R)"><i class="fas fa-sync-alt"></i></button>
             `;
         }
         topbarActions.innerHTML = html;
@@ -2033,64 +2393,32 @@
     };
 
     function buildFilterBar() {
-        const isAdmin = userRole === 'admin';
-        const isMaintenance = userRole === 'maintenance';
-
-        let filterHtml = '';
-        if (currentView === 'requests') {
-            if (isAdmin || isMaintenance) {
-                filterHtml = `
-                    <div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchFilter" placeholder="Search requests…" oninput="applyFilters()" /></div>
-                `;
-            } else {
-                filterHtml = `<div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchFilter" placeholder="Search requests…" oninput="applyFilters()" /></div>`;
-            }
-        } else {
-            filterHtml = `<div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchFilter" placeholder="Search jobcards…" oninput="applyFilters()" /></div>`;
-        }
-        filterBar.innerHTML = filterHtml;
+        filterBar.innerHTML = `<div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchFilter" placeholder="Search…" oninput="applyFilters()" /></div>`;
     }
 
     function buildFilterChips() {
-        const isAdmin = userRole === 'admin';
-        const isMaintenance = userRole === 'maintenance';
-
         let chips = [];
         if (currentView === 'requests') {
             const source = userRole === 'requester' ? getMyRequests() : allRequests;
-            const newCount = source.filter(r => r.jobStatus === 'No Job' && r.received !== true).length;
-            const pendingCount = source.filter(r => r.jobStatus === 'Pending').length;
-            const receivedCount = source.filter(r => r.received === true).length;
-            const completedCount = source.filter(r => r.jobStatus === 'Completed').length;
-            const writtenOffCount = source.filter(r => r.jobStatus === 'Written Off').length;
-
             chips = [
                 { key:'all', label:'All', count:source.length },
-                { key:'new', label:'New', count:newCount },
-                { key:'pending', label:'Pending', count:pendingCount },
-                { key:'received', label:'Received', count:receivedCount },
-                { key:'completed', label:'Completed', count:completedCount },
-                { key:'writtenoff', label:'Written Off', count:writtenOffCount }
+                { key:'new', label:'New', count:source.filter(r => r.jobStatus === 'No Job' && r.received !== true).length },
+                { key:'pending', label:'Pending', count:source.filter(r => r.jobStatus === 'Pending').length },
+                { key:'received', label:'Received', count:source.filter(r => r.received === true).length },
+                { key:'completed', label:'Completed', count:source.filter(r => r.jobStatus === 'Completed').length },
+                { key:'writtenoff', label:'Written Off', count:source.filter(r => r.jobStatus === 'Written Off').length }
             ];
         } else {
             const source = allJobCards;
-            const pendingCount = source.filter(j => (j.status||'Pending') === 'Pending').length;
-            const completedCount = source.filter(j => j.status === 'Completed').length;
-            const writtenOffCount = source.filter(j => j.status === 'Written Off').length;
-            const postponedCount = source.filter(j => j.status === 'Postponed').length;
-
             chips = [
                 { key:'all', label:'All', count:source.length },
-                { key:'pending', label:'Pending', count:pendingCount },
-                { key:'completed', label:'Completed', count:completedCount },
-                { key:'writtenoff', label:'Written Off', count:writtenOffCount },
-                { key:'postponed', label:'Postponed', count:postponedCount }
+                { key:'pending', label:'Pending', count:source.filter(j => (j.status||'Pending') === 'Pending').length },
+                { key:'completed', label:'Completed', count:source.filter(j => j.status === 'Completed').length },
+                { key:'writtenoff', label:'Written Off', count:source.filter(j => j.status === 'Written Off').length },
+                { key:'postponed', label:'Postponed', count:source.filter(j => j.status === 'Postponed').length }
             ];
         }
-
-        // Remove zero-count chips except 'all'
         chips = chips.filter(c => c.key === 'all' || c.count > 0);
-
         filterChips.innerHTML = chips.map(c => `
             <button class="filter-chip ${currentStatusFilter === c.key ? 'active' : ''}" onclick="setChipFilter('${c.key}')">
                 ${c.label}
@@ -2116,9 +2444,11 @@
         if (currentView === 'requests') {
             pageTitleText.textContent = isRequester ? 'My Requests' : 'All Requests';
             pageTitleSub.textContent = 'Manage all service requests';
+            breadcrumbCurrent.textContent = 'Requests';
         } else {
             pageTitleText.textContent = isRequester ? 'Department Jobcards' : 'All Jobcards';
             pageTitleSub.textContent = 'Track and complete job cards';
+            breadcrumbCurrent.textContent = 'Jobcards';
         }
     }
 
@@ -2126,9 +2456,9 @@
         const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
         const gridColor = isDark ? 'rgba(255,255,255,0.06)' : '#f1f5f9';
         const tickColor = isDark ? '#94a3b8' : '#94a3b8';
+        const borderBg = isDark ? '#131c30' : '#fff';
 
         let requestsForCharts = userRole === 'requester' ? getMyRequests() : allRequests;
-
         const statusCounts = { 'Pending':0, 'Completed':0, 'Written Off':0, 'Postponed':0, 'No Job':0, 'Received':0 };
         requestsForCharts.forEach(r => {
             let s = r.jobStatus || 'No Job';
@@ -2143,12 +2473,10 @@
         if (statusChartInstance) statusChartInstance.destroy();
         statusChartInstance = new Chart(ctx1, {
             type:'doughnut',
-            data:{ labels, datasets:[{ data, backgroundColor:colors, borderWidth:2, borderColor: isDark ? '#131c30' : '#fff' }] },
+            data:{ labels, datasets:[{ data, backgroundColor:colors, borderWidth:2, borderColor:borderBg }] },
             options:{
-                responsive:true,
-                maintainAspectRatio:false,
-                cutout:'62%',
-                animation:{ animateRotate:true, animateScale:true, duration:800 },
+                responsive:true, maintainAspectRatio:false, cutout:'62%',
+                animation:{ animateRotate:true, animateScale:true, duration:900, easing:'easeOutQuart' },
                 plugins:{ legend:{ position:'bottom', labels:{ boxWidth:9, padding:10, font:{ size:10, family:'Plus Jakarta Sans', weight:'600' }, color: isDark ? '#cbd5e1' : '#475569' } } }
             }
         });
@@ -2165,11 +2493,10 @@
         if (trendChartInstance) trendChartInstance.destroy();
         trendChartInstance = new Chart(ctx2, {
             type:'line',
-            data:{ labels:sortedMonths, datasets:[{ label:'Requests', data:trendData, borderColor:'#C8102E', backgroundColor:'rgba(200,16,46,0.08)', fill:true, tension:0.4, pointBackgroundColor:'#C8102E', pointBorderColor: isDark ? '#131c30' : '#fff', pointBorderWidth:2, pointRadius:4 }] },
+            data:{ labels:sortedMonths, datasets:[{ label:'Requests', data:trendData, borderColor:'#C8102E', backgroundColor:'rgba(200,16,46,0.08)', fill:true, tension:0.4, pointBackgroundColor:'#C8102E', pointBorderColor:borderBg, pointBorderWidth:2, pointRadius:4 }] },
             options:{
-                responsive:true,
-                maintainAspectRatio:false,
-                animation:{ duration:900, easing:'easeOutQuart' },
+                responsive:true, maintainAspectRatio:false,
+                animation:{ duration:1000, easing:'easeOutQuart' },
                 plugins:{ legend:{ display:false } },
                 scales:{
                     y:{ beginAtZero:true, ticks:{ stepSize:1, font:{ size:10 }, color:tickColor }, grid:{ color:gridColor, drawBorder:false } },
@@ -2179,25 +2506,14 @@
         });
     }
 
-    // Re-render charts when theme changes
-    themeToggle.addEventListener('click', () => {
-        setTimeout(() => { if (currentUser) renderCharts(); }, 50);
-    });
-
     window.applyFilters = function() {
         const searchFilter = document.getElementById('searchFilter')?.value?.toLowerCase() || '';
-
-        let data = [];
-        let isRequests = (currentView === 'requests');
-        if (isRequests) {
-            data = userRole === 'requester' ? getMyRequests() : allRequests;
-        } else data = allJobCards;
+        let data = currentView === 'requests' ? (userRole === 'requester' ? getMyRequests() : allRequests) : allJobCards;
 
         if (currentStatusFilter !== 'all') {
-            if (isRequests) {
+            if (currentView === 'requests') {
                 if (currentStatusFilter === 'new') data = data.filter(i => i.jobStatus === 'No Job' && i.received !== true);
                 else if (currentStatusFilter === 'received') data = data.filter(i => i.received === true);
-                else if (currentStatusFilter === 'pending-receiving') data = data.filter(i => (i.received !== true) && (i.jobStatus === 'No Job' || i.jobStatus === 'Pending'));
                 else data = data.filter(i => i.jobStatus && i.jobStatus.toLowerCase() === currentStatusFilter);
             } else {
                 data = data.filter(i => {
@@ -2209,30 +2525,23 @@
         }
 
         if (searchFilter) {
-            if (isRequests) data = data.filter(i => i.requestNo?.toLowerCase().includes(searchFilter) || i.equipName?.toLowerCase().includes(searchFilter) || i.requesterName?.toLowerCase().includes(searchFilter));
+            if (currentView === 'requests') data = data.filter(i => i.requestNo?.toLowerCase().includes(searchFilter) || i.equipName?.toLowerCase().includes(searchFilter) || i.requesterName?.toLowerCase().includes(searchFilter));
             else data = data.filter(i => i.jobNo?.toLowerCase().includes(searchFilter) || i.equipName?.toLowerCase().includes(searchFilter) || i.techName?.toLowerCase().includes(searchFilter));
         }
 
         renderTable(data);
     };
 
-    // ============================================================
-    // SORTABLE TABLE
-    // ============================================================
     window.sortTable = function(column) {
-        if (currentSort.column === column) {
-            currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
-        } else {
-            currentSort.column = column;
-            currentSort.direction = 'asc';
-        }
+        if (currentSort.column === column) currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+        else { currentSort.column = column; currentSort.direction = 'asc'; }
         applyFilters();
     };
 
     function sortData(data) {
         const { column, direction } = currentSort;
         if (!column) return data;
-        const sorted = [...data].sort((a, b) => {
+        return [...data].sort((a, b) => {
             let av = a[column] || '';
             let bv = b[column] || '';
             if (typeof av === 'string') av = av.toLowerCase();
@@ -2241,7 +2550,6 @@
             if (av > bv) return direction === 'asc' ? 1 : -1;
             return 0;
         });
-        return sorted;
     }
 
     function renderTable(data) {
@@ -2252,7 +2560,7 @@
                     <i class="fas fa-inbox"></i>
                     <h3>No records yet</h3>
                     <p>${isRequester ? 'Submit your first request to get started.' : 'Records will appear here once submitted.'}</p>
-                    ${isRequester ? `<button class="btn btn-primary" onclick="window.location.href='request.html'"><i class="fas fa-plus"></i> Create First Request</button>` : ''}
+                    ${isRequester ? `<button class="btn btn-primary" onclick="navigateTo('request.html')"><i class="fas fa-plus"></i> Create First Request</button>` : ''}
                 </div>
             `;
             return;
@@ -2281,38 +2589,22 @@
             const status = r.jobStatus || 'No Job';
             const statusClass = getStatusClass(status);
             const isReceived = r.received === true;
-            const receiveBadge = isReceived
-                ? '<span class="status-badge received">Received</span>'
-                : '<span class="status-badge pending">Pending</span>';
+            const receiveBadge = isReceived ? '<span class="status-badge received">Received</span>' : '<span class="status-badge pending">Pending</span>';
             const canReceive = (userRole === 'admin' || userRole === 'maintenance') && !isReceived && (status === 'No Job' || status === 'Pending');
             const initials = getInitials(r.requesterName);
             const avatarClass = getAvatarClass(r.requesterName);
-
             const actions = `
                 <div class="row-actions">
-                    <button class="btn btn-info btn-icon btn-sm" onclick="downloadRequestPDF('${r.id}')" title="Download PDF"><i class="fas fa-file-pdf"></i></button>
-                    ${canReceive ? `<button class="btn btn-success btn-icon btn-sm receive-btn" data-id="${r.id}" title="Mark as Received"><i class="fas fa-check-double"></i></button>` : ''}
-                    ${(userRole === 'maintenance' || userRole === 'admin') && status === 'No Job' ? `<button class="btn btn-warning btn-icon btn-sm" onclick="createJob('${r.requestNo}')" title="Create Job Card"><i class="fas fa-tools"></i></button>` : ''}
+                    <button class="btn btn-info btn-icon btn-sm" onclick="downloadRequestPDF('${r.id}')" data-tooltip="Download PDF"><i class="fas fa-file-pdf"></i></button>
+                    ${canReceive ? `<button class="btn btn-success btn-icon btn-sm receive-btn" data-id="${r.id}" data-tooltip="Mark as Received"><i class="fas fa-check-double"></i></button>` : ''}
+                    ${(userRole === 'maintenance' || userRole === 'admin') && status === 'No Job' ? `<button class="btn btn-warning btn-icon btn-sm" onclick="createJob('${r.requestNo}')" data-tooltip="Create Job Card"><i class="fas fa-tools"></i></button>` : ''}
                 </div>
             `;
-
             html += `<tr>
                 <td><strong>${r.requestNo}</strong></td>
-                <td>
-                    <div class="cell-with-avatar">
-                        <div class="row-avatar ${avatarClass}">${initials}</div>
-                        <div class="row-name">
-                            <span class="primary">${r.requesterName || 'N/A'}</span>
-                        </div>
-                    </div>
-                </td>
+                <td><div class="cell-with-avatar"><div class="row-avatar ${avatarClass}">${initials}</div><div class="row-name"><span class="primary">${r.requesterName || 'N/A'}</span></div></div></td>
                 <td>${r.unit || 'N/A'}</td>
-                <td>
-                    <div class="row-name">
-                        <span class="primary">${r.equipName || 'N/A'}</span>
-                        ${r.serial ? `<span class="secondary">SN: ${r.serial}</span>` : ''}
-                    </div>
-                </td>
+                <td><div class="row-name"><span class="primary">${r.equipName || 'N/A'}</span>${r.serial ? `<span class="secondary">SN: ${r.serial}</span>` : ''}</div></td>
                 <td><span class="status-badge ${statusClass}">${status}</span></td>
                 <td>${receiveBadge}</td>
                 <td>${actions}</td>
@@ -2320,7 +2612,6 @@
         });
         html += '</tbody></table>';
         tableBody.innerHTML = html;
-
         document.querySelectorAll('.receive-btn').forEach(btn => {
             btn.addEventListener('click', function() { const id = this.dataset.id; if (id) markAsReceived(id); });
         });
@@ -2358,32 +2649,20 @@
             const canEdit = isEditable && (userRole === 'admin' || userRole === 'maintenance');
             const initials = getInitials(j.techName);
             const avatarClass = getAvatarClass(j.techName);
-
             const actions = `
                 <div class="row-actions">
-                    <button class="btn btn-info btn-icon btn-sm" onclick="downloadJobcardPDF('${j.id}')" title="Download PDF"><i class="fas fa-file-pdf"></i></button>
-                    ${canEdit ? `<button class="btn btn-primary btn-icon btn-sm" onclick="editJobCard('${j.id}')" title="Edit Job Card"><i class="fas fa-edit"></i></button>` : ''}
-                    ${(!isEditable && (userRole === 'admin' || userRole === 'maintenance')) ? `<span style="font-size:10px; color:var(--text-muted); padding:5px 8px; background:var(--border-soft); border-radius:6px;"><i class="fas fa-lock"></i></span>` : ''}
+                    <button class="btn btn-info btn-icon btn-sm" onclick="downloadJobcardPDF('${j.id}')" data-tooltip="Download PDF"><i class="fas fa-file-pdf"></i></button>
+                    ${canEdit ? `<button class="btn btn-primary btn-icon btn-sm" onclick="editJobCard('${j.id}')" data-tooltip="Edit Job Card"><i class="fas fa-edit"></i></button>` : ''}
+                    ${(!isEditable && (userRole === 'admin' || userRole === 'maintenance')) ? `<span style="font-size:10px; color:var(--text-muted); padding:5px 8px; background:var(--border-soft); border-radius:6px;" data-tooltip="Locked"><i class="fas fa-lock"></i></span>` : ''}
                 </div>
             `;
-
             html += `<tr>
                 <td><strong>${j.jobNo || 'N/A'}</strong></td>
                 <td>${j.requestNo || 'N/A'}</td>
-                <td>
-                    <div class="row-name">
-                        <span class="primary">${j.equipName || 'N/A'}</span>
-                        ${j.serial ? `<span class="secondary">SN: ${j.serial}</span>` : ''}
-                    </div>
-                </td>
+                <td><div class="row-name"><span class="primary">${j.equipName || 'N/A'}</span>${j.serial ? `<span class="secondary">SN: ${j.serial}</span>` : ''}</div></td>
                 <td>${j.unit || 'N/A'}</td>
                 <td><span class="status-badge ${statusClass}">${status}</span></td>
-                <td>
-                    <div class="cell-with-avatar">
-                        <div class="row-avatar ${avatarClass}">${initials}</div>
-                        <div class="row-name"><span class="primary">${j.techName || 'N/A'}</span></div>
-                    </div>
-                </td>
+                <td><div class="cell-with-avatar"><div class="row-avatar ${avatarClass}">${initials}</div><div class="row-name"><span class="primary">${j.techName || 'N/A'}</span></div></div></td>
                 <td>${actions}</td>
             </tr>`;
         });
@@ -2392,7 +2671,7 @@
     }
 
     // ============================================================
-    // PDF GENERATION
+    // PDF FUNCTIONS (unchanged logic)
     // ============================================================
     function signatureToDataURL(signatureData, width = 250, height = 70) {
         if (!signatureData || !Array.isArray(signatureData) || signatureData.length === 0) return null;
@@ -2429,17 +2708,7 @@
     }
 
     function getHeaderHTML() {
-        return `
-            <div style="display:flex;align-items:center;gap:12px;border-bottom:3px solid #C8102E;padding-bottom:8px;margin-bottom:12px;">
-                <div style="background:#C8102E;color:white;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;">M</div>
-                <div style="flex:1;">
-                    <h1 style="font-size:18px;color:#C8102E;font-weight:700;margin:0;">MOI VOI COUNTY REFERRAL HOSPITAL</h1>
-                    <div style="font-size:10px;color:#333;">P.O. BOX 18-80300 VOI | biomedsmoivoi@gmail.com</div>
-                    <div style="font-size:11px;font-weight:700;color:#C8102E;">TAITA TAVETA COUNTY</div>
-                    <div style="font-size:9px;font-weight:600;color:#C8102E;">DEPARTMENT OF HEALTH SERVICES</div>
-                </div>
-            </div>
-        `;
+        return `<div style="display:flex;align-items:center;gap:12px;border-bottom:3px solid #C8102E;padding-bottom:8px;margin-bottom:12px;"><div style="background:#C8102E;color:white;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;">M</div><div style="flex:1;"><h1 style="font-size:18px;color:#C8102E;font-weight:700;margin:0;">MOI VOI COUNTY REFERRAL HOSPITAL</h1><div style="font-size:10px;color:#333;">P.O. BOX 18-80300 VOI | biomedsmoivoi@gmail.com</div><div style="font-size:11px;font-weight:700;color:#C8102E;">TAITA TAVETA COUNTY</div><div style="font-size:9px;font-weight:600;color:#C8102E;">DEPARTMENT OF HEALTH SERVICES</div></div></div>`;
     }
 
     window.downloadRequestPDF = async function(requestId) {
@@ -2453,28 +2722,23 @@
             temp.style.cssText = 'position:fixed;left:-9999px;top:0;width:800px;padding:15px 20px;background:white;font-family:Segoe UI,sans-serif;color:#1e2a3a;font-size:12px;';
             temp.innerHTML = `
                 ${getHeaderHTML()}
-                <div style="display:flex;justify-content:space-between;background:#f8f9fc;padding:4px 12px;border-radius:6px;margin-bottom:10px;">
-                    <h2 style="font-size:16px;font-weight:600;margin:0;">📋 SERVICE REQUEST FORM</h2>
-                    <span style="background:#28a745;color:white;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;">● OPEN</span>
-                </div>
+                <div style="background:#f8f9fc;padding:4px 12px;border-radius:6px;margin-bottom:10px;"><h2 style="font-size:16px;font-weight:600;margin:0;">📋 SERVICE REQUEST FORM</h2></div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;">
-                    <div><label style="font-size:9px;font-weight:600;color:#495057;text-transform:uppercase;">Request No.</label><div style="font-size:12px;">${req.requestNo || 'N/A'}</div></div>
-                    <div><label style="font-size:9px;font-weight:600;color:#495057;text-transform:uppercase;">Date</label><div style="font-size:12px;">${formatDateForPDF(req.dateTime)}</div></div>
-                    <div><label style="font-size:9px;font-weight:600;color:#495057;text-transform:uppercase;">Requester</label><div style="font-size:12px;">${req.requesterName || 'N/A'}</div></div>
-                    <div><label style="font-size:9px;font-weight:600;color:#495057;text-transform:uppercase;">Unit/Ward</label><div style="font-size:12px;">${req.unit || 'N/A'}</div></div>
-                    <div><label style="font-size:9px;font-weight:600;color:#495057;text-transform:uppercase;">Equipment Type</label><div style="font-size:12px;">${req.type || 'N/A'}</div></div>
-                    <div><label style="font-size:9px;font-weight:600;color:#495057;text-transform:uppercase;">Equipment Name</label><div style="font-size:12px;">${req.equipName || 'N/A'}</div></div>
-                    <div style="grid-column:1/-1;"><label style="font-size:9px;font-weight:600;color:#495057;text-transform:uppercase;">Complaint</label><div style="font-size:12px;">${req.complaint || 'N/A'}</div></div>
-                </div>
-            `;
+                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Request No.</label><div>${req.requestNo || 'N/A'}</div></div>
+                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Date</label><div>${formatDateForPDF(req.dateTime)}</div></div>
+                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Requester</label><div>${req.requesterName || 'N/A'}</div></div>
+                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Unit/Ward</label><div>${req.unit || 'N/A'}</div></div>
+                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Equipment Type</label><div>${req.type || 'N/A'}</div></div>
+                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Equipment Name</label><div>${req.equipName || 'N/A'}</div></div>
+                    <div style="grid-column:1/-1;"><label style="font-size:9px;font-weight:600;color:#495057;">Complaint</label><div>${req.complaint || 'N/A'}</div></div>
+                </div>`;
             document.body.appendChild(temp);
             const canvas = await html2canvas(temp, { scale:2, useCORS:true });
             document.body.removeChild(temp);
-            const img = canvas.toDataURL('image/png');
             const { jsPDF } = window.jspdf;
             const pdf = new jsPDF('p','mm','a4');
             const iw = 210, ih = (canvas.height * iw) / canvas.width;
-            pdf.addImage(img, 'PNG', 0, 0, iw, ih);
+            pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, iw, ih);
             pdf.save(`RequestSlip_${req.requestNo || 'export'}.pdf`);
             showToast('PDF downloaded successfully', 'success', 'Done');
         } catch (err) { showToast(err.message, 'error'); }
@@ -2492,70 +2756,41 @@
             let statusColor = '#ffc107';
             if (job.status === 'Completed') statusColor = '#28a745';
             else if (job.status === 'Written Off') statusColor = '#dc3545';
-
             const temp = document.createElement('div');
             temp.style.cssText = 'position:fixed;left:-9999px;top:0;width:800px;padding:12px 18px;background:white;font-family:Segoe UI,sans-serif;color:#1e2a3a;font-size:12px;';
             temp.innerHTML = `
                 ${getHeaderHTML()}
-                <div style="display:flex;justify-content:space-between;background:#f8f9fc;padding:4px 12px;border-radius:6px;margin-bottom:8px;">
-                    <h2 style="font-size:16px;font-weight:600;margin:0;">⚙️ JOB CARD</h2>
-                    <span style="background:${statusColor};color:${job.status === 'Pending' ? '#1e2a3a' : 'white'};padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;">● ${job.status || 'PENDING'}</span>
-                </div>
+                <div style="display:flex;justify-content:space-between;background:#f8f9fc;padding:4px 12px;border-radius:6px;margin-bottom:8px;"><h2 style="font-size:16px;font-weight:600;margin:0;">⚙️ JOB CARD</h2><span style="background:${statusColor};color:${job.status === 'Pending' ? '#1e2a3a' : 'white'};padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;">● ${job.status || 'PENDING'}</span></div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;">
-                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Job No.</label><div style="font-size:12px;">${job.jobNo || 'N/A'}</div></div>
-                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Request No.</label><div style="font-size:12px;">${job.requestNo || 'N/A'}</div></div>
-                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Reporting</label><div style="font-size:12px;">${formatDateForPDF(job.reportingDateTime)}</div></div>
-                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Unit/Ward</label><div style="font-size:12px;">${job.unit || 'N/A'}</div></div>
-                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Requester</label><div style="font-size:12px;">${job.requester || 'N/A'}</div></div>
-                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Equipment</label><div style="font-size:12px;">${job.equipName || 'N/A'}</div></div>
-                    <div style="grid-column:1/-1;"><label style="font-size:9px;font-weight:600;color:#495057;">Complaint</label><div style="font-size:12px;">${job.complaint || 'N/A'}</div></div>
-                    <div style="grid-column:1/-1;"><label style="font-size:9px;font-weight:600;color:#495057;">Diagnosis</label><div style="font-size:12px;">${job.diagnosis || 'N/A'}</div></div>
+                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Job No.</label><div>${job.jobNo || 'N/A'}</div></div>
+                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Request No.</label><div>${job.requestNo || 'N/A'}</div></div>
+                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Reporting</label><div>${formatDateForPDF(job.reportingDateTime)}</div></div>
+                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Unit/Ward</label><div>${job.unit || 'N/A'}</div></div>
+                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Requester</label><div>${job.requester || 'N/A'}</div></div>
+                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Equipment</label><div>${job.equipName || 'N/A'}</div></div>
+                    <div style="grid-column:1/-1;"><label style="font-size:9px;font-weight:600;color:#495057;">Complaint</label><div>${job.complaint || 'N/A'}</div></div>
+                    <div style="grid-column:1/-1;"><label style="font-size:9px;font-weight:600;color:#495057;">Diagnosis</label><div>${job.diagnosis || 'N/A'}</div></div>
                 </div>
                 <div style="border-top:1px solid #e9ecef;margin:8px 0 6px;"></div>
-                <h3 style="font-size:13px;font-weight:600;border-left:3px solid #C8102E;padding-left:8px;margin:4px 0;">Handover</h3>
-                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px 12px;">
-                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Received From</label><div style="font-size:12px;">${job.receivedFrom || 'N/A'}</div></div>
-                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Received At</label><div style="font-size:12px;">${formatDateForPDF(job.receivedDateTime)}</div></div>
-                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Received By</label><div style="font-size:12px;">${job.receivedBy || 'N/A'}</div></div>
-                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Handed To</label><div style="font-size:12px;">${job.handedTo || 'N/A'}</div></div>
-                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Handed At</label><div style="font-size:12px;">${formatDateForPDF(job.handedDateTime)}</div></div>
-                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Handed By</label><div style="font-size:12px;">${job.handedBy || 'N/A'}</div></div>
-                </div>
-                <div style="border-top:1px solid #e9ecef;margin:8px 0 6px;"></div>
-                <h3 style="font-size:13px;font-weight:600;border-left:3px solid #C8102E;padding-left:8px;margin:4px 0;">Service</h3>
-                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px 12px;">
-                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Service Type</label><div style="font-size:12px;">${job.serviceType || 'N/A'}</div></div>
-                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Started</label><div style="font-size:12px;">${formatDateForPDF(job.startDateTime)}</div></div>
-                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Completed</label><div style="font-size:12px;">${formatDateForPDF(job.endDateTime)}</div></div>
-                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Total</label><div style="font-size:12px;">${job.totalTime || 'N/A'}</div></div>
-                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Response</label><div style="font-size:12px;">${job.responseTime || 'N/A'}</div></div>
-                    <div><label style="font-size:9px;font-weight:600;color:#495057;">Admin</label><div style="font-size:12px;">${job.adminTime || 'N/A'}</div></div>
-                </div>
-                <div style="border-top:1px solid #e9ecef;margin:8px 0 6px;"></div>
-                <h3 style="font-size:13px;font-weight:600;border-left:3px solid #C8102E;padding-left:8px;margin:4px 0;">Signatures</h3>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px;">
                     <div style="border:1px solid #e9ecef;border-radius:6px;padding:8px 12px;background:#f8f9fa;">
                         <h4 style="font-size:12px;color:#C8102E;margin:0 0 4px;">👨‍🔧 Technician</h4>
-                        <div><label style="font-size:9px;font-weight:600;color:#495057;">Name</label><div style="font-size:12px;">${job.techName || 'N/A'}</div></div>
+                        <div><label style="font-size:9px;font-weight:600;color:#495057;">Name</label><div>${job.techName || 'N/A'}</div></div>
                         <div><label style="font-size:9px;font-weight:600;color:#495057;">Signature</label><div>${techSig ? `<img src="${techSig}" style="max-width:180px;max-height:60px;border:1px solid #ddd;" />` : 'Not signed'}</div></div>
-                        <div><label style="font-size:9px;font-weight:600;color:#495057;">Date</label><div style="font-size:12px;">${job.techDate || 'N/A'}</div></div>
                     </div>
                     <div style="border:1px solid #e9ecef;border-radius:6px;padding:8px 12px;background:#f8f9fa;">
                         <h4 style="font-size:12px;color:#C8102E;margin:0 0 4px;">✅ Supervisor</h4>
-                        <div><label style="font-size:9px;font-weight:600;color:#495057;">Name</label><div style="font-size:12px;">${job.certName || 'N/A'}</div></div>
+                        <div><label style="font-size:9px;font-weight:600;color:#495057;">Name</label><div>${job.certName || 'N/A'}</div></div>
                         <div><label style="font-size:9px;font-weight:600;color:#495057;">Signature</label><div>${certSig ? `<img src="${certSig}" style="max-width:180px;max-height:60px;border:1px solid #ddd;" />` : 'Not signed'}</div></div>
-                        <div><label style="font-size:9px;font-weight:600;color:#495057;">Date</label><div style="font-size:12px;">${job.certDate || 'N/A'}</div></div>
                     </div>
-                </div>
-            `;
+                </div>`;
             document.body.appendChild(temp);
             const canvas = await html2canvas(temp, { scale:2, useCORS:true });
             document.body.removeChild(temp);
-            const img = canvas.toDataURL('image/png');
             const { jsPDF } = window.jspdf;
             const pdf = new jsPDF('p','mm','a4');
             const iw = 210, ih = (canvas.height * iw) / canvas.width;
-            pdf.addImage(img, 'PNG', 0, 0, iw, ih);
+            pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, iw, ih);
             pdf.save(`JobCard_${job.jobNo || 'export'}.pdf`);
             showToast('PDF downloaded successfully', 'success', 'Done');
         } catch (err) { showToast(err.message, 'error'); }
@@ -2724,18 +2959,29 @@
         } catch (err) { showToast(err.message, 'error'); }
     };
 
+    // ---- UNDO INTEGRATION (Tier 2) ----
     window.deleteUser = function(userId) {
         const user = allUsers.find(u => u.id === userId);
         showConfirm({
             title: 'Delete this user?',
-            message: `Are you sure you want to permanently delete ${user?.name || 'this user'}? This action cannot be undone.`,
+            message: `Are you sure you want to permanently delete ${user?.name || 'this user'}?`,
             type: 'danger',
             okText: 'Delete User',
             onConfirm: async () => {
                 try {
+                    // Backup before delete for undo
+                    const backup = { ...user };
                     await deleteDoc(doc(db, USERS_COLL, userId));
-                    showToast(`${user?.name || 'User'} has been deleted`, 'success', 'Deleted');
                     await fetchData(); renderUserList(); renderDashboard();
+                    showToast(`${user?.name || 'User'} deleted`, 'success', 'Deleted', async () => {
+                        // UNDO: restore the user document
+                        try {
+                            const { id, ...data } = backup;
+                            await setDoc(doc(db, USERS_COLL, id), data);
+                            await fetchData(); renderUserList(); renderDashboard();
+                            showToast('User restored', 'info', 'Undone');
+                        } catch (err) { showToast('Undo failed: ' + err.message, 'error'); }
+                    });
                 } catch (err) { showToast(err.message, 'error'); }
             }
         });
@@ -2796,20 +3042,34 @@
     document.getElementById('approvalModal').addEventListener('click', function(e) { if (e.target === this) closeApprovalModal(); });
     document.getElementById('userModal').addEventListener('click', function(e) { if (e.target === this) closeUserModal(); });
 
-    window.createJob = (requestNo) => window.location.href = `jobcard.html?request=${requestNo}`;
+    window.createJob = (requestNo) => navigateTo(`jobcard.html?request=${requestNo}`);
     window.editJobCard = (id) => window.open(`jobcard.html?view=${id}`, '_blank');
 
     // ============================================================
     // KEYBOARD SHORTCUTS
     // ============================================================
     document.addEventListener('keydown', (e) => {
-        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
-        if (e.key === 'Escape') {
-            closeConfirm(); closeUserModal(); closeApprovalModal(); closeSidebar();
-        }
-        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        const tag = e.target.tagName;
+        const isTyping = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
+
+        // Ctrl+K or Cmd+K always opens palette
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
             e.preventDefault();
-            document.getElementById('searchFilter')?.focus();
+            openCommandPalette();
+            return;
+        }
+
+        if (isTyping) return;
+
+        if (e.key === 'Escape') {
+            closeConfirm(); closeUserModal(); closeApprovalModal();
+            closeSidebar(); closeCommandPalette(); closeShortcuts();
+        }
+        if (e.key === '?') { e.preventDefault(); openShortcuts(); }
+        if (e.key === '/') { e.preventDefault(); document.getElementById('searchFilter')?.focus(); }
+        if (e.key.toLowerCase() === 'r') { refreshData(); }
+        if (e.key.toLowerCase() === 'n') {
+            if (userRole === 'requester' || userRole === 'admin') navigateTo('request.html');
         }
     });
 
@@ -2830,11 +3090,9 @@
             }
             currentUser = { id: user.uid, ...data };
             userRole = currentUser.role || 'requester';
-
             document.getElementById('sidebarUserName').textContent = currentUser.name || 'User';
             document.getElementById('sidebarUserRole').textContent = userRole;
             document.getElementById('avatarInitial').textContent = getInitials(currentUser.name);
-
             renderSkeleton();
             await fetchData();
             renderDashboard();
