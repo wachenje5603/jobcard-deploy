@@ -246,6 +246,8 @@
         .btn-danger { background:linear-gradient(135deg,#ef4444,#dc2626); color:white; }
         .btn-warning { background:linear-gradient(135deg,#f59e0b,#fbbf24); color:#1e293b; }
         .btn-info { background:linear-gradient(135deg,#0ea5e9,#22d3ee); color:white; }
+        .btn-purple { background:linear-gradient(135deg,#8b5cf6,#6366f1); color:white; box-shadow:0 4px 12px rgba(139,92,246,0.3); }
+        .btn-purple:hover:not(:disabled) { transform:translateY(-1px); }
         .btn-sm { padding:6px 11px; font-size:11.5px; border-radius:8px; gap:5px; }
         .btn-icon { width:34px; height:34px; padding:0; justify-content:center; border-radius:8px; }
         .btn:disabled { opacity:0.6; cursor:not-allowed; transform:none !important; }
@@ -294,19 +296,35 @@
             box-shadow:var(--glass-shadow), var(--glass-highlight);
             margin-bottom:18px; overflow:hidden;
         }
-        .analytics-drawer-header { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; cursor:pointer; user-select:none; }
+        .analytics-drawer-header { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; cursor:pointer; user-select:none; gap:12px; }
         .analytics-drawer-header:hover { background:rgba(255,255,255,0.15); }
-        .analytics-drawer-title { font-size:13px; font-weight:700; display:flex; align-items:center; gap:9px; color:var(--text); }
+        .analytics-drawer-title { font-size:13px; font-weight:700; display:flex; align-items:center; gap:9px; color:var(--text); flex:1; min-width:0; }
         .analytics-drawer-title i { color:var(--primary); }
         .analytics-drawer-chevron { color:var(--text-muted); transition:transform var(--transition); font-size:12px; }
         .analytics-drawer.open .analytics-drawer-chevron { transform:rotate(180deg); }
         .analytics-drawer-body { max-height:0; overflow:hidden; transition:max-height 380ms cubic-bezier(0.4,0,0.2,1); border-top:1px solid var(--border); }
-        .analytics-drawer.open .analytics-drawer-body { max-height:400px; }
+        .analytics-drawer.open .analytics-drawer-body { max-height:800px; }
         .charts-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; padding:18px; }
         .chart-box { background:var(--card-alt); border-radius:var(--radius-sm); padding:14px; border:1px solid var(--border); }
         .chart-box h4 { font-size:12px; font-weight:700; margin-bottom:10px; color:var(--text); display:flex; align-items:center; gap:7px; }
         .chart-box h4::before { content:''; width:5px; height:5px; background:var(--primary); border-radius:50%; }
         .chart-box canvas { max-height:180px; width:100% !important; }
+        .ai-insights-section { padding:16px 18px; border-top:1px solid var(--border); display:none; }
+        .ai-insights-section.show { display:block; }
+        .ai-insights-section h5 { font-size:12px; font-weight:800; color:#8b5cf6; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+        .insight-card { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:12px 14px; margin-bottom:8px; border-left:3px solid #8b5cf6; display:flex; gap:10px; align-items:flex-start; }
+        .insight-card.critical { border-left-color:var(--danger); background:rgba(239,68,68,0.04); }
+        .insight-card.warning { border-left-color:var(--warning); background:rgba(245,158,11,0.04); }
+        .insight-card.info { border-left-color:var(--info); background:rgba(14,165,233,0.04); }
+        .insight-icon { width:24px; height:24px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:11px; flex-shrink:0; background:var(--purple-soft); color:var(--purple-text); }
+        .insight-card.critical .insight-icon { background:var(--danger-soft); color:var(--danger-text); }
+        .insight-card.warning .insight-icon { background:var(--warning-soft); color:var(--warning-text); }
+        .insight-card.info .insight-icon { background:var(--info-soft); color:var(--info-text); }
+        .insight-body { flex:1; min-width:0; }
+        .insight-title { font-size:12.5px; font-weight:700; color:var(--text); margin-bottom:2px; }
+        .insight-detail { font-size:11.5px; color:var(--text-soft); line-height:1.5; }
+        .insight-action { font-size:11px; color:var(--purple-text); font-weight:700; margin-top:4px; }
+        .insight-empty { padding:20px; text-align:center; color:var(--text-muted); font-size:12px; }
         .panel {
             background:var(--glass-bg); backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur);
             border-radius:var(--radius-lg); border:1px solid var(--glass-border);
@@ -647,6 +665,49 @@
         .mms-item .mms-arrow { color:var(--text-muted); font-size:11px; }
         .mms-item.logout i.mms-icon { background:var(--danger-soft); color:var(--danger); }
         .mms-item.logout:hover { background:var(--danger-soft); border-color:var(--danger); color:var(--danger); }
+        /* ============ AI WIDGET ============ */
+        .mcrh-ai-fab{position:fixed;right:20px;bottom:calc(84px + env(safe-area-inset-bottom,0px));width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#8b5cf6,#6366f1);color:#fff;border:none;cursor:pointer;z-index:900;font-size:22px;box-shadow:0 8px 24px rgba(99,102,241,.4),inset 0 1px 0 rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .2s}
+        .mcrh-ai-fab:hover{transform:scale(1.06);box-shadow:0 10px 30px rgba(99,102,241,.5)}
+        .mcrh-ai-fab:active{transform:scale(.94)}
+        .mcrh-ai-fab::after{content:'';position:absolute;top:4px;right:4px;width:10px;height:10px;background:#10b981;border:2px solid #fff;border-radius:50%}
+        @media(min-width:1025px){.mcrh-ai-fab{bottom:24px}}
+        .mcrh-ai-panel{position:fixed;right:20px;bottom:calc(84px + env(safe-area-inset-bottom,0px) + 70px);width:380px;max-width:calc(100vw - 40px);height:540px;max-height:calc(100vh - 200px);background:var(--glass-bg-strong);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:1px solid var(--glass-border);border-radius:18px;box-shadow:0 20px 60px rgba(15,23,42,.2);z-index:901;display:none;flex-direction:column;overflow:hidden;transform-origin:bottom right}
+        .mcrh-ai-panel.open{display:flex;animation:mcrhAiIn .28s cubic-bezier(.16,1,.3,1)}
+        @keyframes mcrhAiIn{from{opacity:0;transform:translateY(20px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+        @media(min-width:1025px){.mcrh-ai-panel{bottom:100px}}
+        @media(max-width:640px){.mcrh-ai-panel{right:0;left:0;bottom:0;width:100%;max-width:100%;height:85vh;max-height:85vh;border-radius:20px 20px 0 0;padding-bottom:env(safe-area-inset-bottom,0px)}.mcrh-ai-fab{display:none}}
+        .mcrh-ai-hdr{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,rgba(139,92,246,.08),rgba(99,102,241,.08))}
+        .mcrh-ai-hdr-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#8b5cf6,#6366f1);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+        .mcrh-ai-hdr-info{flex:1;min-width:0}
+        .mcrh-ai-hdr-info .t{font-size:14px;font-weight:800;color:var(--text)}
+        .mcrh-ai-hdr-info .s{font-size:11px;color:#10b981;font-weight:600;display:flex;align-items:center;gap:4px;margin-top:1px}
+        .mcrh-ai-hdr-info .s::before{content:'';width:6px;height:6px;border-radius:50%;background:#10b981;animation:mcrhPulse 2s ease infinite}
+        @keyframes mcrhPulse{0%,100%{opacity:1}50%{opacity:.4}}
+        .mcrh-ai-close{width:32px;height:32px;border-radius:8px;background:transparent;border:none;color:var(--text-muted);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+        .mcrh-ai-close:hover{background:var(--border-soft);color:var(--text)}
+        .mcrh-ai-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;background:var(--bg)}
+        .mcrh-ai-msg{max-width:85%;padding:10px 14px;border-radius:14px;font-size:13.5px;line-height:1.5;word-wrap:break-word;animation:mcrhMsgIn .22s cubic-bezier(.16,1,.3,1)}
+        @keyframes mcrhMsgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+        .mcrh-ai-msg.user{align-self:flex-end;background:linear-gradient(135deg,#C8102E,#e81a3f);color:#fff;border-bottom-right-radius:4px}
+        .mcrh-ai-msg.assistant{align-self:flex-start;background:var(--card);color:var(--text);border:1px solid var(--border);border-bottom-left-radius:4px;box-shadow:var(--shadow-sm)}
+        .mcrh-ai-msg.assistant code{background:var(--border-soft);padding:1px 6px;border-radius:4px;font-size:12px;font-family:'Courier New',monospace}
+        .mcrh-ai-msg.assistant strong{color:var(--text);font-weight:800}
+        .mcrh-ai-msg.assistant ul{padding-left:18px;margin:6px 0}
+        .mcrh-ai-msg.assistant li{margin-bottom:3px}
+        .mcrh-ai-msg.typing{display:flex;gap:4px;padding:14px}
+        .mcrh-ai-msg.typing span{width:7px;height:7px;border-radius:50%;background:var(--text-muted);animation:mcrhTyping 1.4s ease infinite}
+        .mcrh-ai-msg.typing span:nth-child(2){animation-delay:.2s}
+        .mcrh-ai-msg.typing span:nth-child(3){animation-delay:.4s}
+        @keyframes mcrhTyping{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-6px);opacity:1}}
+        .mcrh-ai-suggestions{padding:8px 16px 12px;display:flex;flex-wrap:wrap;gap:6px;background:var(--bg);border-top:1px solid var(--border)}
+        .mcrh-ai-suggestion{padding:6px 12px;border-radius:20px;background:var(--card);border:1px solid var(--border);font-size:11.5px;font-weight:600;color:var(--text-soft);cursor:pointer;font-family:inherit;transition:all .2s}
+        .mcrh-ai-suggestion:hover{border-color:#8b5cf6;color:#8b5cf6;background:var(--purple-soft)}
+        .mcrh-ai-inputwrap{padding:12px 16px;background:var(--card);border-top:1px solid var(--border);display:flex;gap:8px}
+        .mcrh-ai-input{flex:1;padding:11px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:13.5px;font-family:inherit;background:var(--bg);color:var(--text);outline:none;resize:none;max-height:100px;min-height:44px;transition:all .2s}
+        .mcrh-ai-input:focus{border-color:#8b5cf6;box-shadow:0 0 0 3px rgba(139,92,246,.1);background:var(--card)}
+        .mcrh-ai-send{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#8b5cf6,#6366f1);color:#fff;border:none;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+        .mcrh-ai-send:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 4px 12px rgba(139,92,246,.3)}
+        .mcrh-ai-send:disabled{opacity:.5;cursor:not-allowed}
         @media (max-width:1024px) {
             .sidebar { display:none !important; }
             .sidebar-backdrop { display:none !important; }
@@ -737,14 +798,8 @@
         ::-webkit-scrollbar { width:8px; height:8px; }
         ::-webkit-scrollbar-track { background:transparent; }
         ::-webkit-scrollbar-thumb { background:var(--border); border-radius:10px; }
-        ::-webkit-scrollbar-thumb:hover { background:var(--text-muted); }
         @media (max-width:640px) { ::-webkit-scrollbar { width:4px; height:4px; } }
-        #pdfTemplate, #requestPdfTemplate {
-            position:fixed; left:-9999px; top:0; width:800px; background:white;
-            padding:30px; font-family:'Segoe UI',sans-serif; font-size:14px;
-            color:#000; z-index:9999; opacity:0; pointer-events:none;
-            overflow:visible; box-sizing:border-box;
-        }
+        #pdfTemplate, #requestPdfTemplate { position:fixed; left:-9999px; top:0; width:800px; background:white; padding:30px; font-family:'Segoe UI',sans-serif; font-size:14px; color:#000; z-index:9999; opacity:0; pointer-events:none; overflow:visible; box-sizing:border-box; }
     </style>
 </head>
 <body>
@@ -754,35 +809,19 @@
         <div class="sidebar-header">
             <div class="sidebar-logo">M</div>
             <div class="sidebar-title">MCRH<small>Maintenance</small></div>
-            <button class="sidebar-collapse-btn" onclick="toggleSidebarCollapse()" data-tooltip="Collapse">
-                <i class="fas fa-chevron-left"></i>
-            </button>
+            <button class="sidebar-collapse-btn" onclick="toggleSidebarCollapse()" data-tooltip="Collapse"><i class="fas fa-chevron-left"></i></button>
         </div>
         <nav class="sidebar-nav">
             <div class="nav-section-title">Overview</div>
-            <button class="nav-item active" id="navRequests" onclick="switchView('requests')" data-tooltip="Requests">
-                <i class="fas fa-clipboard-list"></i><span>Requests</span><span class="badge-count" id="navReqCount">0</span>
-            </button>
-            <button class="nav-item" id="navJobcards" onclick="switchView('jobcards')" data-tooltip="Jobcards">
-                <i class="fas fa-tools"></i><span>Jobcards</span><span class="badge-count" id="navJobCount">0</span>
-            </button>
+            <button class="nav-item active" id="navRequests" onclick="switchView('requests')" data-tooltip="Requests"><i class="fas fa-clipboard-list"></i><span>Requests</span><span class="badge-count" id="navReqCount">0</span></button>
+            <button class="nav-item" id="navJobcards" onclick="switchView('jobcards')" data-tooltip="Jobcards"><i class="fas fa-tools"></i><span>Jobcards</span><span class="badge-count" id="navJobCount">0</span></button>
             <div class="nav-section-title">Admin</div>
-            <button class="nav-item" id="navUsers" onclick="openUserModal()" data-tooltip="Manage Users">
-                <i class="fas fa-users-cog"></i><span>Manage Users</span>
-            </button>
-            <button class="nav-item" id="navApprovals" onclick="showPendingUsers()" data-tooltip="Approvals">
-                <i class="fas fa-user-check"></i><span>Approvals</span><span class="badge-count" id="navApprovalCount">0</span>
-            </button>
+            <button class="nav-item" id="navUsers" onclick="openUserModal()" data-tooltip="Manage Users"><i class="fas fa-users-cog"></i><span>Manage Users</span></button>
+            <button class="nav-item" id="navApprovals" onclick="showPendingUsers()" data-tooltip="Approvals"><i class="fas fa-user-check"></i><span>Approvals</span><span class="badge-count" id="navApprovalCount">0</span></button>
             <div class="nav-section-title">Reports</div>
-            <button class="nav-item" onclick="navigateTo('analytics.html')" data-tooltip="Analytics">
-                <i class="fas fa-chart-bar"></i><span>Analytics</span>
-            </button>
-            <button class="nav-item" onclick="navigateTo('report.html')" data-tooltip="Monthly Report">
-                <i class="fas fa-file-alt"></i><span>Monthly Report</span>
-            </button>
-            <button class="nav-item" onclick="navigateTo('stats.html')" data-tooltip="Public Stats">
-                <i class="fas fa-globe"></i><span>Public Stats</span>
-            </button>
+            <button class="nav-item" onclick="navigateTo('analytics.html')" data-tooltip="Analytics"><i class="fas fa-chart-bar"></i><span>Analytics</span></button>
+            <button class="nav-item" onclick="navigateTo('report.html')" data-tooltip="Monthly Report"><i class="fas fa-file-alt"></i><span>Monthly Report</span></button>
+            <button class="nav-item" onclick="navigateTo('stats.html')" data-tooltip="Public Stats"><i class="fas fa-globe"></i><span>Public Stats</span></button>
         </nav>
         <div class="sidebar-footer">
             <div class="user-chip">
@@ -805,9 +844,7 @@
                 </div>
             </div>
             <div class="topbar-actions">
-                <button class="command-trigger" onclick="openCommandPalette()" data-tooltip="Search (Ctrl+K)">
-                    <i class="fas fa-search"></i><span>Search</span><kbd>Ctrl K</kbd>
-                </button>
+                <button class="command-trigger" onclick="openCommandPalette()" data-tooltip="Search (Ctrl+K)"><i class="fas fa-search"></i><span>Search</span><kbd>Ctrl K</kbd></button>
                 <button class="theme-toggle" id="themeToggle" data-tooltip="Toggle theme"><i class="fas fa-moon"></i></button>
                 <div id="topbarActions" style="display:flex;gap:8px;"></div>
             </div>
@@ -823,14 +860,21 @@
             <div class="kpi-strip" id="statsContainer"></div>
 
             <div class="analytics-drawer" id="analyticsDrawer">
-                <div class="analytics-drawer-header" onclick="toggleAnalytics()">
-                    <div class="analytics-drawer-title"><i class="fas fa-chart-pie"></i><span>Analytics Snapshot</span></div>
-                    <i class="fas fa-chevron-down analytics-drawer-chevron"></i>
+                <div class="analytics-drawer-header">
+                    <div class="analytics-drawer-title" onclick="toggleAnalytics()">
+                        <i class="fas fa-chart-pie"></i><span>Analytics Snapshot</span>
+                    </div>
+                    <button class="btn btn-purple btn-sm" onclick="event.stopPropagation();runAIInsights(this)" id="aiInsightsBtn" style="font-size:11px;padding:6px 12px;"><i class="fas fa-sparkles"></i> AI Insights</button>
+                    <i class="fas fa-chevron-down analytics-drawer-chevron" onclick="toggleAnalytics()"></i>
                 </div>
                 <div class="analytics-drawer-body">
                     <div class="charts-row">
                         <div class="chart-box"><h4>Job Status Distribution</h4><canvas id="statusChart"></canvas></div>
                         <div class="chart-box"><h4>Monthly Job Trend</h4><canvas id="trendChart"></canvas></div>
+                    </div>
+                    <div class="ai-insights-section" id="aiInsightsSection">
+                        <h5><i class="fas fa-sparkles"></i> AI Insights</h5>
+                        <div id="aiInsightsList"></div>
                     </div>
                 </div>
             </div>
@@ -839,32 +883,17 @@
                 <div class="panel-header">
                     <div class="panel-header-left">
                         <div class="tabs">
-                            <button class="tab active" id="tabRequests" onclick="switchView('requests')">
-                                <i class="fas fa-clipboard-list"></i> Requests
-                                <span class="count" id="tabReqCount">0</span>
-                            </button>
-                            <button class="tab" id="tabJobcards" onclick="switchView('jobcards')">
-                                <i class="fas fa-tools"></i> Jobcards
-                                <span class="count" id="tabJobCount">0</span>
-                            </button>
+                            <button class="tab active" id="tabRequests" onclick="switchView('requests')"><i class="fas fa-clipboard-list"></i> Requests<span class="count" id="tabReqCount">0</span></button>
+                            <button class="tab" id="tabJobcards" onclick="switchView('jobcards')"><i class="fas fa-tools"></i> Jobcards<span class="count" id="tabJobCount">0</span></button>
                         </div>
-                        <button class="back-btn" id="backBtn" onclick="backToDeptOverview()">
-                            <i class="fas fa-arrow-left"></i> All Departments
-                        </button>
+                        <button class="back-btn" id="backBtn" onclick="backToDeptOverview()"><i class="fas fa-arrow-left"></i> All Departments</button>
                     </div>
                     <div class="toolbar" id="filterBar"></div>
                 </div>
-
                 <div class="dept-stats-bar" id="deptStatsBar"></div>
                 <div class="filter-chips" id="filterChips"></div>
-
                 <div class="table-scroll">
-                    <div id="tableBody">
-                        <div class="empty-state">
-                            <i class="fas fa-circle-notch fa-spin"></i>
-                            <p>Loading…</p>
-                        </div>
-                    </div>
+                    <div id="tableBody"><div class="empty-state"><i class="fas fa-circle-notch fa-spin"></i><p>Loading…</p></div></div>
                 </div>
             </div>
         </div>
@@ -872,25 +901,11 @@
 </div>
 
 <nav class="mobile-bottom-nav" id="mobileBottomNav">
-    <button class="mbn-item active" id="mbnRequests" onclick="switchView('requests')">
-        <i class="fas fa-clipboard-list"></i>
-        <span>Requests</span>
-    </button>
-    <button class="mbn-item" id="mbnJobcards" onclick="switchView('jobcards')">
-        <i class="fas fa-tools"></i>
-        <span>Jobcards</span>
-    </button>
-    <button class="mbn-item mbn-new" onclick="fabAction()" aria-label="Create new">
-        <i class="fas fa-plus"></i>
-    </button>
-    <button class="mbn-item" id="mbnAnalytics" onclick="navigateTo('analytics.html')">
-        <i class="fas fa-chart-bar"></i>
-        <span>Analytics</span>
-    </button>
-    <button class="mbn-item" id="mbnMore" onclick="openMobileMenu()">
-        <i class="fas fa-ellipsis-h"></i>
-        <span>More</span>
-    </button>
+    <button class="mbn-item active" id="mbnRequests" onclick="switchView('requests')"><i class="fas fa-clipboard-list"></i><span>Requests</span></button>
+    <button class="mbn-item" id="mbnJobcards" onclick="switchView('jobcards')"><i class="fas fa-tools"></i><span>Jobcards</span></button>
+    <button class="mbn-item mbn-new" onclick="fabAction()" aria-label="Create new"><i class="fas fa-plus"></i></button>
+    <button class="mbn-item" id="mbnAnalytics" onclick="navigateTo('analytics.html')"><i class="fas fa-chart-bar"></i><span>Analytics</span></button>
+    <button class="mbn-item" id="mbnMore" onclick="openMobileMenu()"><i class="fas fa-ellipsis-h"></i><span>More</span></button>
 </nav>
 
 <div class="mobile-menu-overlay" id="mobileMenuOverlay" onclick="if(event.target===this)closeMobileMenu()">
@@ -905,50 +920,38 @@
         </div>
         <div class="mms-section-title">Navigation</div>
         <div class="mms-list">
-            <button class="mms-item" onclick="closeMobileMenu(); navigateTo('report.html')">
-                <i class="mms-icon fas fa-file-alt"></i>
-                <span>Monthly Report</span>
-                <i class="mms-arrow fas fa-chevron-right"></i>
-            </button>
-            <button class="mms-item" onclick="closeMobileMenu(); navigateTo('stats.html')">
-                <i class="mms-icon fas fa-globe"></i>
-                <span>Public Stats</span>
-                <i class="mms-arrow fas fa-chevron-right"></i>
-            </button>
-            <button class="mms-item admin-only" onclick="closeMobileMenu(); openUserModal()">
-                <i class="mms-icon fas fa-users-cog"></i>
-                <span>Manage Users</span>
-                <i class="mms-arrow fas fa-chevron-right"></i>
-            </button>
-            <button class="mms-item admin-only" onclick="closeMobileMenu(); showPendingUsers()">
-                <i class="mms-icon fas fa-user-check"></i>
-                <span>Pending Approvals</span>
-                <i class="mms-arrow fas fa-chevron-right"></i>
-            </button>
+            <button class="mms-item" onclick="closeMobileMenu(); navigateTo('report.html')"><i class="mms-icon fas fa-file-alt"></i><span>Monthly Report</span><i class="mms-arrow fas fa-chevron-right"></i></button>
+            <button class="mms-item" onclick="closeMobileMenu(); navigateTo('stats.html')"><i class="mms-icon fas fa-globe"></i><span>Public Stats</span><i class="mms-arrow fas fa-chevron-right"></i></button>
+            <button class="mms-item admin-only" onclick="closeMobileMenu(); openUserModal()"><i class="mms-icon fas fa-users-cog"></i><span>Manage Users</span><i class="mms-arrow fas fa-chevron-right"></i></button>
+            <button class="mms-item admin-only" onclick="closeMobileMenu(); showPendingUsers()"><i class="mms-icon fas fa-user-check"></i><span>Pending Approvals</span><i class="mms-arrow fas fa-chevron-right"></i></button>
         </div>
         <div class="mms-section-title">Preferences</div>
         <div class="mms-list">
-            <button class="mms-item" onclick="themeToggle.click()">
-                <i class="mms-icon fas fa-adjust"></i>
-                <span>Toggle Theme</span>
-                <i class="mms-arrow fas fa-chevron-right"></i>
-            </button>
-            <button class="mms-item logout" onclick="closeMobileMenu(); document.getElementById('logoutBtn').click()">
-                <i class="mms-icon fas fa-sign-out-alt"></i>
-                <span>Logout</span>
-                <i class="mms-arrow fas fa-chevron-right"></i>
-            </button>
+            <button class="mms-item" onclick="themeToggle.click()"><i class="mms-icon fas fa-adjust"></i><span>Toggle Theme</span><i class="mms-arrow fas fa-chevron-right"></i></button>
+            <button class="mms-item logout" onclick="closeMobileMenu(); document.getElementById('logoutBtn').click()"><i class="mms-icon fas fa-sign-out-alt"></i><span>Logout</span><i class="mms-arrow fas fa-chevron-right"></i></button>
         </div>
+    </div>
+</div>
+
+<!-- AI WIDGET -->
+<button class="mcrh-ai-fab" onclick="mcrhAiToggle()" title="Ask AI" aria-label="Open AI assistant"><i class="fas fa-robot"></i></button>
+<div class="mcrh-ai-panel" id="mcrhAiPanel">
+    <div class="mcrh-ai-hdr">
+        <div class="mcrh-ai-hdr-icon"><i class="fas fa-robot"></i></div>
+        <div class="mcrh-ai-hdr-info"><div class="t">MCRH Assistant</div><div class="s">Online</div></div>
+        <button class="mcrh-ai-close" onclick="mcrhAiToggle()" aria-label="Close"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="mcrh-ai-msgs" id="mcrhAiMessages"></div>
+    <div class="mcrh-ai-suggestions" id="mcrhAiSuggestions"></div>
+    <div class="mcrh-ai-inputwrap">
+        <textarea class="mcrh-ai-input" id="mcrhAiInput" placeholder="Ask anything about the system…" rows="1"></textarea>
+        <button class="mcrh-ai-send" id="mcrhAiSend" onclick="mcrhAiSend()" aria-label="Send"><i class="fas fa-paper-plane"></i></button>
     </div>
 </div>
 
 <div class="command-overlay" id="commandOverlay" onclick="if(event.target===this)closeCommandPalette()">
     <div class="command-palette">
-        <div class="command-input-wrap">
-            <i class="fas fa-search"></i>
-            <input type="text" id="commandInput" placeholder="Type a command or search…" autocomplete="off" />
-            <kbd>Esc</kbd>
-        </div>
+        <div class="command-input-wrap"><i class="fas fa-search"></i><input type="text" id="commandInput" placeholder="Type a command or search…" autocomplete="off" /><kbd>Esc</kbd></div>
         <div class="command-results" id="commandResults"></div>
     </div>
 </div>
@@ -999,6 +1002,7 @@
                     <option value="MATERNITY">MATERNITY</option>
                     <option value="PEDIATRIC">PEDIATRIC</option>
                     <option value="ORTHOPAEDIC AND TRAUMA">ORTHOPAEDIC AND TRAUMA</option>
+                    <option value="DENTAL">DENTAL</option>
                     <option value="THEATRE">THEATRE</option>
                     <option value="MALE WARD">MALE WARD</option>
                     <option value="FEMALE WARD">FEMALE WARD</option>
@@ -1061,6 +1065,7 @@
                     <option value="MATERNITY">MATERNITY</option>
                     <option value="PEDIATRIC">PEDIATRIC</option>
                     <option value="ORTHOPAEDIC AND TRAUMA">ORTHOPAEDIC AND TRAUMA</option>
+                    <option value="DENTAL">DENTAL</option>
                     <option value="THEATRE">THEATRE</option>
                     <option value="MALE WARD">MALE WARD</option>
                     <option value="FEMALE WARD">FEMALE WARD</option>
@@ -1115,16 +1120,7 @@
         <div class="form-group" id="whatsappFieldContainer">
             <label>WhatsApp Number (for maintenance)</label>
             <div style="display:flex; gap:8px; align-items:stretch;">
-                <select id="newUserCountryCode" style="flex:0 0 130px;">
-                    <option value="+254">🇰🇪 +254</option>
-                    <option value="+256">🇺🇬 +256</option>
-                    <option value="+255">🇹🇿 +255</option>
-                    <option value="+250">🇷🇼 +250</option>
-                    <option value="+1">🇺🇸 +1</option>
-                    <option value="+44">🇬🇧 +44</option>
-                    <option value="+91">🇮🇳 +91</option>
-                    <option value="+27">🇿🇦 +27</option>
-                </select>
+                <select id="newUserCountryCode" style="flex:0 0 130px;"><option value="+254">🇰🇪 +254</option><option value="+256">🇺🇬 +256</option><option value="+255">🇹🇿 +255</option><option value="+250">🇷🇼 +250</option></select>
                 <input type="text" id="newUserWhatsApp" placeholder="e.g. 712345678" style="flex:1;" />
             </div>
         </div>
@@ -1151,41 +1147,34 @@
         <div class="confirm-icon danger" id="confirmIcon"><i class="fas fa-exclamation-triangle"></i></div>
         <h3 id="confirmTitle">Are you sure?</h3>
         <p id="confirmMessage">This action cannot be undone.</p>
-        <div class="confirm-actions">
-            <button class="btn btn-outline" id="confirmCancelBtn">Cancel</button>
-            <button class="btn btn-danger" id="confirmOkBtn">Confirm</button>
-        </div>
+        <div class="confirm-actions"><button class="btn btn-outline" id="confirmCancelBtn">Cancel</button><button class="btn btn-danger" id="confirmOkBtn">Confirm</button></div>
     </div>
 </div>
 
 <div id="toast" class="toast">
     <div class="toast-icon" id="toastIcon"><i class="fas fa-info"></i></div>
-    <div class="toast-body">
-        <div class="toast-title" id="toastTitle">Message</div>
-        <div class="toast-message" id="toastMessage"></div>
-    </div>
+    <div class="toast-body"><div class="toast-title" id="toastTitle">Message</div><div class="toast-message" id="toastMessage"></div></div>
     <button class="toast-close" onclick="hideToast()" aria-label="Close"><i class="fas fa-times"></i></button>
 </div>
 
-<div id="pdfTemplate"></div>
-<div id="requestPdfTemplate"></div>
-
 <script type="module">
+    // ============ AI BACKEND ============
+    function getAIBackend() {
+        let url = localStorage.getItem('mcrh-ai-backend-url');
+        if (!url) {
+            url = prompt('Enter your MCRH AI backend URL\n(e.g. https://mcrh-ai-backend.onrender.com):');
+            if (url) localStorage.setItem('mcrh-ai-backend-url', url.trim().replace(/\/$/,''));
+        }
+        return url;
+    }
+
     function toDate(v) {
         if (!v) return null;
         if (v instanceof Date) return isNaN(v.getTime()) ? null : v;
-        if (typeof v.toDate === 'function') {
-            try { const d = v.toDate(); return isNaN(d.getTime()) ? null : d; } catch (e) { return null; }
-        }
-        if (typeof v === 'object') {
-            if (typeof v.seconds === 'number') return new Date(v.seconds * 1000);
-            if (typeof v._seconds === 'number') return new Date(v._seconds * 1000);
-        }
+        if (typeof v.toDate === 'function') { try { const d = v.toDate(); return isNaN(d.getTime()) ? null : d; } catch (e) { return null; } }
+        if (typeof v === 'object') { if (typeof v.seconds === 'number') return new Date(v.seconds * 1000); if (typeof v._seconds === 'number') return new Date(v._seconds * 1000); }
         if (typeof v === 'number') return new Date(v);
-        if (typeof v === 'string') {
-            const d = new Date(v);
-            return isNaN(d.getTime()) ? null : d;
-        }
+        if (typeof v === 'string') { const d = new Date(v); return isNaN(d.getTime()) ? null : d; }
         return null;
     }
     function fmtDate(v, withTime = false) {
@@ -1197,9 +1186,7 @@
         } catch (e) { return '—'; }
     }
 
-    window.addEventListener('DOMContentLoaded', () => {
-        requestAnimationFrame(() => document.body.classList.add('page-ready'));
-    });
+    window.addEventListener('DOMContentLoaded', () => requestAnimationFrame(() => document.body.classList.add('page-ready')));
     window.navigateTo = function(url) {
         document.body.classList.remove('page-ready');
         document.body.classList.add('page-leaving');
@@ -1279,10 +1266,7 @@
         requestAnimationFrame(tick);
     }
     function animateKPIs() {
-        document.querySelectorAll('.kpi-value[data-target]').forEach(el => {
-            const target = parseInt(el.dataset.target) || 0;
-            animateNumber(el, target);
-        });
+        document.querySelectorAll('.kpi-value[data-target]').forEach(el => animateNumber(el, parseInt(el.dataset.target) || 0));
     }
     const themeToggle = document.getElementById('themeToggle');
     function applyTheme(theme) {
@@ -1317,12 +1301,8 @@
     window.toggleSidebar = function() {};
     window.closeSidebar = function() {};
     window.toggleAnalytics = function() { document.getElementById('analyticsDrawer').classList.toggle('open'); };
-    window.openMobileMenu = function() {
-        document.getElementById('mobileMenuOverlay').classList.add('show');
-    };
-    window.closeMobileMenu = function() {
-        document.getElementById('mobileMenuOverlay').classList.remove('show');
-    };
+    window.openMobileMenu = function() { document.getElementById('mobileMenuOverlay').classList.add('show'); };
+    window.closeMobileMenu = function() { document.getElementById('mobileMenuOverlay').classList.remove('show'); };
     function updateBottomNav() {
         document.querySelectorAll('.mbn-item').forEach(el => el.classList.remove('active'));
         if (currentView === 'requests') document.getElementById('mbnRequests')?.classList.add('active');
@@ -1343,14 +1323,12 @@
         const t = types[type] || types.info;
         toast.className = 'toast ' + type;
         icon.innerHTML = `<i class="fas ${t.icon}"></i>`;
-        titleEl.textContent = t.title;
-        msgEl.textContent = message;
+        titleEl.textContent = t.title; msgEl.textContent = message;
         const existingUndo = toast.querySelector('.toast-undo-btn');
         if (existingUndo) existingUndo.remove();
         if (undoFn) {
             const btn = document.createElement('button');
-            btn.className = 'toast-undo-btn';
-            btn.textContent = 'Undo';
+            btn.className = 'toast-undo-btn'; btn.textContent = 'Undo';
             btn.onclick = () => { undoFn(); hideToast(); };
             toast.querySelector('.toast-body').appendChild(btn);
         }
@@ -1382,6 +1360,64 @@
     function closeConfirm() { document.getElementById('confirmModal').classList.remove('show'); }
     window.closeConfirm = closeConfirm;
     document.getElementById('confirmModal').addEventListener('click', function(e) { if (e.target === this) closeConfirm(); });
+
+    // ============ AI INSIGHTS ============
+    window.runAIInsights = async function(btn) {
+        const backend = getAIBackend();
+        if (!backend) return;
+        const section = document.getElementById('aiInsightsSection');
+        const list = document.getElementById('aiInsightsList');
+        section.classList.add('show');
+        document.getElementById('analyticsDrawer').classList.add('open');
+        list.innerHTML = '<div class="insight-empty"><i class="fas fa-circle-notch fa-spin"></i> Analysing your data…</div>';
+        const orig = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
+
+        const total = allRequests.length;
+        const pending = allRequests.filter(r => r.jobStatus === 'Pending' || r.jobStatus === 'No Job').length;
+        const completed = allJobCards.filter(j => j.status === 'Completed').length;
+        const writtenOff = allJobCards.filter(j => j.status === 'Written Off').length;
+        const byDept = {};
+        allRequests.forEach(r => { const d = r.unit || 'UNASSIGNED'; byDept[d] = (byDept[d]||0)+1; });
+        const topDepts = Object.entries(byDept).sort((a,b) => b[1]-a[1]).slice(0,5).map(([d,c]) => ({ dept: d, count: c }));
+
+        try {
+            const res = await fetch(backend + '/api/insights', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    data: { totalRequests: total, pendingRequests: pending, completedJobs: completed, writtenOffJobs: writtenOff, topDepartments: topDepts, userRole },
+                    focus: 'operational improvement'
+                })
+            });
+            if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e.error || 'Backend error ' + res.status); }
+            const result = await res.json();
+            const insights = result.insights || [];
+            if (!insights.length) {
+                list.innerHTML = '<div class="insight-empty">No insights to show yet.</div>';
+                return;
+            }
+            list.innerHTML = insights.map(i => `
+                <div class="insight-card ${i.severity || 'info'}">
+                    <div class="insight-icon"><i class="fas ${i.severity === 'critical' ? 'fa-exclamation-triangle' : i.severity === 'warning' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i></div>
+                    <div class="insight-body">
+                        <div class="insight-title">${i.title || ''}</div>
+                        <div class="insight-detail">${i.detail || ''}</div>
+                        ${i.action ? `<div class="insight-action">→ ${i.action}</div>` : ''}
+                    </div>
+                </div>
+            `).join('');
+            showToast('AI insights ready', 'success', 'Done');
+        } catch (err) {
+            list.innerHTML = `<div class="insight-empty" style="color:#b91c1c;">⚠️ ${err.message}</div>`;
+            showToast('AI error: ' + err.message, 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = orig;
+        }
+    };
+
     let commandItems = [];
     let commandActiveIndex = 0;
     function buildCommandItems() {
@@ -1400,6 +1436,8 @@
             items.push({ section:'Actions', label:'Add New User', icon:'fa-user-plus', action:openUserModal });
             items.push({ section:'Actions', label:'Show Pending Approvals', icon:'fa-user-check', action:showPendingUsers });
         }
+        items.push({ section:'Actions', label:'Ask AI Assistant', icon:'fa-robot', action:() => mcrhAiToggle() });
+        items.push({ section:'Actions', label:'AI Insights', icon:'fa-sparkles', action:() => runAIInsights(document.getElementById('aiInsightsBtn')) });
         items.push({ section:'Actions', label:'Toggle Dark Mode', icon:'fa-moon', action:() => themeToggle.click() });
         items.push({ section:'Actions', label:'Show Keyboard Shortcuts', icon:'fa-keyboard', hint:'?', action:openShortcuts });
         items.push({ section:'Actions', label:'Refresh Data', icon:'fa-sync-alt', hint:'R', action:refreshData });
@@ -1427,15 +1465,13 @@
         setTimeout(() => item.action(), 80);
     };
     window.openCommandPalette = function() {
-        buildCommandItems();
-        renderCommandResults('');
+        buildCommandItems(); renderCommandResults('');
         document.getElementById('commandOverlay').classList.add('show');
         setTimeout(() => document.getElementById('commandInput').focus(), 100);
     };
     window.closeCommandPalette = function() {
         document.getElementById('commandOverlay').classList.remove('show');
-        document.getElementById('commandInput').value = '';
-        commandActiveIndex = 0;
+        document.getElementById('commandInput').value = ''; commandActiveIndex = 0;
     };
     document.getElementById('commandInput').addEventListener('input', (e) => renderCommandResults(e.target.value));
     document.getElementById('commandInput').addEventListener('keydown', (e) => {
@@ -1483,9 +1519,7 @@
         const whatsappContainer = document.getElementById('whatsappFieldContainer');
         const deptLabel = document.getElementById('deptLabel');
         const passwordField = document.getElementById('passwordField');
-        deptContainer.style.display = 'none';
-        multiDeptContainer.style.display = 'none';
-        whatsappContainer.style.display = 'none';
+        deptContainer.style.display = 'none'; multiDeptContainer.style.display = 'none'; whatsappContainer.style.display = 'none';
         const isEdit = document.getElementById('editUserId').value !== '';
         passwordField.style.display = isEdit ? 'none' : 'block';
         if (role === 'requester') { deptContainer.style.display = 'block'; deptLabel.textContent = 'Department (for requester)'; }
@@ -1538,10 +1572,8 @@
                 queries.push(query(collection(db, JOBCARDS_COLL), where('requesterId', '==', currentUser.id), orderBy('updatedAt', 'desc')));
                 const seen = new Set();
                 for (const q of queries) {
-                    try {
-                        const snap = await getDocs(q);
-                        snap.forEach(d => { const data = d.data(); data.id = d.id; if (!seen.has(d.id)) { seen.add(d.id); jobcards.push(data); } });
-                    } catch (err) { console.warn(err); }
+                    try { const snap = await getDocs(q); snap.forEach(d => { const data = d.data(); data.id = d.id; if (!seen.has(d.id)) { seen.add(d.id); jobcards.push(data); } }); }
+                    catch (err) { console.warn(err); }
                 }
                 allJobCards = jobcards;
             } else allJobCards = [];
@@ -1560,10 +1592,7 @@
             } else { allUsers = []; pendingApprovalCount = 0; }
         } catch (err) { console.error('❌ fetchData error:', err); showToast(err.message, 'error', 'Failed to load data'); }
     }
-    function getMyRequests() {
-        if (!currentUser || !currentUser.id) return [];
-        return allRequests.filter(r => r.requesterId === currentUser.id);
-    }
+    function getMyRequests() { if (!currentUser || !currentUser.id) return []; return allRequests.filter(r => r.requesterId === currentUser.id); }
     function renderDashboard() {
         if (!currentUser) return;
         const isAdmin = userRole === 'admin';
@@ -1583,8 +1612,7 @@
                 <div class="kpi-card completed"><div class="kpi-icon"><i class="fas fa-check-circle"></i></div><div class="kpi-body"><div class="kpi-value" data-target="${completedReqs}">0</div><div class="kpi-label">Completed</div></div></div>
                 <div class="kpi-card writtenoff"><div class="kpi-icon"><i class="fas fa-times-circle"></i></div><div class="kpi-body"><div class="kpi-value" data-target="${writtenOffReqs}">0</div><div class="kpi-label">Written Off</div></div></div>
                 <div class="kpi-card users" onclick="openUserModal()"><div class="kpi-icon"><i class="fas fa-users"></i></div><div class="kpi-body"><div class="kpi-value" data-target="${allUsers.length}">0</div><div class="kpi-label">Users</div></div></div>
-                <div class="kpi-card pending" onclick="showPendingUsers()"><div class="kpi-icon"><i class="fas fa-user-clock"></i></div><div class="kpi-body"><div class="kpi-value" data-target="${pendingApprovalCount}">0</div><div class="kpi-label">Approvals</div></div></div>
-            `;
+                <div class="kpi-card pending" onclick="showPendingUsers()"><div class="kpi-icon"><i class="fas fa-user-clock"></i></div><div class="kpi-body"><div class="kpi-value" data-target="${pendingApprovalCount}">0</div><div class="kpi-label">Approvals</div></div></div>`;
         } else if (isMaintenance) {
             const newReqs = allRequests.filter(r => r.jobStatus === 'No Job').length;
             kpiHtml = `
@@ -1592,16 +1620,14 @@
                 <div class="kpi-card jobcards" onclick="switchView('jobcards')"><div class="kpi-icon"><i class="fas fa-tools"></i></div><div class="kpi-body"><div class="kpi-value" data-target="${totalJobcards}">0</div><div class="kpi-label">My Jobcards</div></div></div>
                 <div class="kpi-card new"><div class="kpi-icon"><i class="fas fa-plus-circle"></i></div><div class="kpi-body"><div class="kpi-value" data-target="${newReqs}">0</div><div class="kpi-label">New</div></div></div>
                 <div class="kpi-card pending"><div class="kpi-icon"><i class="fas fa-clock"></i></div><div class="kpi-body"><div class="kpi-value" data-target="${pendingReqs}">0</div><div class="kpi-label">Pending</div></div></div>
-                <div class="kpi-card completed"><div class="kpi-icon"><i class="fas fa-check-circle"></i></div><div class="kpi-body"><div class="kpi-value" data-target="${completedReqs}">0</div><div class="kpi-label">Completed</div></div></div>
-            `;
+                <div class="kpi-card completed"><div class="kpi-icon"><i class="fas fa-check-circle"></i></div><div class="kpi-body"><div class="kpi-value" data-target="${completedReqs}">0</div><div class="kpi-label">Completed</div></div></div>`;
         } else {
             kpiHtml = `
                 <div class="kpi-card myrequests" onclick="switchView('requests')"><div class="kpi-icon"><i class="fas fa-file-alt"></i></div><div class="kpi-body"><div class="kpi-value" data-target="${myRequests.length}">0</div><div class="kpi-label">My Requests</div></div></div>
                 <div class="kpi-card jobcards" onclick="switchView('jobcards')"><div class="kpi-icon"><i class="fas fa-tools"></i></div><div class="kpi-body"><div class="kpi-value" data-target="${totalJobcards}">0</div><div class="kpi-label">Dept. Jobcards</div></div></div>
                 <div class="kpi-card pending"><div class="kpi-icon"><i class="fas fa-clock"></i></div><div class="kpi-body"><div class="kpi-value" data-target="${myRequests.filter(r => r.jobStatus === 'Pending' || r.jobStatus === 'No Job').length}">0</div><div class="kpi-label">Pending</div></div></div>
                 <div class="kpi-card completed"><div class="kpi-icon"><i class="fas fa-check-circle"></i></div><div class="kpi-body"><div class="kpi-value" data-target="${myRequests.filter(r => r.jobStatus === 'Completed').length}">0</div><div class="kpi-label">Completed</div></div></div>
-                <div class="kpi-card writtenoff"><div class="kpi-icon"><i class="fas fa-times-circle"></i></div><div class="kpi-body"><div class="kpi-value" data-target="${myRequests.filter(r => r.jobStatus === 'Written Off').length}">0</div><div class="kpi-label">Written Off</div></div></div>
-            `;
+                <div class="kpi-card writtenoff"><div class="kpi-icon"><i class="fas fa-times-circle"></i></div><div class="kpi-body"><div class="kpi-value" data-target="${myRequests.filter(r => r.jobStatus === 'Written Off').length}">0</div><div class="kpi-label">Written Off</div></div></div>`;
         }
         statsContainer.innerHTML = kpiHtml;
         animateKPIs();
@@ -1615,58 +1641,51 @@
         document.getElementById('mmsUserRole').textContent = userRole;
         const isAdminForMenu = userRole === 'admin';
         document.querySelectorAll('.mms-item.admin-only').forEach(el => { el.style.display = isAdminForMenu ? 'flex' : 'none'; });
-        renderCharts();
-        renderTopbarActions();
-        buildFilterBar();
-        buildFilterChips();
-        updateTableTitle();
-        applyFilters();
-        updateBottomNav();
+
+        // AI CONTEXT
+        window.aiContext = {
+            userName: currentUser.name,
+            userRole: userRole,
+            currentPage: currentView === 'requests' ? 'Requests' : 'Jobcards',
+            totalRequests: allRequests.length,
+            pendingRequests: pendingReqs,
+            totalJobcards: totalJobcards,
+            departments: currentUser.departments || (currentUser.department ? [currentUser.department] : [])
+        };
+
+        renderCharts(); renderTopbarActions(); buildFilterBar(); buildFilterChips(); updateTableTitle(); applyFilters(); updateBottomNav();
     }
     function renderTopbarActions() {
         const isAdmin = userRole === 'admin';
         const isMaintenance = userRole === 'maintenance';
         const isRequester = userRole === 'requester';
         let html = '';
-        if (isRequester) {
-            html = `<button class="btn btn-primary btn-sm" onclick="navigateTo('request.html')" data-tooltip="New Request"><i class="fas fa-plus"></i> <span>New Request</span></button>`;
-        } else if (isMaintenance) {
-            html = `<button class="btn btn-success btn-sm" onclick="navigateTo('jobcard.html')" data-tooltip="Create Job"><i class="fas fa-tools"></i> <span>Create Job</span></button><button class="btn btn-outline btn-sm" onclick="navigateTo('analytics.html')" data-tooltip="Analytics"><i class="fas fa-chart-bar"></i> <span>Analytics</span></button>`;
-        } else if (isAdmin) {
-            html = `<button class="btn btn-primary btn-sm" onclick="navigateTo('request.html')" data-tooltip="New Request"><i class="fas fa-plus"></i> <span>Request</span></button><button class="btn btn-success btn-sm" onclick="navigateTo('jobcard.html')" data-tooltip="Create Job Card"><i class="fas fa-tools"></i> <span>Job Card</span></button><button class="btn btn-outline btn-sm" onclick="openUserModal()" data-tooltip="Manage Users"><i class="fas fa-users-cog"></i> <span>Users</span></button><button class="btn btn-outline btn-sm" onclick="refreshData()" data-tooltip="Refresh (R)"><i class="fas fa-sync-alt"></i></button>`;
-        }
+        if (isRequester) html = `<button class="btn btn-primary btn-sm" onclick="navigateTo('request.html')" data-tooltip="New Request"><i class="fas fa-plus"></i> <span>New Request</span></button>`;
+        else if (isMaintenance) html = `<button class="btn btn-success btn-sm" onclick="navigateTo('jobcard.html')" data-tooltip="Create Job"><i class="fas fa-tools"></i> <span>Create Job</span></button><button class="btn btn-outline btn-sm" onclick="navigateTo('analytics.html')" data-tooltip="Analytics"><i class="fas fa-chart-bar"></i> <span>Analytics</span></button>`;
+        else if (isAdmin) html = `<button class="btn btn-primary btn-sm" onclick="navigateTo('request.html')" data-tooltip="New Request"><i class="fas fa-plus"></i> <span>Request</span></button><button class="btn btn-success btn-sm" onclick="navigateTo('jobcard.html')" data-tooltip="Create Job Card"><i class="fas fa-tools"></i> <span>Job Card</span></button><button class="btn btn-outline btn-sm" onclick="openUserModal()" data-tooltip="Manage Users"><i class="fas fa-users-cog"></i> <span>Users</span></button><button class="btn btn-outline btn-sm" onclick="refreshData()" data-tooltip="Refresh (R)"><i class="fas fa-sync-alt"></i></button>`;
         topbarActions.innerHTML = html;
     }
     window.refreshData = function() {
         showToast('Refreshing data…', 'info', 'Loading');
         renderSkeleton();
-        fetchData().then(() => {
-            renderDashboard();
-            showToast('Data refreshed successfully', 'success', 'Updated');
-        });
+        fetchData().then(() => { renderDashboard(); showToast('Data refreshed successfully', 'success', 'Updated'); });
     };
     window.switchView = function(view) {
-        currentView = view;
-        currentSubView = 'overview';
-        currentDepartment = null;
-        currentStatusFilter = 'all';
+        currentView = view; currentSubView = 'overview'; currentDepartment = null; currentStatusFilter = 'all';
         document.getElementById('tabRequests').classList.toggle('active', view === 'requests');
         document.getElementById('tabJobcards').classList.toggle('active', view === 'jobcards');
         document.getElementById('navRequests').classList.toggle('active', view === 'requests');
         document.getElementById('navJobcards').classList.toggle('active', view === 'jobcards');
         buildFilterBar(); buildFilterChips(); updateTableTitle(); applyFilters(); updateBottomNav();
+        if (window.aiContext) window.aiContext.currentPage = view === 'requests' ? 'Requests' : 'Jobcards';
     };
     window.selectDepartment = function(dept) {
-        currentDepartment = dept;
-        currentSubView = 'detail';
-        currentStatusFilter = 'all';
+        currentDepartment = dept; currentSubView = 'detail'; currentStatusFilter = 'all';
         buildFilterBar(); buildFilterChips(); updateTableTitle(); applyFilters();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
     window.backToDeptOverview = function() {
-        currentDepartment = null;
-        currentSubView = 'overview';
-        currentStatusFilter = 'all';
+        currentDepartment = null; currentSubView = 'overview'; currentStatusFilter = 'all';
         buildFilterBar(); buildFilterChips(); updateTableTitle(); applyFilters();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
@@ -1676,34 +1695,26 @@
     }
     function buildFilterChips() {
         if (currentSubView === 'overview') {
-            filterChips.innerHTML = '';
-            backBtn.style.display = 'none';
-            deptStatsBar.classList.remove('show');
-            return;
+            filterChips.innerHTML = ''; backBtn.style.display = 'none'; deptStatsBar.classList.remove('show'); return;
         }
         backBtn.style.display = 'inline-flex';
         const isRequests = currentView === 'requests';
-        const source = isRequests
-            ? (userRole === 'requester' ? getMyRequests() : allRequests).filter(r => (r.unit || 'UNASSIGNED') === currentDepartment)
-            : allJobCards.filter(j => (j.unit || 'UNASSIGNED') === currentDepartment);
+        const source = isRequests ? (userRole === 'requester' ? getMyRequests() : allRequests).filter(r => (r.unit || 'UNASSIGNED') === currentDepartment) : allJobCards.filter(j => (j.unit || 'UNASSIGNED') === currentDepartment);
         let chips = [];
-        if (isRequests) {
-            chips = [
-                { key:'all', label:'All', count:source.length },
-                { key:'new', label:'New', count:source.filter(r => r.jobStatus === 'No Job' && r.received !== true).length },
-                { key:'pending', label:'Pending', count:source.filter(r => r.jobStatus === 'Pending').length },
-                { key:'completed', label:'Completed', count:source.filter(r => r.jobStatus === 'Completed').length },
-                { key:'writtenoff', label:'Written Off', count:source.filter(r => r.jobStatus === 'Written Off').length }
-            ];
-        } else {
-            chips = [
-                { key:'all', label:'All', count:source.length },
-                { key:'pending', label:'Pending', count:source.filter(j => (j.status||'Pending') === 'Pending').length },
-                { key:'completed', label:'Completed', count:source.filter(j => j.status === 'Completed').length },
-                { key:'writtenoff', label:'Written Off', count:source.filter(j => j.status === 'Written Off').length },
-                { key:'postponed', label:'Postponed', count:source.filter(j => j.status === 'Postponed').length }
-            ];
-        }
+        if (isRequests) chips = [
+            { key:'all', label:'All', count:source.length },
+            { key:'new', label:'New', count:source.filter(r => r.jobStatus === 'No Job' && r.received !== true).length },
+            { key:'pending', label:'Pending', count:source.filter(r => r.jobStatus === 'Pending').length },
+            { key:'completed', label:'Completed', count:source.filter(r => r.jobStatus === 'Completed').length },
+            { key:'writtenoff', label:'Written Off', count:source.filter(r => r.jobStatus === 'Written Off').length }
+        ];
+        else chips = [
+            { key:'all', label:'All', count:source.length },
+            { key:'pending', label:'Pending', count:source.filter(j => (j.status||'Pending') === 'Pending').length },
+            { key:'completed', label:'Completed', count:source.filter(j => j.status === 'Completed').length },
+            { key:'writtenoff', label:'Written Off', count:source.filter(j => j.status === 'Written Off').length },
+            { key:'postponed', label:'Postponed', count:source.filter(j => j.status === 'Postponed').length }
+        ];
         chips = chips.filter(c => c.key === 'all' || c.count > 0);
         filterChips.innerHTML = chips.map(c => `<button class="filter-chip ${currentStatusFilter === c.key ? 'active' : ''}" onclick="setChipFilter('${c.key}')">${c.label} <span class="chip-count">${c.count}</span></button>`).join('');
         const total = source.length;
@@ -1742,36 +1753,20 @@
             if (r.received === true && (s === 'No Job' || s === 'Pending')) s = 'Received';
             statusCounts[s] = (statusCounts[s] || 0) + 1;
         });
-        const labels = Object.keys(statusCounts);
-        const data = Object.values(statusCounts);
+        const labels = Object.keys(statusCounts); const data = Object.values(statusCounts);
         const colors = ['#f59e0b', '#22c55e', '#ef4444', '#f59e0b', '#6b7280', '#10b981'];
         const ctx1 = document.getElementById('statusChart').getContext('2d');
         if (statusChartInstance) statusChartInstance.destroy();
-        statusChartInstance = new Chart(ctx1, {
-            type:'doughnut',
-            data:{ labels, datasets:[{ data, backgroundColor:colors, borderWidth:2, borderColor:borderBg }] },
-            options:{ responsive:true, maintainAspectRatio:false, cutout:'62%', animation:{ animateRotate:true, animateScale:true, duration:900, easing:'easeOutQuart' }, plugins:{ legend:{ position:'bottom', labels:{ boxWidth:9, padding:10, font:{ size:10, family:'Plus Jakarta Sans', weight:'600' }, color: isDark ? '#cbd5e1' : '#475569' } } } }
-        });
+        statusChartInstance = new Chart(ctx1, { type:'doughnut', data:{ labels, datasets:[{ data, backgroundColor:colors, borderWidth:2, borderColor:borderBg }] }, options:{ responsive:true, maintainAspectRatio:false, cutout:'62%', animation:{ animateRotate:true, animateScale:true, duration:900, easing:'easeOutQuart' }, plugins:{ legend:{ position:'bottom', labels:{ boxWidth:9, padding:10, font:{ size:10, family:'Plus Jakarta Sans', weight:'600' }, color: isDark ? '#cbd5e1' : '#475569' } } } } });
         const months = {};
-        requestsForCharts.forEach(r => {
-            const d = toDate(r.createdAt) || new Date();
-            const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
-            months[key] = (months[key] || 0) + 1;
-        });
+        requestsForCharts.forEach(r => { const d = toDate(r.createdAt) || new Date(); const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); months[key] = (months[key] || 0) + 1; });
         const sortedMonths = Object.keys(months).sort().slice(-6);
         const trendData = sortedMonths.map(m => months[m]);
         const ctx2 = document.getElementById('trendChart').getContext('2d');
         if (trendChartInstance) trendChartInstance.destroy();
-        trendChartInstance = new Chart(ctx2, {
-            type:'line',
-            data:{ labels:sortedMonths, datasets:[{ label:'Requests', data:trendData, borderColor:'#C8102E', backgroundColor:'rgba(200,16,46,0.08)', fill:true, tension:0.4, pointBackgroundColor:'#C8102E', pointBorderColor:borderBg, pointBorderWidth:2, pointRadius:4 }] },
-            options:{ responsive:true, maintainAspectRatio:false, animation:{ duration:1000, easing:'easeOutQuart' }, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, ticks:{ stepSize:1, font:{ size:10 }, color:tickColor }, grid:{ color:gridColor, drawBorder:false } }, x:{ ticks:{ font:{ size:10 }, color:tickColor }, grid:{ display:false } } } }
-        });
+        trendChartInstance = new Chart(ctx2, { type:'line', data:{ labels:sortedMonths, datasets:[{ label:'Requests', data:trendData, borderColor:'#C8102E', backgroundColor:'rgba(200,16,46,0.08)', fill:true, tension:0.4, pointBackgroundColor:'#C8102E', pointBorderColor:borderBg, pointBorderWidth:2, pointRadius:4 }] }, options:{ responsive:true, maintainAspectRatio:false, animation:{ duration:1000, easing:'easeOutQuart' }, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, ticks:{ stepSize:1, font:{ size:10 }, color:tickColor }, grid:{ color:gridColor, drawBorder:false } }, x:{ ticks:{ font:{ size:10 }, color:tickColor }, grid:{ display:false } } } } });
     }
-    window.applyFilters = function() {
-        if (currentSubView === 'overview') renderDepartmentOverview();
-        else renderDepartmentDetail();
-    };
+    window.applyFilters = function() { if (currentSubView === 'overview') renderDepartmentOverview(); else renderDepartmentDetail(); };
     function renderDepartmentOverview() {
         const isRequests = currentView === 'requests';
         const source = isRequests ? (userRole === 'requester' ? getMyRequests() : allRequests) : allJobCards;
@@ -1817,9 +1812,7 @@
         });
         html += '</div>';
         tableBody.innerHTML = html;
-        tableBody.querySelectorAll('.dept-card').forEach(card => {
-            card.addEventListener('click', () => selectDepartment(card.dataset.dept));
-        });
+        tableBody.querySelectorAll('.dept-card').forEach(card => card.addEventListener('click', () => selectDepartment(card.dataset.dept)));
     }
     function renderDepartmentDetail() {
         const isRequests = currentView === 'requests';
@@ -1843,11 +1836,7 @@
             if (isRequests) items = items.filter(i => i.requestNo?.toLowerCase().includes(search) || i.equipName?.toLowerCase().includes(search) || i.requesterName?.toLowerCase().includes(search));
             else items = items.filter(i => i.jobNo?.toLowerCase().includes(search) || i.equipName?.toLowerCase().includes(search) || i.techName?.toLowerCase().includes(search));
         }
-        items.sort((a,b) => {
-            const da = toDate(a.updatedAt) || toDate(a.createdAt) || new Date(0);
-            const db = toDate(b.updatedAt) || toDate(b.createdAt) || new Date(0);
-            return db - da;
-        });
+        items.sort((a,b) => { const da = toDate(a.updatedAt) || toDate(a.createdAt) || new Date(0); const db = toDate(b.updatedAt) || toDate(b.createdAt) || new Date(0); return db - da; });
         if (!items.length) {
             tableBody.innerHTML = `<div class="empty-state"><i class="fas fa-search"></i><h3>No matching ${isRequests ? 'requests' : 'jobcards'}</h3><p>Try a different filter or clear the search.</p></div>`;
             return;
@@ -1856,52 +1845,44 @@
         items.forEach(item => { html += isRequests ? renderRequestCard(item) : renderJobcardCard(item); });
         html += '</div>';
         tableBody.innerHTML = html;
-        document.querySelectorAll('.receive-btn').forEach(btn => {
-            btn.addEventListener('click', function(e) { e.stopPropagation(); const id = this.dataset.id; if (id) markAsReceived(id); });
-        });
+        document.querySelectorAll('.receive-btn').forEach(btn => btn.addEventListener('click', function(e) { e.stopPropagation(); const id = this.dataset.id; if (id) markAsReceived(id); }));
     }
     function renderRequestCard(r) {
         const status = r.jobStatus || 'No Job';
         const statusClass = getStatusClass(status);
         const isReceived = r.received === true;
         const canReceive = (userRole === 'admin' || userRole === 'maintenance') && !isReceived && (status === 'No Job' || status === 'Pending');
-        const initials = getInitials(r.requesterName);
-        const avatarClass = getAvatarClass(r.requesterName);
-        return `<div class="req-card">
-            <div class="rc-main">
-                <div class="rc-no">${r.requestNo || '—'}</div>
-                <div class="rc-requester"><div class="rc-avatar ${avatarClass}">${initials}</div><div class="rc-names"><div class="rc-name">${r.requesterName || 'N/A'}</div><div class="rc-dept">${r.unit || 'N/A'}</div></div></div>
-                <div class="rc-equip"><div class="rc-equip-name">${r.equipName || 'N/A'}</div>${r.serial ? `<div class="rc-equip-serial">SN: ${r.serial}</div>` : ''}</div>
-                <span class="status-badge ${statusClass}">${status}</span>
-                <div class="rc-date">${fmtDate(r.createdAt)}</div>
-                <div class="rc-actions">
-                    <button class="btn btn-info btn-icon btn-sm" onclick="downloadRequestPDF('${r.id}')" data-tooltip="PDF"><i class="fas fa-file-pdf"></i></button>
-                    ${canReceive ? `<button class="btn btn-success btn-icon btn-sm receive-btn" data-id="${r.id}" data-tooltip="Received"><i class="fas fa-check-double"></i></button>` : ''}
-                    ${(userRole === 'maintenance' || userRole === 'admin') && status === 'No Job' ? `<button class="btn btn-warning btn-icon btn-sm" onclick="createJob('${r.requestNo}')" data-tooltip="Create Job"><i class="fas fa-tools"></i></button>` : ''}
-                </div>
+        const initials = getInitials(r.requesterName); const avatarClass = getAvatarClass(r.requesterName);
+        return `<div class="req-card"><div class="rc-main">
+            <div class="rc-no">${r.requestNo || '—'}</div>
+            <div class="rc-requester"><div class="rc-avatar ${avatarClass}">${initials}</div><div class="rc-names"><div class="rc-name">${r.requesterName || 'N/A'}</div><div class="rc-dept">${r.unit || 'N/A'}</div></div></div>
+            <div class="rc-equip"><div class="rc-equip-name">${r.equipName || 'N/A'}</div>${r.serial ? `<div class="rc-equip-serial">SN: ${r.serial}</div>` : ''}</div>
+            <span class="status-badge ${statusClass}">${status}</span>
+            <div class="rc-date">${fmtDate(r.createdAt)}</div>
+            <div class="rc-actions">
+                <button class="btn btn-info btn-icon btn-sm" onclick="downloadRequestPDF('${r.id}')" data-tooltip="PDF"><i class="fas fa-file-pdf"></i></button>
+                ${canReceive ? `<button class="btn btn-success btn-icon btn-sm receive-btn" data-id="${r.id}" data-tooltip="Received"><i class="fas fa-check-double"></i></button>` : ''}
+                ${(userRole === 'maintenance' || userRole === 'admin') && status === 'No Job' ? `<button class="btn btn-warning btn-icon btn-sm" onclick="createJob('${r.requestNo}')" data-tooltip="Create Job"><i class="fas fa-tools"></i></button>` : ''}
             </div>
-        </div>`;
+        </div></div>`;
     }
     function renderJobcardCard(j) {
         const status = j.status || 'Pending';
         const statusClass = getStatusClass(status);
         const isEditable = (status === 'Pending' || status === 'Postponed');
         const canEdit = isEditable && (userRole === 'admin' || userRole === 'maintenance');
-        const initials = getInitials(j.techName);
-        const avatarClass = getAvatarClass(j.techName);
-        return `<div class="req-card">
-            <div class="rc-main">
-                <div class="rc-no">${j.jobNo || '—'}</div>
-                <div class="rc-requester"><div class="rc-avatar ${avatarClass}">${initials}</div><div class="rc-names"><div class="rc-name">${j.techName || 'N/A'}</div><div class="rc-dept">Req: ${j.requestNo || '—'}</div></div></div>
-                <div class="rc-equip"><div class="rc-equip-name">${j.equipName || 'N/A'}</div>${j.serial ? `<div class="rc-equip-serial">SN: ${j.serial}</div>` : ''}</div>
-                <span class="status-badge ${statusClass}">${status}</span>
-                <div class="rc-date">${fmtDate(j.updatedAt)}</div>
-                <div class="rc-actions">
-                    <button class="btn btn-info btn-icon btn-sm" onclick="downloadJobcardPDF('${j.id}')" data-tooltip="PDF"><i class="fas fa-file-pdf"></i></button>
-                    ${canEdit ? `<button class="btn btn-primary btn-icon btn-sm" onclick="editJobCard('${j.id}')" data-tooltip="Edit"><i class="fas fa-edit"></i></button>` : ''}
-                </div>
+        const initials = getInitials(j.techName); const avatarClass = getAvatarClass(j.techName);
+        return `<div class="req-card"><div class="rc-main">
+            <div class="rc-no">${j.jobNo || '—'}</div>
+            <div class="rc-requester"><div class="rc-avatar ${avatarClass}">${initials}</div><div class="rc-names"><div class="rc-name">${j.techName || 'N/A'}</div><div class="rc-dept">Req: ${j.requestNo || '—'}</div></div></div>
+            <div class="rc-equip"><div class="rc-equip-name">${j.equipName || 'N/A'}</div>${j.serial ? `<div class="rc-equip-serial">SN: ${j.serial}</div>` : ''}</div>
+            <span class="status-badge ${statusClass}">${status}</span>
+            <div class="rc-date">${fmtDate(j.updatedAt)}</div>
+            <div class="rc-actions">
+                <button class="btn btn-info btn-icon btn-sm" onclick="downloadJobcardPDF('${j.id}')" data-tooltip="PDF"><i class="fas fa-file-pdf"></i></button>
+                ${canEdit ? `<button class="btn btn-primary btn-icon btn-sm" onclick="editJobCard('${j.id}')" data-tooltip="Edit"><i class="fas fa-edit"></i></button>` : ''}
             </div>
-        </div>`;
+        </div></div>`;
     }
     async function markAsReceived(requestId) {
         if (!requestId) return;
@@ -1935,15 +1916,8 @@
         let ink = false; for (let i=0; i<d.length; i+=4) { if (d[i]<255||d[i+1]<255||d[i+2]<255) { ink=true; break; } }
         return ink ? c.toDataURL('image/png') : null;
     }
-    function pdfFmtDate(v, withTime = true) {
-        const d = toDate(v);
-        if (!d) return '';
-        try { const opts = { day:'2-digit', month:'short', year:'numeric' }; if (withTime) { opts.hour='2-digit'; opts.minute='2-digit'; opts.hour12=true; } return d.toLocaleString('en-GB', opts); } catch { return ''; }
-    }
-    function pdfStatusStyle(status) {
-        const map = { 'Pending':{ bg:'#fef3c7', text:'#b45309', border:'#f59e0b' }, 'Postponed':{ bg:'#fef3c7', text:'#b45309', border:'#f59e0b' }, 'Completed':{ bg:'#d1fae5', text:'#047857', border:'#10b981' }, 'Written Off':{ bg:'#fee2e2', text:'#b91c1c', border:'#ef4444' }, 'No Job':{ bg:'#e0f2fe', text:'#0369a1', border:'#0ea5e9' }, 'Open':{ bg:'#e0f2fe', text:'#0369a1', border:'#0ea5e9' } };
-        return map[status] || map['Open'];
-    }
+    function pdfFmtDate(v, withTime = true) { const d = toDate(v); if (!d) return ''; try { const opts = { day:'2-digit', month:'short', year:'numeric' }; if (withTime) { opts.hour='2-digit'; opts.minute='2-digit'; opts.hour12=true; } return d.toLocaleString('en-GB', opts); } catch { return ''; } }
+    function pdfStatusStyle(status) { const map = { 'Pending':{ bg:'#fef3c7', text:'#b45309', border:'#f59e0b' }, 'Postponed':{ bg:'#fef3c7', text:'#b45309', border:'#f59e0b' }, 'Completed':{ bg:'#d1fae5', text:'#047857', border:'#10b981' }, 'Written Off':{ bg:'#fee2e2', text:'#b91c1c', border:'#ef4444' }, 'No Job':{ bg:'#e0f2fe', text:'#0369a1', border:'#0ea5e9' }, 'Open':{ bg:'#e0f2fe', text:'#0369a1', border:'#0ea5e9' } }; return map[status] || map['Open']; }
     function pdfHeader() { return `<div style="background:linear-gradient(135deg,#C8102E 0%,#e81a3f 100%);color:white;padding:22px 30px;display:flex;align-items:center;gap:18px;"><div style="width:62px;height:62px;background:rgba(255,255,255,0.18);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:800;border:2px solid rgba(255,255,255,0.35);flex-shrink:0;">M</div><div style="flex:1;"><div style="font-size:19px;font-weight:800;letter-spacing:-0.2px;line-height:1.2;">MOI VOI COUNTY REFERRAL HOSPITAL</div><div style="font-size:10.5px;opacity:0.92;margin-top:4px;font-weight:500;">P.O. BOX 18-80300 VOI &nbsp;·&nbsp; biomedsmoivoi@gmail.com</div><div style="font-size:10px;font-weight:700;margin-top:3px;letter-spacing:0.5px;">TAITA TAVETA COUNTY &nbsp;·&nbsp; DEPARTMENT OF HEALTH SERVICES</div></div></div>`; }
     function pdfFooter(docId) { const now = new Date().toLocaleString('en-GB', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit', hour12:true }); return `<div style="background:#0f172a;color:#cbd5e1;padding:12px 30px;display:flex;justify-content:space-between;align-items:center;font-size:9px;"><div><div style="font-weight:700;color:white;margin-bottom:2px;">MCRH Equipment Maintenance System</div><div style="opacity:0.7;">Generated on ${now}</div></div><div style="text-align:right;"><div style="font-weight:700;color:white;margin-bottom:2px;">Document ID</div><div style="opacity:0.75;font-family:'Courier New',monospace;">${docId} &nbsp;·&nbsp; v1.0</div></div></div>`; }
     function pdfSectionTitle(text) { return `<div style="font-size:10.5px;font-weight:800;color:#C8102E;text-transform:uppercase;letter-spacing:1px;padding-bottom:6px;border-bottom:2px solid #C8102E;margin-bottom:12px;">${text}</div>`; }
@@ -1991,7 +1965,7 @@
             const sc = pdfStatusStyle(status);
             const temp = document.createElement('div');
             temp.style.cssText = 'position:fixed;left:-9999px;top:0;width:794px;background:white;font-family:Arial,Helvetica,sans-serif;color:#1e293b;';
-            temp.innerHTML = `<div style="width:794px;background:white;">${pdfHeader()}<div style="padding:14px 30px;background:white;border-bottom:3px solid #C8102E;display:flex;justify-content:space-between;align-items:center;"><div><div style="font-size:17px;font-weight:800;color:#0f172a;letter-spacing:0.4px;">EQUIPMENT JOB CARD</div><div style="font-size:10px;color:#64748b;margin-top:2px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">Maintenance Record Document</div></div><div style="text-align:right;"><div style="font-size:9px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;">Job Card No.</div><div style="font-size:22px;font-weight:800;color:#C8102E;letter-spacing:0.8px;font-family:'Courier New',monospace;margin-top:1px;">${job.jobNo || 'N/A'}</div></div></div><div style="padding:10px 30px;background:#f8fafc;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;"><div style="display:flex;gap:20px;flex-wrap:wrap;align-items:center;"><div style="display:flex;gap:8px;align-items:center;"><div style="font-size:9.5px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">Status</div><div style="display:inline-block;padding:3px 12px;border-radius:20px;background:${sc.bg};color:${sc.text};font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;border:1.5px solid ${sc.border};">● ${status}</div></div><div style="display:flex;gap:8px;align-items:center;"><div style="font-size:9.5px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">Request</div><div style="font-size:11px;font-weight:800;color:#0f172a;font-family:'Courier New',monospace;">${job.requestNo || 'N/A'}</div></div></div><div style="font-size:9px;color:#64748b;font-weight:600;">Last updated: ${pdfFmtDate(job.updatedAt)}</div></div><div style="padding:18px 30px;"><div style="margin-bottom:14px;">${pdfSectionTitle('Job & Requester Information')}<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px 20px;">${pdfField('Reporting Date', pdfFmtDate(job.reportingDateTime))}${pdfField('Requester', job.requester)}${pdfField('Unit / Ward', job.unit)}</div></div><div style="margin-bottom:14px;">${pdfSectionTitle('Equipment Details')}<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px 20px;">${pdfField('Equipment Name', job.equipName)}${pdfField('Serial No.', job.serial)}${pdfField('Model / Make', job.modelMake)}${pdfField('Inventory No.', job.inventory)}</div></div><div style="margin-bottom:14px;">${pdfSectionTitle('Complaint & Diagnosis')}<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 20px;"><div><div style="font-size:8.5px;color:#64748b;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Complaint by User</div><div style="padding:8px 12px;background:#f8fafc;border:1px solid #e2e8f0;border-left:3px solid #0ea5e9;border-radius:4px;font-size:10.5px;color:#1e293b;line-height:1.5;min-height:44px;font-weight:500;">${job.complaint || '<span style="color:#94a3b8;font-style:italic;">Not provided</span>'}</div></div><div><div style="font-size:8.5px;color:#64748b;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Diagnosis</div><div style="padding:8px 12px;background:#f8fafc;border:1px solid #e2e8f0;border-left:3px solid #C8102E;border-radius:4px;font-size:10.5px;color:#1e293b;line-height:1.5;min-height:44px;font-weight:500;">${job.diagnosis || '<span style="color:#94a3b8;font-style:italic;">Not provided</span>'}</div></div></div></div><div style="margin-bottom:14px;">${pdfSectionTitle('Handover')}<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px 20px;">${pdfField('Received From', job.receivedFrom)}${pdfField('Received By', job.receivedBy)}${pdfField('Received At', pdfFmtDate(job.receivedDateTime))}${pdfField('Handed To', job.handedTo)}${pdfField('Handed By', job.handedBy)}${pdfField('Handed At', pdfFmtDate(job.handedDateTime))}</div></div><div style="margin-bottom:14px;">${pdfSectionTitle('Service Type & Timeline')}<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px 20px;">${pdfField('Service Type', job.serviceType)}${pdfField('Job Started', pdfFmtDate(job.startDateTime))}${pdfField('Job Completed', pdfFmtDate(job.endDateTime))}${pdfField('Total Time', job.totalTime)}${pdfField('Response Time', job.responseTime)}${pdfField('Admin Time', job.adminTime)}</div></div><div style="margin-bottom:14px;">${pdfSectionTitle('Status & Resolution')}${status === 'Completed' ? `<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 20px;"><div><div style="font-size:8.5px;color:#64748b;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Defects Found</div><div style="padding:8px 12px;background:#fef3c7;border:1px solid #fcd34d;border-radius:4px;font-size:10.5px;color:#78350f;line-height:1.5;min-height:44px;font-weight:500;">${job.defects || '<span style="color:#a16207;font-style:italic;">Not provided</span>'}</div></div><div><div style="font-size:8.5px;color:#64748b;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Action Taken</div><div style="padding:8px 12px;background:#d1fae5;border:1px solid #6ee7b7;border-radius:4px;font-size:10.5px;color:#065f46;line-height:1.5;min-height:44px;font-weight:500;">${job.actionTaken || '<span style="color:#047857;font-style:italic;">Not provided</span>'}</div></div></div>` : ''}${status === 'Pending' ? `<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px 20px;">${pdfField('Postpone Reason', job.postponeReason)}${pdfField('Expected Date', pdfFmtDate(job.expectedDate))}${pdfField('Postpone Note', job.postponeNote)}</div>` : ''}${status === 'Written Off' ? `<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 20px;">${pdfField('Write-Off Reason', job.writeOffReason)}${pdfField('Write-Off Note', job.writeOffNote)}</div>` : ''}${job.comments ? `<div style="margin-top:10px;"><div style="font-size:8.5px;color:#64748b;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Additional Comments</div><div style="padding:8px 12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:4px;font-size:10.5px;color:#1e293b;line-height:1.5;font-weight:500;">${job.comments}</div></div>` : ''}</div><div style="margin-bottom:14px;">${pdfSectionTitle('Measurements & Verification')}<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px 20px;">${pdfField('Current (A)', job.measureCurrent)}${pdfField('Voltage (V)', job.measureVoltage)}${pdfField('Insulation (MΩ)', job.measureInsulation)}${pdfField('Pressure', job.measurePressure)}</div></div></div><div style="padding:0 30px 20px;"><div style="font-size:11px;font-weight:800;color:#C8102E;text-transform:uppercase;letter-spacing:1px;padding-bottom:6px;border-bottom:2px solid #C8102E;margin-bottom:14px;">Signatures &amp; Authorisation</div><div style="display:flex;gap:20px;">${pdfSigBlock('Technician Signature', job.techName, pdfFmtDate(job.techDate, false), techSig, '#0ea5e9')}${pdfSigBlock('Supervisor Signature', job.certName, pdfFmtDate(job.certDate, false), certSig, '#C8102E')}</div></div>${pdfFooter(`JC-${job.jobNo || 'N/A'}`)}</div>`;
+            temp.innerHTML = `<div style="width:794px;background:white;">${pdfHeader()}<div style="padding:14px 30px;background:white;border-bottom:3px solid #C8102E;display:flex;justify-content:space-between;align-items:center;"><div><div style="font-size:17px;font-weight:800;color:#0f172a;letter-spacing:0.4px;">EQUIPMENT JOB CARD</div><div style="font-size:10px;color:#64748b;margin-top:2px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">Maintenance Record Document</div></div><div style="text-align:right;"><div style="font-size:9px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;">Job Card No.</div><div style="font-size:22px;font-weight:800;color:#C8102E;letter-spacing:0.8px;font-family:'Courier New',monospace;margin-top:1px;">${job.jobNo || 'N/A'}</div></div></div><div style="padding:10px 30px;background:#f8fafc;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;"><div style="display:flex;gap:20px;flex-wrap:wrap;align-items:center;"><div style="display:flex;gap:8px;align-items:center;"><div style="font-size:9.5px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">Status</div><div style="display:inline-block;padding:3px 12px;border-radius:20px;background:${sc.bg};color:${sc.text};font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;border:1.5px solid ${sc.border};">● ${status}</div></div><div style="display:flex;gap:8px;align-items:center;"><div style="font-size:9.5px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">Request</div><div style="font-size:11px;font-weight:800;color:#0f172a;font-family:'Courier New',monospace;">${job.requestNo || 'N/A'}</div></div></div><div style="font-size:9px;color:#64748b;font-weight:600;">Last updated: ${pdfFmtDate(job.updatedAt)}</div></div><div style="padding:18px 30px;"><div style="margin-bottom:14px;">${pdfSectionTitle('Job & Requester Information')}<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px 20px;">${pdfField('Reporting Date', pdfFmtDate(job.reportingDateTime))}${pdfField('Requester', job.requester)}${pdfField('Unit / Ward', job.unit)}</div></div><div style="margin-bottom:14px;">${pdfSectionTitle('Equipment Details')}<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px 20px;">${pdfField('Equipment Name', job.equipName)}${pdfField('Serial No.', job.serial)}${pdfField('Model / Make', job.modelMake)}${pdfField('Inventory No.', job.inventory)}</div></div><div style="margin-bottom:14px;">${pdfSectionTitle('Complaint & Diagnosis')}<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 20px;"><div><div style="font-size:8.5px;color:#64748b;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Complaint by User</div><div style="padding:8px 12px;background:#f8fafc;border:1px solid #e2e8f0;border-left:3px solid #0ea5e9;border-radius:4px;font-size:10.5px;color:#1e293b;line-height:1.5;min-height:44px;font-weight:500;">${job.complaint || '<span style="color:#94a3b8;font-style:italic;">Not provided</span>'}</div></div><div><div style="font-size:8.5px;color:#64748b;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Diagnosis</div><div style="padding:8px 12px;background:#f8fafc;border:1px solid #e2e8f0;border-left:3px solid #C8102E;border-radius:4px;font-size:10.5px;color:#1e293b;line-height:1.5;min-height:44px;font-weight:500;">${job.diagnosis || '<span style="color:#94a3b8;font-style:italic;">Not provided</span>'}</div></div></div></div><div style="margin-bottom:14px;">${pdfSectionTitle('Handover')}<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px 20px;">${pdfField('Received From', job.receivedFrom)}${pdfField('Received By', job.receivedBy)}${pdfField('Received At', pdfFmtDate(job.receivedDateTime))}${pdfField('Handed To', job.handedTo)}${pdfField('Handed By', job.handedBy)}${pdfField('Handed At', pdfFmtDate(job.handedDateTime))}</div></div><div style="margin-bottom:14px;">${pdfSectionTitle('Service Type & Timeline')}<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px 20px;">${pdfField('Service Type', job.serviceType)}${pdfField('Job Started', pdfFmtDate(job.startDateTime))}${pdfField('Job Completed', pdfFmtDate(job.endDateTime))}${pdfField('Total Time', job.totalTime)}${pdfField('Response Time', job.responseTime)}${pdfField('Admin Time', job.adminTime)}</div></div><div style="margin-bottom:14px;">${pdfSectionTitle('Status & Resolution')}${status === 'Completed' ? `<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 20px;"><div><div style="font-size:8.5px;color:#64748b;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Defects Found</div><div style="padding:8px 12px;background:#fef3c7;border:1px solid #fcd34d;border-radius:4px;font-size:10.5px;color:#78350f;line-height:1.5;min-height:44px;font-weight:500;">${job.defects || '<span style="color:#a16207;font-style:italic;">Not provided</span>'}</div></div><div><div style="font-size:8.5px;color:#64748b;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Action Taken</div><div style="padding:8px 12px;background:#d1fae5;border:1px solid #6ee7b7;border-radius:4px;font-size:10.5px;color:#065f46;line-height:1.5;min-height:44px;font-weight:500;">${job.actionTaken || '<span style="color:#047857;font-style:italic;">Not provided</span>'}</div></div></div>` : ''}${status === 'Pending' ? `<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px 20px;">${pdfField('Postpone Reason', job.postponeReason)}${pdfField('Expected Date', pdfFmtDate(job.expectedDate))}${pdfField('Postpone Note', job.postponeNote)}</div>` : ''}${status === 'Written Off' ? `<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 20px;">${pdfField('Write-Off Reason', job.writeOffReason)}${pdfField('Write-Off Note', job.writeOffNote)}</div>` : ''}${job.comments ? `<div style="margin-top:10px;"><div style="font-size:8.5px;color:#64748b;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Additional Comments</div><div style="padding:8px 12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:4px;font-size:10.5px;color:#1e293b;line-height:1.5;font-weight:500;">${job.comments}</div></div>` : ''}</div><div style="margin-bottom:14px;">${pdfSectionTitle('Measurements & Verification')}<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px 20px;">${pdfField('Current (A)', job.measureCurrent)}${pdfField('Voltage (V)', job.measureVoltage)}${pdfField('Insulation (MΩ)', job.measureInsulation)}${pdfField('Pressure', job.measurePressure)}</div><div style="display:flex;gap:24px;margin-top:12px;"><div style="display:flex;align-items:center;gap:8px;font-size:10.5px;font-weight:700;color:#0f172a;"><span style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border:1.5px solid #10b981;border-radius:3px;background:${job.functionOk ? '#10b981' : 'white'};color:white;font-size:10px;font-weight:900;">${job.functionOk ? '✓' : ''}</span>Function O.K.</div><div style="display:flex;align-items:center;gap:8px;font-size:10.5px;font-weight:700;color:#0f172a;"><span style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border:1.5px solid #10b981;border-radius:3px;background:${job.safetyOk ? '#10b981' : 'white'};color:white;font-size:10px;font-weight:900;">${job.safetyOk ? '✓' : ''}</span>Safety O.K.</div></div></div></div><div style="padding:0 30px 20px;"><div style="font-size:11px;font-weight:800;color:#C8102E;text-transform:uppercase;letter-spacing:1px;padding-bottom:6px;border-bottom:2px solid #C8102E;margin-bottom:14px;">Signatures &amp; Authorisation</div><div style="display:flex;gap:20px;">${pdfSigBlock('Technician Signature', job.techName, pdfFmtDate(job.techDate, false), techSig, '#0ea5e9')}${pdfSigBlock('Supervisor Signature', job.certName, pdfFmtDate(job.certDate, false), certSig, '#C8102E')}</div></div>${pdfFooter(`JC-${job.jobNo || 'N/A'}`)}</div>`;
             document.body.appendChild(temp);
             await renderElementToPDF(temp, `JobCard_${job.jobNo || 'export'}.pdf`);
             document.body.removeChild(temp);
@@ -2068,7 +2042,7 @@
                 const result = await res.json();
                 if (!res.ok) throw new Error(result.error || 'Unknown error');
                 sucD.textContent = `✅ ${result.message}`; sucD.style.display = 'block';
-                showToast(`${name} has been added to the system`, 'success', 'User Created');
+                showToast(`${name} has been added`, 'success', 'User Created');
                 await fetchData(); renderUserList(); renderDashboard(); closeUserModal();
             } else {
                 const userData = { name, role, whatsapp: role === 'maintenance' ? countryCode + whatsappNumber : '', updatedAt: serverTimestamp() };
@@ -2077,7 +2051,7 @@
                 else { userData.department = null; userData.departments = null; }
                 await updateDoc(doc(db, USERS_COLL, editId), userData);
                 sucD.textContent = `✅ User ${name} updated!`; sucD.style.display = 'block';
-                showToast(`User ${name} has been updated`, 'success', 'Updated');
+                showToast(`User ${name} updated`, 'success', 'Updated');
                 await fetchData(); renderUserList(); renderDashboard(); closeUserModal();
             }
         } catch (err) { errD.textContent = 'Error: ' + err.message; errD.style.display = 'block'; showToast(err.message, 'error', 'Failed'); }
@@ -2090,17 +2064,17 @@
             const deptDisplay = u.role === 'requester' ? u.department : (u.departments ? u.departments.join(', ') : '');
             const initials = getInitials(u.name);
             const avatarClass = getAvatarClass(u.name || u.email);
-            html += `<li><div class="user-info"><div class="rc-avatar ${avatarClass}" style="width:36px;height:36px;font-size:13px;">${initials}</div><div><strong>${u.name || 'Unnamed'}</strong><small>${u.email} · ${u.role}${deptDisplay ? ' · ' + deptDisplay : ''}${u.whatsapp ? ' · 📱 ' + u.whatsapp : ''}</small></div></div><div class="user-actions"><select class="role-select" onchange="updateUserRole('${u.id}', this.value)"><option value="requester" ${u.role === 'requester' ? 'selected' : ''}>Requester</option><option value="maintenance" ${u.role === 'maintenance' ? 'selected' : ''}>Maintenance</option><option value="admin" ${u.role === 'admin' ? 'selected' : ''}>Admin</option></select><button class="edit-btn" onclick="editUser('${u.id}')"><i class="fas fa-edit"></i></button>${!u.approved ? `<button class="approve-btn" onclick="approveUser('${u.id}')">Approve</button>` : ''}<button class="deny-btn" onclick="deleteUser('${u.id}')"><i class="fas fa-trash"></i></button></div></li>`;
+            html += `<li><div class="user-info"><div class="rc-avatar ${avatarClass}" style="width:36px;height:36px;font-size:13px;">${initials}</div><div><strong>${u.name || 'Unnamed'}</strong><small>${u.email} · ${u.role}${deptDisplay ? ' · ' + deptDisplay : ''}</small></div></div><div class="user-actions"><select class="role-select" onchange="updateUserRole('${u.id}', this.value)"><option value="requester" ${u.role === 'requester' ? 'selected' : ''}>Requester</option><option value="maintenance" ${u.role === 'maintenance' ? 'selected' : ''}>Maintenance</option><option value="admin" ${u.role === 'admin' ? 'selected' : ''}>Admin</option></select><button class="edit-btn" onclick="editUser('${u.id}')"><i class="fas fa-edit"></i></button>${!u.approved ? `<button class="approve-btn" onclick="approveUser('${u.id}')">Approve</button>` : ''}<button class="deny-btn" onclick="deleteUser('${u.id}')"><i class="fas fa-trash"></i></button></div></li>`;
         });
         list.innerHTML = html;
     }
     window.updateUserRole = async function(userId, newRole) {
-        try { await updateDoc(doc(db, USERS_COLL, userId), { role: newRole }); showToast('User role updated successfully', 'success'); await fetchData(); renderUserList(); renderDashboard(); }
+        try { await updateDoc(doc(db, USERS_COLL, userId), { role: newRole }); showToast('Role updated', 'success'); await fetchData(); renderUserList(); renderDashboard(); }
         catch (err) { showToast(err.message, 'error'); }
     };
     window.deleteUser = function(userId) {
         const user = allUsers.find(u => u.id === userId);
-        showConfirm({ title:'Delete this user?', message:`Are you sure you want to permanently delete ${user?.name || 'this user'}?`, type:'danger', okText:'Delete User', onConfirm: async () => {
+        showConfirm({ title:'Delete this user?', message:`Are you sure you want to delete ${user?.name || 'this user'}?`, type:'danger', okText:'Delete User', onConfirm: async () => {
             try {
                 const backup = { ...user };
                 await deleteDoc(doc(db, USERS_COLL, userId));
@@ -2113,7 +2087,7 @@
         }});
     };
     window.approveUser = async function(userId) {
-        try { await updateDoc(doc(db, USERS_COLL, userId), { approved: true }); showToast('User has been approved', 'success', 'Approved'); await fetchData(); renderUserList(); renderDashboard(); if (document.getElementById('approvalModal').classList.contains('show')) showPendingUsers(); }
+        try { await updateDoc(doc(db, USERS_COLL, userId), { approved: true }); showToast('User approved', 'success'); await fetchData(); renderUserList(); renderDashboard(); if (document.getElementById('approvalModal').classList.contains('show')) showPendingUsers(); }
         catch (err) { showToast(err.message, 'error'); }
     };
     window.showPendingUsers = async function() {
@@ -2128,7 +2102,7 @@
         } catch (err) { list.innerHTML = '<p style="color:red;">Error loading users.</p>'; }
     };
     window.denyUser = function(userId) {
-        showConfirm({ title:'Deny & delete?', message:'This user will be permanently deleted. They will not be able to sign in.', type:'danger', okText:'Deny User', onConfirm: async () => { try { await deleteDoc(doc(db, USERS_COLL, userId)); showToast('User has been denied and removed', 'success', 'Removed'); await fetchData(); showPendingUsers(); renderDashboard(); } catch (err) { showToast(err.message, 'error'); } } });
+        showConfirm({ title:'Deny & delete?', message:'This user will be permanently deleted.', type:'danger', okText:'Deny User', onConfirm: async () => { try { await deleteDoc(doc(db, USERS_COLL, userId)); showToast('User removed', 'success'); await fetchData(); showPendingUsers(); renderDashboard(); } catch (err) { showToast(err.message, 'error'); } } });
     };
     window.closeApprovalModal = function() { document.getElementById('approvalModal').classList.remove('show'); };
     document.getElementById('approvalModal').addEventListener('click', function(e) { if (e.target === this) closeApprovalModal(); });
@@ -2157,7 +2131,7 @@
             const snap = await getDoc(doc(db, USERS_COLL, user.uid));
             if (!snap.exists()) { await signOut(auth); window.location.href = 'login.html'; return; }
             const data = snap.data();
-            if (!data.approved) { showToast('Your account is pending approval.', 'warning'); await signOut(auth); window.location.href = 'login.html'; return; }
+            if (!data.approved) { showToast('Account pending approval.', 'warning'); await signOut(auth); window.location.href = 'login.html'; return; }
             currentUser = { id: user.uid, ...data };
             userRole = currentUser.role || 'requester';
             document.getElementById('sidebarUserName').textContent = currentUser.name || 'User';
@@ -2166,6 +2140,99 @@
             renderSkeleton(); await fetchData(); renderDashboard();
         } catch (err) { showToast(err.message, 'error'); }
     });
+
+    // ============ AI WIDGET ============
+    (function(){
+        let conversation = [];
+        let sending = false;
+        const SUGGESTIONS = ['How do I create a new request?', 'What does Written Off mean?', 'Who approves new users?', 'How do I download a PDF?', 'What needs attention today?'];
+        window.mcrhAiToggle = function() {
+            const panel = document.getElementById('mcrhAiPanel');
+            panel.classList.toggle('open');
+            if (panel.classList.contains('open')) {
+                if (!conversation.length) initChat();
+                renderSuggestions();
+                setTimeout(() => document.getElementById('mcrhAiInput').focus(), 200);
+            }
+        };
+        function initChat() {
+            conversation = [];
+            document.getElementById('mcrhAiMessages').innerHTML = '';
+            const ctx = window.aiContext || {};
+            let greeting = "Hi! I'm your MCRH assistant. Ask me anything about the system.";
+            if (ctx.userName) greeting = `Hi ${ctx.userName.split(' ')[0]}! I'm your assistant. Ask me how to submit a request, what statuses mean, or what needs attention today.`;
+            addMsg('assistant', greeting);
+        }
+        function renderSuggestions() {
+            document.getElementById('mcrhAiSuggestions').innerHTML = SUGGESTIONS.map(s => `<button class="mcrh-ai-suggestion" onclick="mcrhAiQuickAsk('${s.replace(/'/g,"\\'")}')">${s}</button>`).join('');
+        }
+        window.mcrhAiQuickAsk = function(text) { document.getElementById('mcrhAiInput').value = text; mcrhAiSend(); };
+        function addMsg(role, text, isHtml) {
+            const c = document.getElementById('mcrhAiMessages');
+            const d = document.createElement('div');
+            d.className = 'mcrh-ai-msg ' + role;
+            if (isHtml) d.innerHTML = text; else d.textContent = text;
+            c.appendChild(d); c.scrollTop = c.scrollHeight;
+        }
+        function addTyping() {
+            const c = document.getElementById('mcrhAiMessages');
+            const d = document.createElement('div');
+            d.className = 'mcrh-ai-msg assistant typing';
+            d.id = 'mcrhAiTyping';
+            d.innerHTML = '<span></span><span></span><span></span>';
+            c.appendChild(d); c.scrollTop = c.scrollHeight;
+        }
+        function removeTyping() { const t = document.getElementById('mcrhAiTyping'); if (t) t.remove(); }
+        function renderMd(text) {
+            if (!text) return '';
+            let h = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+            h = h.replace(/^### (.+)$/gm,'<strong>$1</strong>');
+            h = h.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+            h = h.replace(/\*(.+?)\*/g,'<em>$1</em>');
+            h = h.replace(/`(.+?)`/g,'<code>$1</code>');
+            h = h.replace(/^[-*] (.+)$/gm,'<li>$1</li>');
+            h = h.replace(/(<li>.*<\/li>\n?)+/g,'<ul>$&</ul>');
+            h = h.replace(/\n\n+/g,'<br><br>').replace(/\n/g,'<br>');
+            return h;
+        }
+        window.mcrhAiSend = async function() {
+            if (sending) return;
+            const input = document.getElementById('mcrhAiInput');
+            const text = input.value.trim();
+            if (!text) return;
+            const backend = getAIBackend();
+            if (!backend) { addMsg('assistant', 'Backend URL not configured.'); return; }
+            input.value = ''; input.style.height = 'auto';
+            addMsg('user', text);
+            conversation.push({ role: 'user', content: text });
+            sending = true;
+            document.getElementById('mcrhAiSend').disabled = true;
+            addTyping();
+            try {
+                const res = await fetch(backend + '/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: conversation, context: window.aiContext || {} }) });
+                if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e.error || 'Backend error ' + res.status); }
+                const data = await res.json();
+                removeTyping();
+                addMsg('assistant', renderMd(data.reply || ''), true);
+                conversation.push({ role: 'assistant', content: data.reply || '' });
+                if (conversation.length > 20) conversation = conversation.slice(-20);
+            } catch (err) {
+                removeTyping();
+                addMsg('assistant', '⚠️ ' + (err.message || 'Could not reach AI.'));
+            } finally {
+                sending = false;
+                document.getElementById('mcrhAiSend').disabled = false;
+                document.getElementById('mcrhAiInput').focus();
+            }
+        };
+        document.getElementById('mcrhAiInput')?.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+        });
+        document.getElementById('mcrhAiInput')?.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); mcrhAiSend(); }
+        });
+    })();
 </script>
 </body>
 </html>

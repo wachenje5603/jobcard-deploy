@@ -1,504 +1,472 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
-    <title>MCRH - Login</title>
-    <script type="importmap">
-    {"imports":{
-        "firebase/app":"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js",
-        "firebase/auth":"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js",
-        "firebase/firestore":"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"
-    }}
-    </script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
-        :root {
-            --primary:#C8102E; --primary-dark:#a00d24; --primary-light:#e81a3f;
-            --primary-gradient:linear-gradient(135deg,#C8102E 0%,#e81a3f 100%);
-            --primary-soft:rgba(200,16,46,0.08);
-            --bg:#f4f6fb; --card:#ffffff;
-            --border:#e8ebf1; --border-soft:#f1f4f9;
-            --text:#0f172a; --text-soft:#475569; --text-muted:#94a3b8;
-            --success:#10b981; --success-soft:#d1fae5; --success-text:#047857;
-            --warning:#f59e0b; --warning-soft:#fef3c7; --warning-text:#b45309;
-            --danger:#ef4444; --danger-soft:#fee2e2; --danger-text:#b91c1c;
-            --transition:200ms cubic-bezier(0.4,0,0.2,1);
-            --transition-slow:320ms cubic-bezier(0.4,0,0.2,1);
-        }
-        [data-theme="dark"] {
-            --bg:#0b1220; --card:#131c30;
-            --border:rgba(255,255,255,0.08); --border-soft:rgba(255,255,255,0.04);
-            --text:#f1f5f9; --text-soft:#cbd5e1; --text-muted:#94a3b8;
-            --success-soft:rgba(16,185,129,0.15); --success-text:#6ee7b7;
-            --warning-soft:rgba(245,158,11,0.15); --warning-text:#fcd34d;
-            --danger-soft:rgba(239,68,68,0.15); --danger-text:#fca5a5;
-        }
-        html, body { transition: background-color var(--transition-slow), color var(--transition-slow); }
-        body {
-            font-family:'Plus Jakarta Sans','Inter',-apple-system,sans-serif;
-            background:var(--bg);
-            background-image:
-                radial-gradient(circle at 0% 0%, rgba(200,16,46,0.08) 0%, transparent 40%),
-                radial-gradient(circle at 100% 100%, rgba(99,102,241,0.08) 0%, transparent 40%);
-            background-attachment:fixed; min-height:100vh;
-            display:flex; align-items:center; justify-content:center; padding:20px;
-            -webkit-font-smoothing:antialiased; opacity:0; transition: opacity 320ms ease;
-            -webkit-text-size-adjust:100%;
-        }
-        body.page-ready { opacity:1; }
-        body.page-leaving { opacity:0; }
-        .login-wrap {
-            width:100%; max-width:440px;
-            animation:fadeUp 700ms cubic-bezier(0.16,1,0.3,1);
-        }
-        @keyframes fadeUp { from { opacity:0; transform:translateY(28px); } to { opacity:1; transform:translateY(0); } }
-        .brand { text-align:center; margin-bottom:30px; }
-        .brand-icon {
-            width:80px; height:80px; background:var(--primary-gradient); border-radius:24px;
-            display:inline-flex; align-items:center; justify-content:center;
-            font-size:36px; font-weight:800; color:white; margin-bottom:18px;
-            box-shadow:0 20px 50px rgba(200,16,46,0.35);
-            animation:brandFloat 4s ease-in-out infinite;
-        }
-        @keyframes brandFloat {
-            0%, 100% { transform:translateY(0) rotate(0deg); }
-            50% { transform:translateY(-6px) rotate(-2deg); }
-        }
-        .brand h1 { font-size:30px; font-weight:800; color:var(--text); letter-spacing:-0.6px; }
-        .brand p { font-size:13.5px; color:var(--text-muted); margin-top:6px; font-weight:500; }
-        .theme-toggle-login {
-            position:fixed; top:20px; right:20px; width:40px; height:40px;
-            border-radius:12px; border:1.5px solid var(--border);
-            background:var(--card); color:var(--text-soft); cursor:pointer;
-            display:flex; align-items:center; justify-content:center;
-            font-size:14px; transition:var(--transition); z-index:100;
-        }
-        .theme-toggle-login:hover { border-color:var(--primary); color:var(--primary); transform:rotate(15deg); }
-        .login-card {
-            background:var(--card); border-radius:20px; padding:36px 34px;
-            border:1px solid var(--border); box-shadow:0 24px 70px rgba(15,23,42,0.1);
-            position:relative; overflow:hidden;
-        }
-        .login-card::before {
-            content:''; position:absolute; top:0; left:0; right:0; height:4px;
-            background:var(--primary-gradient);
-        }
-        .form-group { margin-bottom:18px; position:relative; }
-        .form-group label {
-            font-size:11.5px; font-weight:700; color:var(--text-soft);
-            display:block; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px;
-        }
-        .input-wrap { position:relative; display:flex; align-items:center; }
-        .input-wrap > i.input-icon {
-            position:absolute; left:15px; top:50%; transform:translateY(-50%);
-            color:var(--text-muted); font-size:14px; pointer-events:none;
-            transition:var(--transition); z-index:1;
-        }
-        .form-group input {
-            width:100%; padding:14px 46px 14px 44px; border:1.5px solid var(--border);
-            border-radius:12px; font-size:14.5px; background:var(--bg);
-            font-family:inherit; color:var(--text); font-weight:500;
-            transition:var(--transition); outline:none;
-        }
-        .form-group input:focus {
-            border-color:var(--primary); box-shadow:0 0 0 4px rgba(200,16,46,0.08); background:var(--card);
-        }
-        .form-group input:focus ~ i.input-icon, .input-wrap:focus-within > i.input-icon { color:var(--primary); }
-        input[type="password"]::-ms-reveal, input[type="password"]::-ms-clear { display:none; }
-        .toggle-password {
-            position:absolute; right:8px; top:50%; transform:translateY(-50%);
-            background:transparent; border:none; width:38px; height:38px;
-            border-radius:9px; cursor:pointer; color:var(--text-muted);
-            font-size:14px; display:flex; align-items:center; justify-content:center;
-            transition:var(--transition); font-family:inherit; z-index:2;
-        }
-        .toggle-password:hover { background:var(--primary-soft); color:var(--primary); }
-        .toggle-password:active { transform:translateY(-50%) scale(0.92); }
-        .toggle-password.visible { color:var(--primary); }
-        .password-strength { margin-top:8px; display:none; }
-        .password-strength.show { display:block; }
-        .strength-bar-wrap { display:flex; gap:4px; margin-bottom:6px; }
-        .strength-bar { flex:1; height:4px; background:var(--border); border-radius:2px; transition:var(--transition); }
-        .strength-bar.weak { background:var(--danger); }
-        .strength-bar.fair { background:var(--warning); }
-        .strength-bar.good { background:#0ea5e9; }
-        .strength-bar.strong { background:var(--success); }
-        .strength-text { font-size:11px; font-weight:700; color:var(--text-muted); letter-spacing:0.3px; }
-        .caps-warning {
-            display:none; align-items:center; gap:6px; margin-top:8px;
-            font-size:12px; font-weight:700; color:var(--warning-text);
-            background:var(--warning-soft); padding:8px 12px; border-radius:8px;
-            animation:fadeIn 200ms ease;
-        }
-        .caps-warning.show { display:flex; }
-        @keyframes fadeIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:translateY(0); } }
-        .forgot-row { text-align:right; margin-top:-6px; margin-bottom:20px; }
-        .forgot-row a { color:var(--text-muted); font-size:12.5px; text-decoration:none; font-weight:600; transition:var(--transition); }
-        .forgot-row a:hover { color:var(--primary); }
-        .btn-login {
-            width:100%; padding:15px; background:var(--primary-gradient); color:white;
-            border:none; border-radius:12px; font-weight:700; font-size:14.5px;
-            font-family:inherit; cursor:pointer; transition:var(--transition);
-            box-shadow:0 10px 26px rgba(200,16,46,0.3);
-            display:flex; align-items:center; justify-content:center; gap:10px;
-            position:relative; overflow:hidden;
-        }
-        .btn-login::before {
-            content:''; position:absolute; inset:0;
-            background:linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.28), transparent 70%);
-            transform:translateX(-100%); transition:600ms ease; pointer-events:none;
-        }
-        .btn-login:hover:not(:disabled)::before { transform:translateX(100%); }
-        .btn-login:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 14px 34px rgba(200,16,46,0.42); }
-        .btn-login:disabled { opacity:0.65; cursor:not-allowed; }
-        .ripple {
-            position:absolute; border-radius:50%; background:rgba(255,255,255,0.55);
-            transform:scale(0); animation:rippleExpand 620ms cubic-bezier(0.4,0,0.2,1); pointer-events:none;
-        }
-        @keyframes rippleExpand { to { transform:scale(3); opacity:0; } }
-        .error-msg {
-            color:var(--danger-text); font-size:12.5px; padding:11px 15px;
-            background:var(--danger-soft); border-radius:10px; margin-top:14px;
-            font-weight:600; display:none; align-items:center; gap:8px;
-            animation:shake 400ms ease;
-        }
-        .error-msg.show { display:flex; }
-        .error-msg i { font-size:13px; flex-shrink:0; }
-        @keyframes shake {
-            0%, 100% { transform:translateX(0); }
-            25% { transform:translateX(-6px); }
-            75% { transform:translateX(6px); }
-        }
-        .footer-note { text-align:center; margin-top:24px; font-size:12px; color:var(--text-muted); font-weight:500; }
-        .footer-note i { color:var(--primary); margin-right:5px; }
-        .spinner {
-            width:16px; height:16px; border:2.5px solid rgba(255,255,255,0.3);
-            border-top-color:#fff; border-radius:50%; animation:spin 0.7s linear infinite;
-        }
-        @keyframes spin { to { transform:rotate(360deg); } }
-        .toast {
-            position:fixed; bottom:24px; right:24px; background:var(--card); color:var(--text);
-            padding:14px 52px 14px 18px; border-radius:12px; font-weight:600; z-index:9999;
-            transform:translateY(120px) scale(0.95); opacity:0;
-            transition:480ms cubic-bezier(0.34,1.56,0.64,1);
-            border:1px solid var(--border); border-left:4px solid var(--primary);
-            max-width:420px; box-shadow:0 24px 70px rgba(15,23,42,0.15);
-            font-size:13px; display:flex; align-items:center; gap:12px; min-width:280px;
-        }
-        .toast.show { transform:translateY(0) scale(1); opacity:1; }
-        .toast-icon {
-            width:32px; height:32px; border-radius:9px; display:flex;
-            align-items:center; justify-content:center; font-size:14px;
-            flex-shrink:0; background:var(--primary-soft); color:var(--primary);
-        }
-        .toast-body { flex:1; min-width:0; }
-        .toast-title { font-weight:800; font-size:13px; color:var(--text); }
-        .toast-message { font-size:12.5px; color:var(--text-soft); margin-top:1px; }
-        .toast-close {
-            position:absolute; top:10px; right:10px; width:22px; height:22px;
-            border-radius:6px; background:transparent; border:none; color:var(--text-muted);
-            cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:11px;
-        }
-        .toast.success { border-left-color:var(--success); }
-        .toast.success .toast-icon { background:var(--success-soft); color:var(--success); }
-        .toast.error { border-left-color:var(--danger); }
-        .toast.error .toast-icon { background:var(--danger-soft); color:var(--danger); }
-        .toast.warning { border-left-color:var(--warning); }
-        .toast.warning .toast-icon { background:var(--warning-soft); color:var(--warning); }
-        .toast.info { border-left-color:#0ea5e9; }
-        .toast.info .toast-icon { background:rgba(14,165,233,0.15); color:#0ea5e9; }
-        /* ========== MOBILE ENHANCEMENTS ========== */
-        @media (max-width:768px) {
-            input, select, textarea { font-size:16px !important; }
-        }
-        @media (max-width:640px) {
-            body { padding:16px; align-items:flex-start; padding-top:max(40px, env(safe-area-inset-top)); }
-            .login-card { padding:26px 20px; border-radius:16px; }
-            .brand-icon { width:68px; height:68px; font-size:28px; }
-            .brand h1 { font-size:22px; }
-            .brand p { font-size:12.5px; }
-            .form-group input { padding:14px 44px 14px 42px; font-size:16px; }
-            .btn-login { min-height:48px; font-size:14.5px; }
-            .theme-toggle-login { top:max(12px, env(safe-area-inset-top)); right:12px; min-height:44px; min-width:44px; }
-            .toast { left:14px; right:14px; bottom:max(14px, env(safe-area-inset-bottom)); max-width:none; min-width:0; }
-        }
-        @supports (padding: max(0px)) {
-            body { padding-bottom:max(20px, env(safe-area-inset-bottom)); }
-        }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#C8102E" />
+<title>MCRH - Login</title>
+<script type="importmap">
+{"imports":{
+  "firebase/app":"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js",
+  "firebase/auth":"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js",
+  "firebase/firestore":"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"
+}}
+</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --primary:#C8102E;--primary-dark:#a00d24;--primary-light:#e81a3f;
+  --primary-gradient:linear-gradient(135deg,#C8102E 0%,#e81a3f 100%);--primary-soft:rgba(200,16,46,0.08);
+  --bg:#f4f6fb;--card:#ffffff;--border:#e8ebf1;--border-soft:#f1f4f9;
+  --text:#0f172a;--text-soft:#475569;--text-muted:#94a3b8;
+  --success:#10b981;--success-soft:#d1fae5;--success-text:#047857;
+  --warning:#f59e0b;--warning-soft:#fef3c7;--warning-text:#b45309;
+  --danger:#ef4444;--danger-soft:#fee2e2;--danger-text:#b91c1c;
+  --purple:#8b5cf6;--purple-soft:#f3e8ff;
+  --transition:200ms cubic-bezier(0.4,0,0.2,1);--transition-slow:320ms cubic-bezier(0.4,0,0.2,1);
+}
+[data-theme="dark"]{
+  --bg:#0b1220;--card:#131c30;--border:rgba(255,255,255,0.08);--border-soft:rgba(255,255,255,0.04);
+  --text:#f1f5f9;--text-soft:#cbd5e1;--text-muted:#94a3b8;
+  --success-soft:rgba(16,185,129,0.15);--success-text:#6ee7b7;
+  --warning-soft:rgba(245,158,11,0.15);--warning-text:#fcd34d;
+  --danger-soft:rgba(239,68,68,0.15);--danger-text:#fca5a5;
+  --purple-soft:rgba(139,92,246,0.15);
+}
+html,body{transition:background-color var(--transition-slow),color var(--transition-slow)}
+body{
+  font-family:'Plus Jakarta Sans','Inter',-apple-system,sans-serif;
+  background:var(--bg);background-image:radial-gradient(circle at 0% 0%,rgba(200,16,46,0.08) 0%,transparent 40%),radial-gradient(circle at 100% 100%,rgba(99,102,241,0.08) 0%,transparent 40%);
+  background-attachment:fixed;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;
+  -webkit-font-smoothing:antialiased;opacity:0;transition:opacity 320ms ease;-webkit-text-size-adjust:100%;
+}
+body.page-ready{opacity:1}
+body.page-leaving{opacity:0}
+.login-wrap{width:100%;max-width:440px;animation:fadeUp 700ms cubic-bezier(0.16,1,0.3,1)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+.brand{text-align:center;margin-bottom:30px}
+.brand-icon{width:80px;height:80px;background:var(--primary-gradient);border-radius:24px;display:inline-flex;align-items:center;justify-content:center;font-size:36px;font-weight:800;color:white;margin-bottom:18px;box-shadow:0 20px 50px rgba(200,16,46,0.35);animation:brandFloat 4s ease-in-out infinite}
+@keyframes brandFloat{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-6px) rotate(-2deg)}}
+.brand h1{font-size:30px;font-weight:800;color:var(--text);letter-spacing:-0.6px}
+.brand p{font-size:13.5px;color:var(--text-muted);margin-top:6px;font-weight:500}
+.theme-toggle-login{position:fixed;top:20px;right:20px;width:40px;height:40px;border-radius:12px;border:1.5px solid var(--border);background:var(--card);color:var(--text-soft);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:var(--transition);z-index:100}
+.theme-toggle-login:hover{border-color:var(--primary);color:var(--primary);transform:rotate(15deg)}
+.login-card{background:var(--card);border-radius:20px;padding:36px 34px;border:1px solid var(--border);box-shadow:0 24px 70px rgba(15,23,42,0.1);position:relative;overflow:hidden}
+.login-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:var(--primary-gradient)}
+.form-group{margin-bottom:18px;position:relative}
+.form-group label{font-size:11.5px;font-weight:700;color:var(--text-soft);display:block;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px}
+.input-wrap{position:relative;display:flex;align-items:center}
+.input-wrap > i.input-icon{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:14px;pointer-events:none;transition:var(--transition);z-index:1}
+.form-group input{width:100%;padding:14px 46px 14px 44px;border:1.5px solid var(--border);border-radius:12px;font-size:14.5px;background:var(--bg);font-family:inherit;color:var(--text);font-weight:500;transition:var(--transition);outline:none}
+.form-group input:focus{border-color:var(--primary);box-shadow:0 0 0 4px rgba(200,16,46,0.08);background:var(--card)}
+.form-group input:focus ~ i.input-icon,.input-wrap:focus-within > i.input-icon{color:var(--primary)}
+input[type="password"]::-ms-reveal,input[type="password"]::-ms-clear{display:none}
+.toggle-password{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:transparent;border:none;width:38px;height:38px;border-radius:9px;cursor:pointer;color:var(--text-muted);font-size:14px;display:flex;align-items:center;justify-content:center;transition:var(--transition);font-family:inherit;z-index:2}
+.toggle-password:hover{background:var(--primary-soft);color:var(--primary)}
+.toggle-password.visible{color:var(--primary)}
+.password-strength{margin-top:8px;display:none}
+.password-strength.show{display:block}
+.strength-bar-wrap{display:flex;gap:4px;margin-bottom:6px}
+.strength-bar{flex:1;height:4px;background:var(--border);border-radius:2px;transition:var(--transition)}
+.strength-bar.weak{background:var(--danger)}.strength-bar.fair{background:var(--warning)}.strength-bar.good{background:#0ea5e9}.strength-bar.strong{background:var(--success)}
+.strength-text{font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:0.3px}
+.caps-warning{display:none;align-items:center;gap:6px;margin-top:8px;font-size:12px;font-weight:700;color:var(--warning-text);background:var(--warning-soft);padding:8px 12px;border-radius:8px;animation:fadeIn 200ms ease}
+.caps-warning.show{display:flex}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.forgot-row{text-align:right;margin-top:-6px;margin-bottom:20px}
+.forgot-row a{color:var(--text-muted);font-size:12.5px;text-decoration:none;font-weight:600;transition:var(--transition)}
+.forgot-row a:hover{color:var(--primary)}
+.btn-login{width:100%;padding:15px;background:var(--primary-gradient);color:white;border:none;border-radius:12px;font-weight:700;font-size:14.5px;font-family:inherit;cursor:pointer;transition:var(--transition);box-shadow:0 10px 26px rgba(200,16,46,0.3);display:flex;align-items:center;justify-content:center;gap:10px;position:relative;overflow:hidden}
+.btn-login::before{content:'';position:absolute;inset:0;background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,0.28),transparent 70%);transform:translateX(-100%);transition:600ms ease;pointer-events:none}
+.btn-login:hover:not(:disabled)::before{transform:translateX(100%)}
+.btn-login:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 14px 34px rgba(200,16,46,0.42)}
+.btn-login:disabled{opacity:0.65;cursor:not-allowed}
+.ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,0.55);transform:scale(0);animation:rippleExpand 620ms cubic-bezier(0.4,0,0.2,1);pointer-events:none}
+@keyframes rippleExpand{to{transform:scale(3);opacity:0}}
+.error-msg{color:var(--danger-text);font-size:12.5px;padding:11px 15px;background:var(--danger-soft);border-radius:10px;margin-top:14px;font-weight:600;display:none;align-items:center;gap:8px;animation:shake 400ms ease}
+.error-msg.show{display:flex}
+.error-msg i{font-size:13px;flex-shrink:0}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.footer-note{text-align:center;margin-top:24px;font-size:12px;color:var(--text-muted);font-weight:500}
+.footer-note i{color:var(--primary);margin-right:5px}
+.spinner{width:16px;height:16px;border:2.5px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--card);color:var(--text);padding:14px 52px 14px 18px;border-radius:12px;font-weight:600;z-index:9999;transform:translateY(120px) scale(0.95);opacity:0;transition:480ms cubic-bezier(0.34,1.56,0.64,1);border:1px solid var(--border);border-left:4px solid var(--primary);max-width:420px;box-shadow:0 24px 70px rgba(15,23,42,0.15);font-size:13px;display:flex;align-items:center;gap:12px;min-width:280px}
+.toast.show{transform:translateY(0) scale(1);opacity:1}
+.toast-icon{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;background:var(--primary-soft);color:var(--primary)}
+.toast-body{flex:1;min-width:0}
+.toast-title{font-weight:800;font-size:13px;color:var(--text)}
+.toast-message{font-size:12.5px;color:var(--text-soft);margin-top:1px}
+.toast-close{position:absolute;top:10px;right:10px;width:22px;height:22px;border-radius:6px;background:transparent;border:none;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px}
+.toast.success{border-left-color:var(--success)}.toast.success .toast-icon{background:var(--success-soft);color:var(--success)}
+.toast.error{border-left-color:var(--danger)}.toast.error .toast-icon{background:var(--danger-soft);color:var(--danger)}
+.toast.warning{border-left-color:var(--warning)}.toast.warning .toast-icon{background:var(--warning-soft);color:var(--warning)}
+.toast.info{border-left-color:#0ea5e9}.toast.info .toast-icon{background:rgba(14,165,233,0.15);color:#0ea5e9}
+/* AI WIDGET */
+.mcrh-ai-fab{position:fixed;right:20px;bottom:24px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#8b5cf6,#6366f1);color:#fff;border:none;cursor:pointer;z-index:900;font-size:22px;box-shadow:0 8px 24px rgba(99,102,241,.4);display:flex;align-items:center;justify-content:center;transition:transform .2s}
+.mcrh-ai-fab:hover{transform:scale(1.06)}
+.mcrh-ai-fab::after{content:'';position:absolute;top:4px;right:4px;width:10px;height:10px;background:#10b981;border:2px solid #fff;border-radius:50%}
+.mcrh-ai-panel{position:fixed;right:20px;bottom:90px;width:380px;max-width:calc(100vw - 40px);height:540px;max-height:calc(100vh - 140px);background:var(--card);border:1px solid var(--border);border-radius:18px;box-shadow:0 20px 60px rgba(15,23,42,.2);z-index:901;display:none;flex-direction:column;overflow:hidden}
+.mcrh-ai-panel.open{display:flex;animation:mcrhAiIn .28s cubic-bezier(.16,1,.3,1)}
+@keyframes mcrhAiIn{from{opacity:0;transform:translateY(20px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(max-width:640px){.mcrh-ai-panel{right:0;left:0;bottom:0;width:100%;max-width:100%;height:85vh;max-height:85vh;border-radius:20px 20px 0 0}.mcrh-ai-fab{display:none}}
+.mcrh-ai-hdr{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,rgba(139,92,246,.08),rgba(99,102,241,.08))}
+.mcrh-ai-hdr-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#8b5cf6,#6366f1);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.mcrh-ai-hdr-info{flex:1;min-width:0}
+.mcrh-ai-hdr-info .t{font-size:14px;font-weight:800;color:var(--text)}
+.mcrh-ai-hdr-info .s{font-size:11px;color:#10b981;font-weight:600;display:flex;align-items:center;gap:4px;margin-top:1px}
+.mcrh-ai-hdr-info .s::before{content:'';width:6px;height:6px;border-radius:50%;background:#10b981;animation:mcrhPulse 2s ease infinite}
+@keyframes mcrhPulse{0%,100%{opacity:1}50%{opacity:.4}}
+.mcrh-ai-close{width:32px;height:32px;border-radius:8px;background:transparent;border:none;color:var(--text-muted);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
+.mcrh-ai-close:hover{background:var(--border-soft);color:var(--text)}
+.mcrh-ai-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;background:var(--bg)}
+.mcrh-ai-msg{max-width:85%;padding:10px 14px;border-radius:14px;font-size:13.5px;line-height:1.5;word-wrap:break-word;animation:mcrhMsgIn .22s cubic-bezier(.16,1,.3,1)}
+@keyframes mcrhMsgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.mcrh-ai-msg.user{align-self:flex-end;background:linear-gradient(135deg,#C8102E,#e81a3f);color:#fff;border-bottom-right-radius:4px}
+.mcrh-ai-msg.assistant{align-self:flex-start;background:var(--card);color:var(--text);border:1px solid var(--border);border-bottom-left-radius:4px;box-shadow:0 1px 3px rgba(15,23,42,.04)}
+.mcrh-ai-msg.assistant code{background:var(--border-soft);padding:1px 6px;border-radius:4px;font-size:12px;font-family:'Courier New',monospace}
+.mcrh-ai-msg.assistant strong{color:var(--text);font-weight:800}
+.mcrh-ai-msg.assistant ul{padding-left:18px;margin:6px 0}
+.mcrh-ai-msg.assistant li{margin-bottom:3px}
+.mcrh-ai-msg.typing{display:flex;gap:4px;padding:14px}
+.mcrh-ai-msg.typing span{width:7px;height:7px;border-radius:50%;background:var(--text-muted);animation:mcrhTyping 1.4s ease infinite}
+.mcrh-ai-msg.typing span:nth-child(2){animation-delay:.2s}
+.mcrh-ai-msg.typing span:nth-child(3){animation-delay:.4s}
+@keyframes mcrhTyping{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-6px);opacity:1}}
+.mcrh-ai-suggestions{padding:8px 16px 12px;display:flex;flex-wrap:wrap;gap:6px;background:var(--bg);border-top:1px solid var(--border)}
+.mcrh-ai-suggestion{padding:6px 12px;border-radius:20px;background:var(--card);border:1px solid var(--border);font-size:11.5px;font-weight:600;color:var(--text-soft);cursor:pointer;font-family:inherit;transition:all .2s}
+.mcrh-ai-suggestion:hover{border-color:#8b5cf6;color:#8b5cf6;background:var(--purple-soft)}
+.mcrh-ai-inputwrap{padding:12px 16px;background:var(--card);border-top:1px solid var(--border);display:flex;gap:8px}
+.mcrh-ai-input{flex:1;padding:11px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:13.5px;font-family:inherit;background:var(--bg);color:var(--text);outline:none;resize:none;max-height:100px;min-height:44px}
+.mcrh-ai-input:focus{border-color:#8b5cf6;box-shadow:0 0 0 3px rgba(139,92,246,.1);background:var(--card)}
+.mcrh-ai-send{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#8b5cf6,#6366f1);color:#fff;border:none;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mcrh-ai-send:disabled{opacity:.5;cursor:not-allowed}
+@media(max-width:768px){input,select,textarea{font-size:16px !important}}
+@media(max-width:640px){
+  body{padding:16px;align-items:flex-start;padding-top:max(40px,env(safe-area-inset-top))}
+  .login-card{padding:26px 20px;border-radius:16px}
+  .brand-icon{width:68px;height:68px;font-size:28px}
+  .brand h1{font-size:22px}.brand p{font-size:12.5px}
+  .form-group input{padding:14px 44px 14px 42px;font-size:16px}
+  .btn-login{min-height:48px;font-size:14.5px}
+  .theme-toggle-login{top:max(12px,env(safe-area-inset-top));right:12px;min-height:44px;min-width:44px}
+  .toast{left:14px;right:14px;bottom:14px;max-width:none;min-width:0}
+}
+@supports(padding: max(0px)){body{padding-bottom:max(20px,env(safe-area-inset-bottom))}}
+</style>
 </head>
 <body>
 
-<button class="theme-toggle-login" id="themeToggleLogin" title="Toggle theme">
-    <i class="fas fa-moon"></i>
-</button>
+<button class="theme-toggle-login" id="themeToggleLogin" title="Toggle theme"><i class="fas fa-moon"></i></button>
 
 <div class="login-wrap">
-    <div class="brand">
-        <div class="brand-icon">M</div>
-        <h1>MCRH</h1>
-        <p>Equipment Maintenance System</p>
-    </div>
+  <div class="brand">
+    <div class="brand-icon">M</div>
+    <h1>MCRH</h1>
+    <p>Equipment Maintenance System</p>
+  </div>
 
-    <div class="login-card">
-        <form id="loginForm" onsubmit="return false;">
-            <div class="form-group">
-                <label for="email">Email Address</label>
-                <div class="input-wrap">
-                    <i class="fas fa-envelope input-icon"></i>
-                    <input type="email" id="email" placeholder="your@email.com" required autofocus autocomplete="email" />
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <div class="input-wrap">
-                    <i class="fas fa-lock input-icon"></i>
-                    <input type="password" id="password" placeholder="Enter your password" required autocomplete="current-password" />
-                    <button type="button" class="toggle-password" id="togglePassword" title="Show password" aria-label="Toggle password visibility">
-                        <i class="fas fa-eye" id="togglePasswordIcon"></i>
-                    </button>
-                </div>
-                <div class="password-strength" id="passwordStrength">
-                    <div class="strength-bar-wrap">
-                        <div class="strength-bar" id="sb1"></div>
-                        <div class="strength-bar" id="sb2"></div>
-                        <div class="strength-bar" id="sb3"></div>
-                        <div class="strength-bar" id="sb4"></div>
-                    </div>
-                    <div class="strength-text" id="strengthText">Enter a password</div>
-                </div>
-                <div class="caps-warning" id="capsWarning">
-                    <i class="fas fa-exclamation-triangle"></i> Caps Lock is ON
-                </div>
-            </div>
-            <div class="forgot-row">
-                <a href="#" id="forgotPasswordLink">Forgot password?</a>
-            </div>
-            <button type="submit" class="btn-login" id="loginBtn">
-                <i class="fas fa-sign-in-alt"></i> Sign In
-            </button>
-            <div class="error-msg" id="errorMsg"></div>
-        </form>
-    </div>
+  <div class="login-card">
+    <form id="loginForm" onsubmit="return false;">
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <div class="input-wrap">
+          <i class="fas fa-envelope input-icon"></i>
+          <input type="email" id="email" placeholder="your@email.com" required autofocus autocomplete="email" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="input-wrap">
+          <i class="fas fa-lock input-icon"></i>
+          <input type="password" id="password" placeholder="Enter your password" required autocomplete="current-password" />
+          <button type="button" class="toggle-password" id="togglePassword" title="Show password" aria-label="Toggle password visibility">
+            <i class="fas fa-eye" id="togglePasswordIcon"></i>
+          </button>
+        </div>
+        <div class="password-strength" id="passwordStrength">
+          <div class="strength-bar-wrap"><div class="strength-bar" id="sb1"></div><div class="strength-bar" id="sb2"></div><div class="strength-bar" id="sb3"></div><div class="strength-bar" id="sb4"></div></div>
+          <div class="strength-text" id="strengthText">Enter a password</div>
+        </div>
+        <div class="caps-warning" id="capsWarning"><i class="fas fa-exclamation-triangle"></i> Caps Lock is ON</div>
+      </div>
+      <div class="forgot-row"><a href="#" id="forgotPasswordLink">Forgot password?</a></div>
+      <button type="submit" class="btn-login" id="loginBtn"><i class="fas fa-sign-in-alt"></i> Sign In</button>
+      <div class="error-msg" id="errorMsg"></div>
+    </form>
+  </div>
 
-    <div class="footer-note">
-        <i class="fas fa-shield-alt"></i> Secured by Firebase
-    </div>
+  <div class="footer-note"><i class="fas fa-shield-alt"></i> Secured by Firebase</div>
+</div>
+
+<button class="mcrh-ai-fab" onclick="mcrhAiToggle()" title="Need help logging in?"><i class="fas fa-robot"></i></button>
+<div class="mcrh-ai-panel" id="mcrhAiPanel">
+  <div class="mcrh-ai-hdr">
+    <div class="mcrh-ai-hdr-icon"><i class="fas fa-robot"></i></div>
+    <div class="mcrh-ai-hdr-info"><div class="t">MCRH Assistant</div><div class="s">Online</div></div>
+    <button class="mcrh-ai-close" onclick="mcrhAiToggle()"><i class="fas fa-times"></i></button>
+  </div>
+  <div class="mcrh-ai-msgs" id="mcrhAiMessages"></div>
+  <div class="mcrh-ai-suggestions" id="mcrhAiSuggestions"></div>
+  <div class="mcrh-ai-inputwrap">
+    <textarea class="mcrh-ai-input" id="mcrhAiInput" placeholder="Ask me how to log in…" rows="1"></textarea>
+    <button class="mcrh-ai-send" id="mcrhAiSend" onclick="mcrhAiSend()"><i class="fas fa-paper-plane"></i></button>
+  </div>
 </div>
 
 <div id="toast" class="toast">
-    <div class="toast-icon" id="toastIcon"><i class="fas fa-info"></i></div>
-    <div class="toast-body">
-        <div class="toast-title" id="toastTitle">Message</div>
-        <div class="toast-message" id="toastMessage"></div>
-    </div>
-    <button class="toast-close" onclick="hideToast()"><i class="fas fa-times"></i></button>
+  <div class="toast-icon" id="toastIcon"><i class="fas fa-info"></i></div>
+  <div class="toast-body"><div class="toast-title" id="toastTitle">Message</div><div class="toast-message" id="toastMessage"></div></div>
+  <button class="toast-close" onclick="hideToast()"><i class="fas fa-times"></i></button>
 </div>
 
 <script type="module">
-    window.addEventListener('DOMContentLoaded', () => {
-        requestAnimationFrame(() => document.body.classList.add('page-ready'));
-    });
-    function navigateTo(url) {
-        document.body.classList.remove('page-ready');
-        document.body.classList.add('page-leaving');
-        setTimeout(() => window.location.href = url, 220);
-    }
-    const firebaseConfig = {
-        apiKey: "AIzaSyDnsz1s-VnewbUszXNJptcdMZ_h0QsNHYQ",
-        authDomain: "moivoibiomed.firebaseapp.com",
-        databaseURL: "https://moivoibiomed-default-rtdb.firebaseio.com",
-        projectId: "moivoibiomed",
-        storageBucket: "moivoibiomed.firebasestorage.app",
-        messagingSenderId: "996551978571",
-        appId: "1:996551978571:web:f44941649a58e020f5e7ce"
+  function getAIBackend() {
+    let url = localStorage.getItem('mcrh-ai-backend-url');
+    if (!url) { url = prompt('Enter your MCRH AI backend URL\n(e.g. https://mcrh-ai-backend.onrender.com):'); if (url) localStorage.setItem('mcrh-ai-backend-url', url.trim().replace(/\/$/,'')); }
+    return url;
+  }
+
+  window.addEventListener('DOMContentLoaded', () => { requestAnimationFrame(() => document.body.classList.add('page-ready')); });
+  function navigateTo(url) { document.body.classList.remove('page-ready'); document.body.classList.add('page-leaving'); setTimeout(() => window.location.href = url, 220); }
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDnsz1s-VnewbUszXNJptcdMZ_h0QsNHYQ",
+    authDomain: "moivoibiomed.firebaseapp.com",
+    databaseURL: "https://moivoibiomed-default-rtdb.firebaseio.com",
+    projectId: "moivoibiomed",
+    storageBucket: "moivoibiomed.firebasestorage.app",
+    messagingSenderId: "996551978571",
+    appId: "1:996551978571:web:f44941649a58e020f5e7ce"
+  };
+  import { initializeApp } from 'firebase/app';
+  import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut } from 'firebase/auth';
+  import { getFirestore, doc, getDoc } from 'firebase/firestore';
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  const emailInput = document.getElementById('email');
+  const passwordInput = document.getElementById('password');
+  const loginBtn = document.getElementById('loginBtn');
+  const errorDiv = document.getElementById('errorMsg');
+  const forgotLink = document.getElementById('forgotPasswordLink');
+  const toast = document.getElementById('toast');
+  const togglePassword = document.getElementById('togglePassword');
+  const togglePasswordIcon = document.getElementById('togglePasswordIcon');
+  const capsWarning = document.getElementById('capsWarning');
+  const passwordStrength = document.getElementById('passwordStrength');
+  const strengthText = document.getElementById('strengthText');
+
+  const themeToggleLogin = document.getElementById('themeToggleLogin');
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    const icon = themeToggleLogin.querySelector('i');
+    icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+    localStorage.setItem('mcrh-theme', theme);
+  }
+  themeToggleLogin.addEventListener('click', () => {
+    const current = document.documentElement.getAttribute('data-theme') || 'light';
+    applyTheme(current === 'dark' ? 'light' : 'dark');
+  });
+  (function initTheme() { applyTheme(localStorage.getItem('mcrh-theme') || 'light'); })();
+
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.btn-login');
+    if (!btn || btn.disabled) return;
+    const rect = btn.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height);
+    const rp = document.createElement('span');
+    rp.className = 'ripple';
+    rp.style.width = rp.style.height = size + 'px';
+    rp.style.left = (e.clientX - rect.left - size/2) + 'px';
+    rp.style.top = (e.clientY - rect.top - size/2) + 'px';
+    btn.appendChild(rp);
+    setTimeout(() => rp.remove(), 650);
+  });
+
+  togglePassword.addEventListener('click', function() {
+    const isP = passwordInput.type === 'password';
+    passwordInput.type = isP ? 'text' : 'password';
+    togglePasswordIcon.classList.toggle('fa-eye', !isP);
+    togglePasswordIcon.classList.toggle('fa-eye-slash', isP);
+    togglePassword.classList.toggle('visible', isP);
+    togglePassword.title = isP ? 'Hide password' : 'Show password';
+    passwordInput.focus();
+  });
+
+  passwordInput.addEventListener('keydown', (e) => {
+    if (e.getModifierState) { const isOn = e.getModifierState('CapsLock'); capsWarning.classList.toggle('show', isOn); }
+  });
+  passwordInput.addEventListener('keyup', (e) => {
+    if (e.getModifierState) { const isOn = e.getModifierState('CapsLock'); capsWarning.classList.toggle('show', isOn); }
+  });
+  passwordInput.addEventListener('blur', () => capsWarning.classList.remove('show'));
+
+  passwordInput.addEventListener('input', function() {
+    const val = this.value;
+    if (!val) { passwordStrength.classList.remove('show'); return; }
+    passwordStrength.classList.add('show');
+    let score = 0;
+    if (val.length >= 8) score++;
+    if (/[A-Z]/.test(val)) score++;
+    if (/[0-9]/.test(val)) score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+    const bars = [document.getElementById('sb1'), document.getElementById('sb2'), document.getElementById('sb3'), document.getElementById('sb4')];
+    bars.forEach(b => { b.className = 'strength-bar'; });
+    let label = '', cls = '';
+    if (score <= 1) { label = 'Weak'; cls = 'weak'; }
+    else if (score === 2) { label = 'Fair'; cls = 'fair'; }
+    else if (score === 3) { label = 'Good'; cls = 'good'; }
+    else { label = 'Strong'; cls = 'strong'; }
+    for (let i = 0; i < score; i++) bars[i].classList.add(cls);
+    strengthText.textContent = label + ' password';
+  });
+
+  let toastTimer = null;
+  window.showToast = function(message, type = 'success', title = null) {
+    const icon = document.getElementById('toastIcon');
+    const types = {
+      success: { icon:'fa-check-circle', title: title || 'Success' },
+      error: { icon:'fa-times-circle', title: title || 'Error' },
+      warning: { icon:'fa-exclamation-triangle', title: title || 'Warning' },
+      info: { icon:'fa-info-circle', title: title || 'Info' }
     };
-    import { initializeApp } from 'firebase/app';
-    import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut } from 'firebase/auth';
-    import { getFirestore, doc, getDoc } from 'firebase/firestore';
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    const emailInput = document.getElementById('email');
-    const passwordInput = document.getElementById('password');
-    const loginBtn = document.getElementById('loginBtn');
-    const errorDiv = document.getElementById('errorMsg');
-    const forgotLink = document.getElementById('forgotPasswordLink');
-    const toast = document.getElementById('toast');
-    const togglePassword = document.getElementById('togglePassword');
-    const togglePasswordIcon = document.getElementById('togglePasswordIcon');
-    const capsWarning = document.getElementById('capsWarning');
-    const passwordStrength = document.getElementById('passwordStrength');
-    const strengthText = document.getElementById('strengthText');
-    const themeToggleLogin = document.getElementById('themeToggleLogin');
-    function applyTheme(theme) {
-        document.documentElement.setAttribute('data-theme', theme);
-        const icon = themeToggleLogin.querySelector('i');
-        icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
-        localStorage.setItem('mcrh-theme', theme);
+    const t = types[type] || types.info;
+    toast.className = 'toast ' + type;
+    icon.innerHTML = `<i class="fas ${t.icon}"></i>`;
+    document.getElementById('toastTitle').textContent = t.title;
+    document.getElementById('toastMessage').textContent = message;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 4000);
+  };
+  window.hideToast = function() { toast.classList.remove('show'); };
+
+  function setError(msg) {
+    errorDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${msg}`;
+    errorDiv.classList.add('show');
+    errorDiv.style.animation = 'none';
+    setTimeout(() => { errorDiv.style.animation = ''; }, 10);
+  }
+  function clearError() { errorDiv.textContent = ''; errorDiv.classList.remove('show'); }
+  function setLoading(isLoading) {
+    loginBtn.disabled = isLoading;
+    loginBtn.innerHTML = isLoading ? '<span class="spinner"></span> Signing in…' : '<i class="fas fa-sign-in-alt"></i> Sign In';
+  }
+
+  async function handleLogin() {
+    const email = emailInput.value.trim();
+    const password = passwordInput.value.trim();
+    clearError();
+    if (!email || !password) { setError('Please enter both email and password.'); return; }
+    setLoading(true);
+    try {
+      const cred = await signInWithEmailAndPassword(auth, email, password);
+      const userDoc = await getDoc(doc(db, 'users', cred.user.uid));
+      if (!userDoc.exists()) {
+        showToast('User profile not found. Please contact admin.', 'error');
+        await signOut(auth); setLoading(false); return;
+      }
+      const userData = userDoc.data();
+      if (!userData.approved) { showToast('Your account is pending approval.', 'warning'); await signOut(auth); setLoading(false); return; }
+      const role = userData.role || 'requester';
+      sessionStorage.setItem('userRole', role);
+      sessionStorage.setItem('userName', userData.name || '');
+      showToast('Welcome back, ' + (userData.name || 'User'), 'success', 'Signing in');
+      setTimeout(() => navigateTo('dashboard.html'), 400);
+    } catch (err) {
+      let msg = 'Login failed. Please try again.';
+      if (err.code === 'auth/user-not-found') msg = 'No account found with this email.';
+      else if (err.code === 'auth/wrong-password') msg = 'Incorrect password.';
+      else if (err.code === 'auth/invalid-credential') msg = 'Incorrect email or password.';
+      else if (err.code === 'auth/too-many-requests') msg = 'Too many attempts. Try again later.';
+      else if (err.code === 'auth/network-request-failed') msg = 'Network error. Check your connection.';
+      setError(msg); showToast(msg, 'error');
+    } finally { setLoading(false); }
+  }
+
+  async function handleForgotPassword() {
+    const email = emailInput.value.trim();
+    if (!email) { setError('Please enter your email address first.'); return; }
+    try {
+      await sendPasswordResetEmail(auth, email);
+      showToast('Password reset email sent. Check your inbox.', 'success');
+      clearError();
+    } catch (err) {
+      let msg = 'Could not send reset email.';
+      if (err.code === 'auth/user-not-found') msg = 'No account found with this email.';
+      setError(msg); showToast(msg, 'error');
     }
-    themeToggleLogin.addEventListener('click', () => {
-        const current = document.documentElement.getAttribute('data-theme') || 'light';
-        applyTheme(current === 'dark' ? 'light' : 'dark');
-    });
-    (function initTheme() { applyTheme(localStorage.getItem('mcrh-theme') || 'light'); })();
-    document.addEventListener('click', (e) => {
-        const btn = e.target.closest('.btn-login');
-        if (!btn || btn.disabled) return;
-        const rect = btn.getBoundingClientRect();
-        const size = Math.max(rect.width, rect.height);
-        const x = e.clientX - rect.left - size / 2;
-        const y = e.clientY - rect.top - size / 2;
-        const ripple = document.createElement('span');
-        ripple.className = 'ripple';
-        ripple.style.width = ripple.style.height = size + 'px';
-        ripple.style.left = x + 'px';
-        ripple.style.top = y + 'px';
-        btn.appendChild(ripple);
-        setTimeout(() => ripple.remove(), 650);
-    });
-    togglePassword.addEventListener('click', function() {
-        const isPassword = passwordInput.type === 'password';
-        passwordInput.type = isPassword ? 'text' : 'password';
-        togglePasswordIcon.classList.toggle('fa-eye', !isPassword);
-        togglePasswordIcon.classList.toggle('fa-eye-slash', isPassword);
-        togglePassword.classList.toggle('visible', isPassword);
-        togglePassword.title = isPassword ? 'Hide password' : 'Show password';
-        passwordInput.focus();
-    });
-    passwordInput.addEventListener('keydown', (e) => {
-        if (e.getModifierState) { const isOn = e.getModifierState('CapsLock'); capsWarning.classList.toggle('show', isOn); }
-    });
-    passwordInput.addEventListener('keyup', (e) => {
-        if (e.getModifierState) { const isOn = e.getModifierState('CapsLock'); capsWarning.classList.toggle('show', isOn); }
-    });
-    passwordInput.addEventListener('blur', () => capsWarning.classList.remove('show'));
-    passwordInput.addEventListener('input', function() {
-        const val = this.value;
-        if (!val) { passwordStrength.classList.remove('show'); return; }
-        passwordStrength.classList.add('show');
-        let score = 0;
-        if (val.length >= 8) score++;
-        if (/[A-Z]/.test(val)) score++;
-        if (/[0-9]/.test(val)) score++;
-        if (/[^A-Za-z0-9]/.test(val)) score++;
-        const bars = [document.getElementById('sb1'), document.getElementById('sb2'), document.getElementById('sb3'), document.getElementById('sb4')];
-        bars.forEach(b => { b.className = 'strength-bar'; });
-        let label = '', cls = '';
-        if (score <= 1) { label = 'Weak'; cls = 'weak'; }
-        else if (score === 2) { label = 'Fair'; cls = 'fair'; }
-        else if (score === 3) { label = 'Good'; cls = 'good'; }
-        else { label = 'Strong'; cls = 'strong'; }
-        for (let i = 0; i < score; i++) bars[i].classList.add(cls);
-        strengthText.textContent = label + ' password';
-    });
-    let toastTimer = null;
-    window.showToast = function(message, type = 'success', title = null) {
-        const icon = document.getElementById('toastIcon');
-        const types = {
-            success: { icon:'fa-check-circle', title: title || 'Success' },
-            error: { icon:'fa-times-circle', title: title || 'Error' },
-            warning: { icon:'fa-exclamation-triangle', title: title || 'Warning' },
-            info: { icon:'fa-info-circle', title: title || 'Info' }
-        };
-        const t = types[type] || types.info;
-        toast.className = 'toast ' + type;
-        icon.innerHTML = `<i class="fas ${t.icon}"></i>`;
-        document.getElementById('toastTitle').textContent = t.title;
-        document.getElementById('toastMessage').textContent = message;
-        toast.classList.add('show');
-        clearTimeout(toastTimer);
-        toastTimer = setTimeout(() => toast.classList.remove('show'), 4000);
+  }
+
+  loginBtn.addEventListener('click', handleLogin);
+  emailInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); if (emailInput.value) passwordInput.focus(); } });
+  passwordInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); handleLogin(); } });
+  forgotLink.addEventListener('click', (e) => { e.preventDefault(); handleForgotPassword(); });
+
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      try {
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (!userDoc.exists()) { await signOut(auth); return; }
+        const userData = userDoc.data();
+        if (!userData.approved) { await signOut(auth); return; }
+        navigateTo('dashboard.html');
+      } catch (err) { console.error(err); }
+    }
+  });
+
+  // AI WIDGET
+  (function(){
+    let conversation = [];
+    let sending = false;
+    const SUGGESTIONS = ['I forgot my password', 'My account is pending approval', 'What is this system?', 'I get an error when logging in'];
+    window.mcrhAiToggle = function() {
+      const p = document.getElementById('mcrhAiPanel');
+      p.classList.toggle('open');
+      if (p.classList.contains('open')) { if (!conversation.length) initChat(); renderSuggestions(); setTimeout(() => document.getElementById('mcrhAiInput').focus(), 200); }
     };
-    window.hideToast = function() { toast.classList.remove('show'); };
-    function setError(msg) {
-        errorDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${msg}`;
-        errorDiv.classList.add('show');
-        errorDiv.style.animation = 'none';
-        setTimeout(() => { errorDiv.style.animation = ''; }, 10);
+    function initChat() {
+      conversation = [];
+      document.getElementById('mcrhAiMessages').innerHTML = '';
+      addMsg('assistant', "Hi! I'm the MCRH assistant. I can help you log in, reset your password, or explain what this system does. Ask me anything.");
     }
-    function clearError() {
-        errorDiv.textContent = '';
-        errorDiv.classList.remove('show');
+    function renderSuggestions() {
+      document.getElementById('mcrhAiSuggestions').innerHTML = SUGGESTIONS.map(s => `<button class="mcrh-ai-suggestion" onclick="mcrhAiQuickAsk('${s.replace(/'/g,"\\'")}')">${s}</button>`).join('');
     }
-    function setLoading(isLoading) {
-        loginBtn.disabled = isLoading;
-        loginBtn.innerHTML = isLoading
-            ? '<span class="spinner"></span> Signing in…'
-            : '<i class="fas fa-sign-in-alt"></i> Sign In';
-    }
-    async function handleLogin() {
-        const email = emailInput.value.trim();
-        const password = passwordInput.value.trim();
-        clearError();
-        if (!email || !password) { setError('Please enter both email and password.'); return; }
-        setLoading(true);
-        try {
-            const cred = await signInWithEmailAndPassword(auth, email, password);
-            const userDoc = await getDoc(doc(db, 'users', cred.user.uid));
-            if (!userDoc.exists()) {
-                showToast('User profile not found. Please contact admin.', 'error');
-                await signOut(auth);
-                setLoading(false);
-                return;
-            }
-            const userData = userDoc.data();
-            if (!userData.approved) {
-                showToast('Your account is pending approval.', 'warning');
-                await signOut(auth);
-                setLoading(false);
-                return;
-            }
-            const role = userData.role || 'requester';
-            sessionStorage.setItem('userRole', role);
-            sessionStorage.setItem('userName', userData.name || '');
-            showToast('Welcome back, ' + (userData.name || 'User'), 'success', 'Signing in');
-            setTimeout(() => navigateTo('dashboard.html'), 400);
-        } catch (err) {
-            let msg = 'Login failed. Please try again.';
-            if (err.code === 'auth/user-not-found') msg = 'No account found with this email.';
-            else if (err.code === 'auth/wrong-password') msg = 'Incorrect password.';
-            else if (err.code === 'auth/invalid-credential') msg = 'Incorrect email or password.';
-            else if (err.code === 'auth/too-many-requests') msg = 'Too many attempts. Try again later.';
-            else if (err.code === 'auth/network-request-failed') msg = 'Network error. Check your connection.';
-            setError(msg);
-            showToast(msg, 'error');
-        } finally { setLoading(false); }
-    }
-    async function handleForgotPassword() {
-        const email = emailInput.value.trim();
-        if (!email) { setError('Please enter your email address first.'); return; }
-        try {
-            await sendPasswordResetEmail(auth, email);
-            showToast('Password reset email sent. Check your inbox.', 'success');
-            clearError();
-        } catch (err) {
-            let msg = 'Could not send reset email.';
-            if (err.code === 'auth/user-not-found') msg = 'No account found with this email.';
-            setError(msg);
-            showToast(msg, 'error');
-        }
-    }
-    loginBtn.addEventListener('click', handleLogin);
-    emailInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); if (emailInput.value) passwordInput.focus(); } });
-    passwordInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); handleLogin(); } });
-    forgotLink.addEventListener('click', (e) => { e.preventDefault(); handleForgotPassword(); });
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            try {
-                const userDoc = await getDoc(doc(db, 'users', user.uid));
-                if (!userDoc.exists()) { await signOut(auth); return; }
-                const userData = userDoc.data();
-                if (!userData.approved) { await signOut(auth); return; }
-                navigateTo('dashboard.html');
-            } catch (err) { console.error(err); }
-        }
-    });
+    window.mcrhAiQuickAsk = function(t) { document.getElementById('mcrhAiInput').value = t; mcrhAiSend(); };
+    function addMsg(role, text, isHtml) { const c = document.getElementById('mcrhAiMessages'); const d = document.createElement('div'); d.className = 'mcrh-ai-msg ' + role; if (isHtml) d.innerHTML = text; else d.textContent = text; c.appendChild(d); c.scrollTop = c.scrollHeight; }
+    function addTyping() { const c = document.getElementById('mcrhAiMessages'); const d = document.createElement('div'); d.className = 'mcrh-ai-msg assistant typing'; d.id = 'mcrhAiTyping'; d.innerHTML = '<span></span><span></span><span></span>'; c.appendChild(d); c.scrollTop = c.scrollHeight; }
+    function removeTyping() { document.getElementById('mcrhAiTyping')?.remove(); }
+    function renderMd(t) { if (!t) return ''; let h = t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); h = h.replace(/^### (.+)$/gm,'<strong>$1</strong>'); h = h.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>'); h = h.replace(/\*(.+?)\*/g,'<em>$1</em>'); h = h.replace(/`(.+?)`/g,'<code>$1</code>'); h = h.replace(/^[-*] (.+)$/gm,'<li>$1</li>'); h = h.replace(/(<li>.*<\/li>\n?)+/g,'<ul>$&</ul>'); h = h.replace(/\n\n+/g,'<br><br>').replace(/\n/g,'<br>'); return h; }
+    window.mcrhAiSend = async function() {
+      if (sending) return;
+      const input = document.getElementById('mcrhAiInput');
+      const text = input.value.trim(); if (!text) return;
+      const backend = getAIBackend(); if (!backend) { addMsg('assistant', 'Backend not configured.'); return; }
+      input.value = ''; input.style.height = 'auto';
+      addMsg('user', text); conversation.push({ role: 'user', content: text });
+      sending = true; document.getElementById('mcrhAiSend').disabled = true;
+      addTyping();
+      try {
+        const res = await fetch(backend + '/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: conversation, context: { currentPage: 'Login Screen', userRole: 'anonymous' } }) });
+        if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e.error || 'Backend ' + res.status); }
+        const data = await res.json();
+        removeTyping(); addMsg('assistant', renderMd(data.reply || ''), true);
+        conversation.push({ role: 'assistant', content: data.reply || '' });
+        if (conversation.length > 20) conversation = conversation.slice(-20);
+      } catch (err) { removeTyping(); addMsg('assistant', '⚠️ ' + (err.message || 'AI error')); }
+      finally { sending = false; document.getElementById('mcrhAiSend').disabled = false; document.getElementById('mcrhAiInput').focus(); }
+    };
+    document.getElementById('mcrhAiInput')?.addEventListener('input', function() { this.style.height = 'auto'; this.style.height = Math.min(this.scrollHeight, 100) + 'px'; });
+    document.getElementById('mcrhAiInput')?.addEventListener('keydown', function(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); mcrhAiSend(); } });
+  })();
 </script>
 </body>
 </html>
