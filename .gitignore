@@ -70,3 +70,6 @@ node_modules/
 
 serviceAccountKey.jsonserviceAccountKey.json 
 serviceAccountKey.json 
+
+mcrh-llm-backend/
+.vscode/

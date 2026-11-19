@@ -313,7 +313,7 @@
                 <div class="stats-row" id="summaryStats"></div>
                 <div class="job-card-list" id="jobCardsList"><div class="empty"><i class="fas fa-chart-line"></i>Select a month and click Generate.</div></div>
                 <div id="aiReportContainer" class="ai-report hidden">
-                    <h3><i class="fas fa-robot"></i> AI Deep Analysis <span class="model-badge" id="aiModelBadge">Groq · Llama 3.3 70B</span></h3>
+                    <h3><i class="fas fa-robot"></i> AI Deep Analysis <span class="model-badge" id="aiModelBadge">MCRH AI</span></h3>
                     <div id="aiText">Loading…</div>
                 </div>
             </div>
@@ -340,18 +340,14 @@
 
 <script type="module">
     // ============================================================
-    // 🔑 GROQ API KEY — PASTE YOUR KEY BELOW
+    // AI backend. The Groq key lives on the backend server, never in this page.
+    // Override for one browser with: localStorage.setItem('mcrh-ai-backend-url', 'https://...')
     // ============================================================
-    // Replace the placeholder string with your actual Groq key
-    // Get one free at: https://console.groq.com/keys
-    // ⚠️ WARNING: Anyone who opens this page can see this key.
-    //    Set a spending limit at https://console.groq.com/settings/limits
-    //    Add report.html to .gitignore before pushing to GitHub.
-    const GROQ_API_KEY = 'https://mcrh-ai-backend.onrender.com';
-    // ============================================================
-
-    const GROQ_MODEL = 'openai/gpt-oss-120b';
-    const GROQ_ENDPOINT = 'https://api.groq.com/openai/v1/chat/completions';
+    function getAIBackend() {
+        let url = '';
+        try { url = localStorage.getItem('mcrh-ai-backend-url') || ''; } catch (e) {}
+        return (url || 'https://mcrh-ai-backend.onrender.com').trim().replace(/\/$/, '');
+    }
 
     // ============================================================
     // HELPERS: Firestore-safe date handling
@@ -447,13 +443,30 @@
     };
     import { initializeApp } from 'firebase/app';
     import { getAuth, signOut, onAuthStateChanged } from 'firebase/auth';
-    import { getFirestore, collection, getDocs, doc, getDoc } from 'firebase/firestore';
+    import { getFirestore, collection, getDocs, doc, getDoc, query, where } from 'firebase/firestore';
 
     const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
+    const auth = getAuth(app); window.__mcrhAuth = auth;
     const db = getFirestore(app);
 
     let currentJobCards = [];
+    let currentProfile = null;
+
+    async function fetchJobCardsForRole(profile) {
+        const col = collection(db, 'jobcards');
+        const byId = new Map();
+        const add = (snap) => snap.forEach(d => byId.set(d.id, { id: d.id, ...d.data() }));
+        if (profile.role === 'admin') {
+            add(await getDocs(col));
+        } else {
+            const depts = Array.isArray(profile.departments) ? profile.departments.filter(Boolean) : [];
+            const jobs = [getDocs(query(col, where('techId', '==', profile.id)))];
+            depts.forEach(d => jobs.push(getDocs(query(col, where('unit', '==', d)))));
+            (await Promise.all(jobs)).forEach(add);
+        }
+        const ms = (j) => { const d = toDate(j.updatedAt) || toDate(j.createdAt); return d ? d.getTime() : 0; };
+        return [...byId.values()].sort((a, b) => ms(b) - ms(a));
+    }
     let toastTimer = null;
 
     window.showToast = function(message, type = 'success', title = null) {
@@ -492,9 +505,7 @@
         const end = new Date(year, mon, 0, 23, 59, 59, 999);
 
         try {
-            const snap = await getDocs(collection(db, 'jobcards'));
-            const all = [];
-            snap.forEach(doc => { all.push({ id: doc.id, ...doc.data() }); });
+            const all = await fetchJobCardsForRole(currentProfile);
             const filtered = all.filter(j => {
                 const d = toDate(j.updatedAt) || toDate(j.createdAt);
                 if (!d) return false;
@@ -550,7 +561,7 @@
     }
 
     // ============================================================
-    // AI DEEP ANALYSIS VIA GROQ DIRECT
+    // AI DEEP ANALYSIS VIA MCRH BACKEND
     // ============================================================
     window.generateAIReport = async function() {
         const container = document.getElementById('aiReportContainer');
@@ -558,11 +569,6 @@
         const aiText = document.getElementById('aiText');
         const btn = document.getElementById('aiBtn');
 
-        // Sanity check: has the user pasted their key?
-        if (!GROQ_API_KEY || GROQ_API_KEY === 'PASTE_YOUR_GROQ_KEY_HERE' || GROQ_API_KEY.length < 20) {
-            aiText.innerHTML = '<div style="color:#b91c1c;padding:14px;background:#fee2e2;border-radius:10px;font-weight:600;"><strong>⚠️ Groq API key not configured</strong><br><br>Open <code>report.html</code> in a text editor and find the line:<br><br><code style="background:#fecaca;padding:2px 6px;border-radius:4px;">const GROQ_API_KEY = \'PASTE_YOUR_GROQ_KEY_HERE\';</code><br><br>Replace the placeholder with your actual Groq key from <a href="https://console.groq.com/keys" target="_blank" style="color:#b91c1c;text-decoration:underline;">console.groq.com/keys</a>.</div>';
-            return;
-        }
 
         const data = currentJobCards;
         if (!data || data.length === 0) {
@@ -639,49 +645,46 @@ Pending: ${analysisData.filter(j => j.status === 'Pending' || j.status === 'Post
 Written Off: ${analysisData.filter(j => j.status === 'Written Off').length}
 
 Full data (JSON):
-${JSON.stringify(analysisData, null, 2)}`;
+${JSON.stringify(analysisData, (k, v) => typeof v === 'string' && v.length > 300 ? v.slice(0, 300) + '…' : v)}`;
 
         try {
-            const response = await fetch(GROQ_ENDPOINT, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${GROQ_API_KEY}`
-                },
-                body: JSON.stringify({
-                    model: GROQ_MODEL,
-                    messages: [
-                        { role: 'system', content: systemPrompt },
-                        { role: 'user', content: userMessage }
-                    ],
-                    temperature: 0.4,
-                    max_tokens: 1800
-                })
-            });
+            const ctrl = new AbortController();
+            const timer = setTimeout(() => ctrl.abort(), 90000);   // free hosting can take ~60s to wake up
+            let response;
+            try {
+                response = await fetch(getAIBackend() + '/api/analyze', {
+                    method: 'POST',
+                    headers: await window.mcrhAiHeaders(),
+                    body: JSON.stringify({
+                        systemPrompt,
+                        messages: [{ role: 'user', content: userMessage }],
+                        temperature: 0.4,
+                        maxTokens: 3000
+                    }),
+                    signal: ctrl.signal
+                });
+            } finally { clearTimeout(timer); }
 
             if (!response.ok) {
-                const errText = await response.text();
-                if (response.status === 401) {
-                    throw new Error('Invalid API key. Check that your Groq key is correct and active.');
-                }
-                if (response.status === 429) {
-                    throw new Error('Rate limit reached. Wait a minute and try again.');
-                }
-                throw new Error(`Groq API error ${response.status}: ${errText.slice(0, 150)}`);
+                const errBody = await response.json().catch(() => ({}));
+                if (response.status === 429) throw new Error('Rate limit reached. Wait a minute and try again.');
+                throw new Error(errBody.error || `AI service error ${response.status}`);
             }
 
             const result = await response.json();
-            const reply = result.choices?.[0]?.message?.content || '';
+            const reply = result.reply || '';
+            if (!reply) throw new Error('The AI returned an empty response. Please try again.');
             if (result.model) {
                 const badge = document.getElementById('aiModelBadge');
-                if (badge) badge.textContent = `Groq · ${result.model.split('-').slice(0, 3).join(' ')}`;
+                if (badge) badge.textContent = result.model.split('/').pop();
             }
             aiText.innerHTML = renderMarkdown(reply);
             showToast('AI analysis generated', 'success', 'Done');
         } catch (err) {
             console.error('AI error:', err);
-            aiText.innerHTML = `<div style="color:#b91c1c;padding:14px;background:#fee2e2;border-radius:10px;font-weight:600;">⚠️ AI analysis failed: ${err.message || 'Unknown error'}</div>`;
-            showToast('AI error: ' + (err.message || 'Unknown'), 'error');
+            const msg = err.name === 'AbortError' ? 'The AI service took too long to respond. Try again in a minute.' : (err.message || 'Unknown error');
+            aiText.innerHTML = `<div style="color:#b91c1c;padding:14px;background:#fee2e2;border-radius:10px;font-weight:600;">⚠️ AI analysis failed: ${msg}</div>`;
+            showToast('AI error: ' + msg, 'error');
         } finally {
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-robot"></i> AI Deep Analysis';
@@ -740,6 +743,7 @@ ${JSON.stringify(analysisData, null, 2)}`;
             const userData = userDoc.data();
             if (!userData.approved) { await signOut(auth); window.location.href = 'login.html'; return; }
             const role = userData.role || 'requester';
+            currentProfile = { id: user.uid, ...userData, role };
             if (role !== 'maintenance' && role !== 'admin') {
                 alert('Access denied.');
                 window.location.href = 'dashboard.html';
@@ -754,6 +758,17 @@ ${JSON.stringify(analysisData, null, 2)}`;
             setTimeout(generateReport, 400);
         } catch (err) { console.error(err); }
     });
+</script>
+<script>
+/* AI calls carry the signed-in user's Firebase ID token so the backend can refuse anonymous use. */
+window.mcrhAiHeaders = async function () {
+  var h = { 'Content-Type': 'application/json' };
+  try {
+    var a = window.__mcrhAuth;
+    if (a && a.currentUser) h['Authorization'] = 'Bearer ' + await a.currentUser.getIdToken();
+  } catch (e) { /* no token: the backend will say if one is required */ }
+  return h;
+};
 </script>
 </body>
 </html>
